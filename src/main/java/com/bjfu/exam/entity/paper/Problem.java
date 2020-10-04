@@ -1,10 +1,13 @@
 package com.bjfu.exam.entity.paper;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 
-@Data
+@Getter
+@Setter
 @Entity(name = "exam_problem")
 public class Problem {
     @Id

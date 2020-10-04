@@ -1,12 +1,15 @@
 package com.bjfu.exam.entity.paper;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Entity(name = "exam_polymerization_problem")
 public class PolymerizationProblem {
     @Id
