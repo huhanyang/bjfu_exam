@@ -7,14 +7,12 @@ import com.bjfu.exam.request.UserRegisterRequest;
 import com.bjfu.exam.service.UserService;
 import com.bjfu.exam.vo.ResponseBody;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 
-@RestController("/user")
+@RestController
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired
@@ -62,7 +60,7 @@ public class UserController {
         return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
     }
 
-    @DeleteMapping("/logout")
+    @GetMapping("/logout")
     public ResponseBody<Void> logout(HttpSession session) {
         session.removeAttribute("account");
         session.removeAttribute("type");
