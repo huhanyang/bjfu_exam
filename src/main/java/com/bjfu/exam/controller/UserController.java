@@ -23,6 +23,7 @@ public class UserController {
         if(account != null && password != null) {
             UserDTO userDTO = userService.loginCheck(account, password);
             if(userDTO != null) {
+                session.setAttribute("userId", userDTO.getId());
                 session.setAttribute("account", userDTO.getAccount());
                 session.setAttribute("type", userDTO.getType());
                 return new ResponseBody<>(ResponseBodyEnum.SUCCESS);
@@ -37,6 +38,7 @@ public class UserController {
         if(userRegisterRequest.isComplete()) {
             UserDTO userDTO = userService.register(userRegisterRequest);
             if(userDTO != null) {
+                session.setAttribute("userId", userDTO.getId());
                 session.setAttribute("account", userDTO.getAccount());
                 session.setAttribute("type", userDTO.getType());
                 return new ResponseBody<>(ResponseBodyEnum.SUCCESS);
@@ -51,8 +53,7 @@ public class UserController {
         if(userChangePasswordRequest.isComplete()) {
             UserDTO userDTO = userService.changePassword(userChangePasswordRequest);
             if(userDTO != null) {
-                session.removeAttribute("account");
-                session.removeAttribute("type");
+                session.invalidate();
                 return new ResponseBody<>(ResponseBodyEnum.SUCCESS);
             }
             return new ResponseBody<>(ResponseBodyEnum.CHANGE_PASSWORD_FAILED);
@@ -62,8 +63,7 @@ public class UserController {
 
     @GetMapping("/logout")
     public ResponseBody<Void> logout(HttpSession session) {
-        session.removeAttribute("account");
-        session.removeAttribute("type");
+        session.invalidate();
         return new ResponseBody<>(ResponseBodyEnum.SUCCESS);
     }
 

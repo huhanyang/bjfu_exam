@@ -1,10 +1,15 @@
 package com.bjfu.exam.service.impl;
 
 import com.alibaba.fastjson.JSONArray;
+import com.bjfu.exam.dto.PaperDTO;
+import com.bjfu.exam.dto.PolymerizationProblemDTO;
+import com.bjfu.exam.dto.ProblemDTO;
 import com.bjfu.exam.entity.paper.Paper;
 import com.bjfu.exam.entity.paper.PolymerizationProblem;
 import com.bjfu.exam.entity.paper.Problem;
 import com.bjfu.exam.entity.user.User;
+import com.bjfu.exam.enums.UserTypeEnum;
+import com.bjfu.exam.exception.UnauthorizedOperationException;
 import com.bjfu.exam.repository.paper.PaperRepository;
 import com.bjfu.exam.repository.paper.PolymerizationProblemRepository;
 import com.bjfu.exam.repository.paper.ProblemRepository;
@@ -13,6 +18,8 @@ import com.bjfu.exam.request.PaperCreateRequest;
 import com.bjfu.exam.request.PolymerizationProblemAddRequest;
 import com.bjfu.exam.request.ProblemAddRequest;
 import com.bjfu.exam.service.PaperService;
+import com.bjfu.exam.util.EntityConvertToDTOUtil;
+import com.bjfu.exam.util.RandomCodeUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,34 +42,55 @@ public class PaperServiceImpl implements PaperService {
     PolymerizationProblemRepository polymerizationProblemRepository;
 
     @Override
-    public Paper getPaper(String code) {
+    public PaperDTO getPaper(String code) {
         Optional<Paper> paperOptional = paperRepository.findByCode(code);
         if(paperOptional.isEmpty()) {
             return null;
         }
-        return paperOptional.get();
+        return EntityConvertToDTOUtil.convertPaper(paperOptional.get());
     }
 
     @Override
-    public Paper createPaper(PaperCreateRequest paperCreateRequest, Long creatorId) {
+    public List<PaperDTO> getAllPaperByCreatorId(Long creatorId) {
+        Optional<User> userOptional = userRepository.findById(creatorId);
+        if(userOptional.isEmpty()) {
+            return null;
+        }
+        Iterable<Paper> paperIterable = paperRepository.findAllByCreator(userOptional.get());
+        List<PaperDTO> paperDTOS = new ArrayList<>();
+        paperIterable.forEach(paper -> {
+            paperDTOS.add(EntityConvertToDTOUtil.convertPaper(paper));
+        });
+        return paperDTOS;
+    }
+
+    @Override
+    @Transactional
+    public PaperDTO createPaper(PaperCreateRequest paperCreateRequest, Long creatorId) {
         Optional<User> userOptional = userRepository.findById(creatorId);
         if(userOptional.isEmpty()) {
             return null;
         }
         User creator = userOptional.get();
+        if(!creator.getType().equals(UserTypeEnum.TEACHER.getType())) {
+            throw new UnauthorizedOperationException(creatorId, "非教师用户试图创建试卷");
+        }
         Paper paper = new Paper();
         BeanUtils.copyProperties(paperCreateRequest, paper);
         paper.setCreator(creator);
-        // todo 编写随机生成试卷代号的功能逻辑
-        paper.setCode("code");
+        String code = RandomCodeUtil.nextCodeWithCharAndNumber();
+        while(paperRepository.existsByCode(code)) {
+            code = RandomCodeUtil.nextCodeWithCharAndNumber();
+        }
+        paper.setCode(code);
         paper = paperRepository.save(paper);
-        return paper;
+        return EntityConvertToDTOUtil.convertPaper(paper);
     }
 
     @Override
     @Transactional
-    public PolymerizationProblem addPolymerizationProblemInPaper(Long userId,
-                                                                 PolymerizationProblemAddRequest polymerizationProblemAddRequest) {
+    public PolymerizationProblemDTO addPolymerizationProblemInPaper(Long userId,
+                                                                    PolymerizationProblemAddRequest polymerizationProblemAddRequest) {
         Optional<Paper> paperOptional = paperRepository.findById(polymerizationProblemAddRequest.getPaperId());
         if(paperOptional.isEmpty()) {
             return null;
@@ -77,12 +105,12 @@ public class PaperServiceImpl implements PaperService {
             polymerizationProblem.setSort(sort);
             polymerizationProblem.setPaper(paper);
             polymerizationProblem = polymerizationProblemRepository.save(polymerizationProblem);
-            return polymerizationProblem;
+            return EntityConvertToDTOUtil.convertPolymerizationProblem(polymerizationProblem);
         }
     }
 
     @Override
-    public PolymerizationProblem addImageInPolymerizationProblem(Long userId,
+    public PolymerizationProblemDTO addImageInPolymerizationProblem(Long userId,
                                                                  Long polymerizationProblemId, File image) {
         Optional<PolymerizationProblem> polymerizationProblemOptional =
                 polymerizationProblemRepository.findById(polymerizationProblemId);
@@ -103,13 +131,13 @@ public class PaperServiceImpl implements PaperService {
             jsonArray.add(url);
             polymerizationProblem.setImages(jsonArray.toJSONString());
             polymerizationProblem = polymerizationProblemRepository.save(polymerizationProblem);
-            return polymerizationProblem;
+            return EntityConvertToDTOUtil.convertPolymerizationProblem(polymerizationProblem);
         }
     }
 
     @Override
     @Transactional
-    public Problem addProblem(Long userId, ProblemAddRequest problemAddRequest) {
+    public ProblemDTO addProblem(Long userId, ProblemAddRequest problemAddRequest) {
         Optional<Paper> paperOptional = paperRepository.findById(problemAddRequest.getPaperId());
         if(paperOptional.isEmpty()) {
             return null;
@@ -125,7 +153,7 @@ public class PaperServiceImpl implements PaperService {
                 problem.setSort(sort);
                 problem.setPaper(paper);
                 problem = problemRepository.save(problem);
-                return problem;
+                return EntityConvertToDTOUtil.convertProblem(problem);
             } else if(problemAddRequest.getPolymerizationProblemId() != null){
                 Optional<PolymerizationProblem> polymerizationProblemOptional = polymerizationProblemRepository
                         .findById(problemAddRequest.getPolymerizationProblemId());
@@ -138,7 +166,7 @@ public class PaperServiceImpl implements PaperService {
                 problem.setSort(sort);
                 problem.setPolymerizationProblem(polymerizationProblem);
                 problem = problemRepository.save(problem);
-                return problem;
+                return EntityConvertToDTOUtil.convertProblem(problem);
             } else {
                 return null;
             }
@@ -146,7 +174,7 @@ public class PaperServiceImpl implements PaperService {
     }
 
     @Override
-    public Problem addImageInProblem(Long userId, Long problemId, File image) {
+    public ProblemDTO addImageInProblem(Long userId, Long problemId, File image) {
         Optional<Problem> problemOptional = problemRepository.findById(problemId);
         if(problemOptional.isEmpty()) {
             return null;
@@ -165,13 +193,13 @@ public class PaperServiceImpl implements PaperService {
             jsonArray.add(url);
             problem.setImages(jsonArray.toJSONString());
             problem = problemRepository.save(problem);
-            return problem;
+            return EntityConvertToDTOUtil.convertProblem(problem);
         }
     }
 
     @Override
     @Transactional
-    public Paper deleteProblem(Long userId, Long paperId, Long problemId) {
+    public PaperDTO deleteProblem(Long userId, Long paperId, Long problemId) {
         Optional<Paper> paperOptional = paperRepository.findById(paperId);
         if(paperOptional.isEmpty()) {
             return null;
@@ -212,13 +240,13 @@ public class PaperServiceImpl implements PaperService {
             paper.setProblems(problems);
             paper.setPolymerizationProblems(polymerizationProblems);
             paper = paperRepository.save(paper);
-            return paper;
+            return EntityConvertToDTOUtil.convertPaper(paper);
         }
     }
 
     @Override
     @Transactional
-    public Paper deletePolymerizationProblem(Long userId, Long paperId, Long polymerizationProblemId) {
+    public PaperDTO deletePolymerizationProblem(Long userId, Long paperId, Long polymerizationProblemId) {
         Optional<Paper> paperOptional = paperRepository.findById(paperId);
         if(paperOptional.isEmpty()) {
             return null;
@@ -258,7 +286,7 @@ public class PaperServiceImpl implements PaperService {
             paper.setProblems(problems);
             paper.setPolymerizationProblems(polymerizationProblems);
             paper = paperRepository.save(paper);
-            return paper;
+            return EntityConvertToDTOUtil.convertPaper(paper);
         }
     }
 

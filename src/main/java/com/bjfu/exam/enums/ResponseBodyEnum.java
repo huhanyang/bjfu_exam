@@ -5,6 +5,7 @@ import lombok.Getter;
 @Getter
 public enum ResponseBodyEnum {
 
+    UNKNOWN_WRONG(0, "未知的错误，请重新登陆后再试"),
     SUCCESS(1, "成功"),
     PARAM_WRONG(2, "参数错误"),
     LOGIN_FAILED(3, "登录失败，账号或密码错误"),

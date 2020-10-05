@@ -1,5 +1,6 @@
 package com.bjfu.exam.controller;
 
+import com.bjfu.exam.dto.PaperDTO;
 import com.bjfu.exam.entity.paper.Paper;
 import com.bjfu.exam.repository.paper.PaperRepository;
 import com.bjfu.exam.service.PaperService;
@@ -19,8 +20,8 @@ public class TestController {
     private PaperRepository paperRepository;
 
     @GetMapping("/test")
-    public Paper test() {
-        Paper paper = paperService.getPaper("code");
+    public PaperDTO test() {
+        PaperDTO paper = paperService.getPaper("code");
         return paper;
     }
 }

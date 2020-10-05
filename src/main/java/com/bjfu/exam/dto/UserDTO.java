@@ -5,6 +5,10 @@ import lombok.Data;
 @Data
 public class UserDTO {
     /**
+     * id
+     */
+    private Long id;
+    /**
      * 用户名
      */
     private String account;
