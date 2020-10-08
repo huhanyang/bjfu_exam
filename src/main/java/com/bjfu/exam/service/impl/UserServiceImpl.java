@@ -4,6 +4,7 @@ import com.bjfu.exam.dto.UserDTO;
 import com.bjfu.exam.entity.user.User;
 import com.bjfu.exam.enums.UserTypeEnum;
 import com.bjfu.exam.repository.user.UserRepository;
+import com.bjfu.exam.request.LoginRequest;
 import com.bjfu.exam.request.UserChangePasswordRequest;
 import com.bjfu.exam.request.UserRegisterRequest;
 import com.bjfu.exam.service.UserService;
@@ -21,13 +22,13 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Override
-    public UserDTO loginCheck(String account, String password) {
-        Optional<User> userOptional = userRepository.findByAccount(account);
+    public UserDTO loginCheck(LoginRequest loginRequest) {
+        Optional<User> userOptional = userRepository.findByAccount(loginRequest.getAccount());
         if(userOptional.isEmpty()) {
             return null;
         } else {
             User user = userOptional.get();
-            if(user.getPassword().equals(password)) {
+            if(user.getPassword().equals(loginRequest.getPassword())) {
                 UserDTO userDTO = new UserDTO();
                 BeanUtils.copyProperties(user, userDTO);
                 return userDTO;

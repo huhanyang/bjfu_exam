@@ -2,6 +2,7 @@ package com.bjfu.exam.controller;
 
 import com.bjfu.exam.dto.UserDTO;
 import com.bjfu.exam.enums.ResponseBodyEnum;
+import com.bjfu.exam.request.LoginRequest;
 import com.bjfu.exam.request.UserChangePasswordRequest;
 import com.bjfu.exam.request.UserRegisterRequest;
 import com.bjfu.exam.service.UserService;
@@ -19,9 +20,10 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/loginCheck")
-    public ResponseBody<Void> loginCheck(String account, String password, HttpSession session) {
-        if(account != null && password != null) {
-            UserDTO userDTO = userService.loginCheck(account, password);
+    public ResponseBody<Void> loginCheck(@RequestBody LoginRequest loginRequest,
+                                         HttpSession session) {
+        if(loginRequest.isComplete()) {
+            UserDTO userDTO = userService.loginCheck(loginRequest);
             if(userDTO != null) {
                 session.setAttribute("userId", userDTO.getId());
                 session.setAttribute("account", userDTO.getAccount());
@@ -34,7 +36,8 @@ public class UserController {
     }
 
     @PutMapping("/register")
-    public ResponseBody<Void> register(UserRegisterRequest userRegisterRequest, HttpSession session) {
+    public ResponseBody<Void> register(@RequestBody UserRegisterRequest userRegisterRequest,
+                                       HttpSession session) {
         if(userRegisterRequest.isComplete()) {
             UserDTO userDTO = userService.register(userRegisterRequest);
             if(userDTO != null) {
@@ -49,7 +52,8 @@ public class UserController {
     }
 
     @PostMapping("/changePassword")
-    public ResponseBody<Void> changePassword(UserChangePasswordRequest userChangePasswordRequest, HttpSession session) {
+    public ResponseBody<Void> changePassword(@RequestBody UserChangePasswordRequest userChangePasswordRequest,
+                                             HttpSession session) {
         if(userChangePasswordRequest.isComplete()) {
             UserDTO userDTO = userService.changePassword(userChangePasswordRequest);
             if(userDTO != null) {
