@@ -1,8 +1,10 @@
 package com.bjfu.exam.controller;
 
 import com.bjfu.exam.dto.PaperDTO;
+import com.bjfu.exam.dto.PolymerizationProblemDTO;
+import com.bjfu.exam.dto.ProblemDTO;
 import com.bjfu.exam.enums.ResponseBodyEnum;
-import com.bjfu.exam.request.PaperCreateRequest;
+import com.bjfu.exam.request.*;
 import com.bjfu.exam.service.PaperService;
 import com.bjfu.exam.vo.PaperVO;
 import com.bjfu.exam.vo.ResponseBody;
@@ -51,7 +53,7 @@ public class PaperController {
     }
 
     @PostMapping("/create")
-    public ResponseBody<PaperVO> createPaper(PaperCreateRequest paperCreateRequest, HttpSession session) {
+    public ResponseBody<PaperVO> createPaper(@RequestBody PaperCreateRequest paperCreateRequest, HttpSession session) {
         if(paperCreateRequest.isComplete()) {
             if(session.getAttribute("userId") == null) {
                 return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
@@ -80,4 +82,71 @@ public class PaperController {
         return new ResponseBody<>(ResponseBodyEnum.SUCCESS);
     }
 
+    @PutMapping("/addPolymerizationProblem")
+    public ResponseBody<Void> addPolymerizationProblem(@RequestBody PolymerizationProblemAddRequest polymerizationProblemAddRequest,
+                                                       HttpSession session) {
+        if(session.getAttribute("userId") == null) {
+            return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
+        }
+        if(polymerizationProblemAddRequest.isComplete()) {
+            Long userId = (Long) session.getAttribute("userId");
+            PolymerizationProblemDTO polymerizationProblemDTO =
+                    paperService.addPolymerizationProblemInPaper(userId, polymerizationProblemAddRequest);
+            if(polymerizationProblemDTO == null) {
+                return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
+            }
+            return new ResponseBody<>(ResponseBodyEnum.SUCCESS);
+        }
+        return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
+    }
+
+    @PutMapping("/addProblem")
+    public ResponseBody<Void> addProblem(@RequestBody ProblemAddRequest problemAddRequest, HttpSession session) {
+        if(session.getAttribute("userId") == null) {
+            return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
+        }
+        if(problemAddRequest.isComplete()) {
+            Long userId = (Long) session.getAttribute("userId");
+            ProblemDTO problemDTO = paperService.addProblem(userId, problemAddRequest);
+            if(problemDTO == null) {
+                return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
+            }
+            return new ResponseBody<>(ResponseBodyEnum.SUCCESS);
+        }
+        return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
+    }
+
+    @DeleteMapping("/deleteProblem")
+    public ResponseBody<PaperDTO> deleteProblem(@RequestBody ProblemDeleteRequest problemDeleteRequest,
+                                            HttpSession session) {
+        if(session.getAttribute("userId") == null) {
+            return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
+        }
+        if(problemDeleteRequest.isComplete()) {
+            Long userId = (Long) session.getAttribute("userId");
+            PaperDTO paperDTO = paperService.deleteProblem(userId, problemDeleteRequest);
+            if(paperDTO == null) {
+                return new ResponseBody<>(ResponseBodyEnum.PARAM_NOT_MATCH);
+            }
+            return new ResponseBody<>(ResponseBodyEnum.SUCCESS, paperDTO);
+        }
+        return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
+    }
+
+    @DeleteMapping("/deletePolymerizationProblem")
+    public ResponseBody<PaperDTO> deletePolymerizationProblem(@RequestBody PolymerizationProblemDeleteRequest polymerizationProblemDeleteRequest,
+                                                HttpSession session) {
+        if(session.getAttribute("userId") == null) {
+            return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
+        }
+        if(polymerizationProblemDeleteRequest.isComplete()) {
+            Long userId = (Long) session.getAttribute("userId");
+            PaperDTO paperDTO = paperService.deletePolymerizationProblem(userId, polymerizationProblemDeleteRequest);
+            if(paperDTO == null) {
+                return new ResponseBody<>(ResponseBodyEnum.PARAM_NOT_MATCH);
+            }
+            return new ResponseBody<>(ResponseBodyEnum.SUCCESS, paperDTO);
+        }
+        return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
+    }
 }

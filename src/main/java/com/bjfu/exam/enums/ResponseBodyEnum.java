@@ -12,7 +12,8 @@ public enum ResponseBodyEnum {
     ACCOUNT_RECUR(4, "账号重复"),
     FIND_FAILED(5, "查找失败"),
     NEED_TO_RELOGIN(6, "需要重新登录"),
-    CHANGE_PASSWORD_FAILED(7, "修改密码失败，账号或密码错误");
+    CHANGE_PASSWORD_FAILED(7, "修改密码失败，账号或密码错误"),
+    PARAM_NOT_MATCH(8, "参数不相互匹配");
 
 
     private final int code;

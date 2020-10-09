@@ -3,9 +3,7 @@ package com.bjfu.exam.service;
 import com.bjfu.exam.dto.PaperDTO;
 import com.bjfu.exam.dto.PolymerizationProblemDTO;
 import com.bjfu.exam.dto.ProblemDTO;
-import com.bjfu.exam.request.PaperCreateRequest;
-import com.bjfu.exam.request.PolymerizationProblemAddRequest;
-import com.bjfu.exam.request.ProblemAddRequest;
+import com.bjfu.exam.request.*;
 
 import java.io.File;
 import java.util.List;
@@ -26,8 +24,7 @@ public interface PaperService {
     /**
      * 为试卷添加组合题目
      */
-    PolymerizationProblemDTO addPolymerizationProblemInPaper(Long userId,
-                                                          PolymerizationProblemAddRequest polymerizationProblemAddRequest);
+    PolymerizationProblemDTO addPolymerizationProblemInPaper(Long userId, PolymerizationProblemAddRequest polymerizationProblemAddRequest);
     /**
      * 为组合题目添加图片
      */
@@ -43,11 +40,11 @@ public interface PaperService {
     /**
      * 删除题目
      */
-    PaperDTO deleteProblem(Long userId, Long paperId, Long problemId);
+    PaperDTO deleteProblem(Long userId, ProblemDeleteRequest problemDeleteRequest);
     /**
      * 删除组合题目
      */
-    PaperDTO deletePolymerizationProblem(Long userId, Long paperId, Long polymerizationProblemId);
+    PaperDTO deletePolymerizationProblem(Long userId, PolymerizationProblemDeleteRequest polymerizationProblemDeleteRequest);
     /**
      * 删除试卷
      */
