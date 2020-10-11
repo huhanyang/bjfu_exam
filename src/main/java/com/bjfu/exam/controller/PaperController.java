@@ -8,9 +8,12 @@ import com.bjfu.exam.enums.ResponseBodyEnum;
 import com.bjfu.exam.request.*;
 import com.bjfu.exam.service.PaperService;
 import com.bjfu.exam.util.DTOConvertToVOUtil;
+import com.bjfu.exam.util.SessionUtil;
 import com.bjfu.exam.vo.ResponseBody;
 import com.bjfu.exam.vo.paper.PaperDetailVO;
 import com.bjfu.exam.vo.paper.PaperVO;
+import com.bjfu.exam.vo.paper.PolymerizationProblemVO;
+import com.bjfu.exam.vo.paper.ProblemVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -41,7 +44,7 @@ public class PaperController {
 
     @GetMapping("/get")
     public ResponseBody<List<PaperDetailVO>> getMyPaper(HttpSession session) {
-        if(session.getAttribute("userId") == null) {
+        if(!SessionUtil.existSession(session)) {
             return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
         }
         List<PaperDetailDTO> paperDetailDTOS = paperService.getAllPaperByCreatorId((Long) session.getAttribute("userId"));
@@ -54,7 +57,7 @@ public class PaperController {
     @PostMapping("/create")
     public ResponseBody<PaperVO> createPaper(@RequestBody PaperCreateRequest paperCreateRequest, HttpSession session) {
         if(paperCreateRequest.isComplete()) {
-            if(session.getAttribute("userId") == null) {
+            if(!SessionUtil.existSession(session)) {
                 return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
             }
             PaperDTO paperDTO = paperService.createPaper(paperCreateRequest, (Long) session.getAttribute("userId"));
@@ -69,7 +72,7 @@ public class PaperController {
 
     @DeleteMapping("/delete")
     public ResponseBody<Void> deletePaper(Long paperId, HttpSession session) {
-        if(session.getAttribute("userId") == null) {
+        if(!SessionUtil.existSession(session)) {
             return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
         }
         if(paperId == null) {
@@ -81,9 +84,9 @@ public class PaperController {
     }
 
     @PutMapping("/addPolymerizationProblem")
-    public ResponseBody<Void> addPolymerizationProblem(@RequestBody PolymerizationProblemAddRequest polymerizationProblemAddRequest,
-                                                       HttpSession session) {
-        if(session.getAttribute("userId") == null) {
+    public ResponseBody<PolymerizationProblemVO> addPolymerizationProblem(@RequestBody PolymerizationProblemAddRequest polymerizationProblemAddRequest,
+                                                                          HttpSession session) {
+        if(!SessionUtil.existSession(session)) {
             return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
         }
         if(polymerizationProblemAddRequest.isComplete()) {
@@ -93,14 +96,16 @@ public class PaperController {
             if(polymerizationProblemDTO == null) {
                 return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
             }
-            return new ResponseBody<>(ResponseBodyEnum.SUCCESS);
+            PolymerizationProblemVO polymerizationProblemVO =
+                    DTOConvertToVOUtil.convertPolymerizationProblemDTO(polymerizationProblemDTO);
+            return new ResponseBody<>(ResponseBodyEnum.SUCCESS, polymerizationProblemVO);
         }
         return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
     }
 
     @PutMapping("/addProblem")
-    public ResponseBody<Void> addProblem(@RequestBody ProblemAddRequest problemAddRequest, HttpSession session) {
-        if(session.getAttribute("userId") == null) {
+    public ResponseBody<ProblemVO> addProblem(@RequestBody ProblemAddRequest problemAddRequest, HttpSession session) {
+        if(!SessionUtil.existSession(session)) {
             return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
         }
         if(problemAddRequest.isComplete()) {
@@ -109,7 +114,8 @@ public class PaperController {
             if(problemDTO == null) {
                 return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
             }
-            return new ResponseBody<>(ResponseBodyEnum.SUCCESS);
+            ProblemVO problemVO = DTOConvertToVOUtil.convertProblemDTO(problemDTO);
+            return new ResponseBody<>(ResponseBodyEnum.SUCCESS, problemVO);
         }
         return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
     }
@@ -117,7 +123,7 @@ public class PaperController {
     @DeleteMapping("/deleteProblem")
     public ResponseBody<PaperDetailVO> deleteProblem(@RequestBody ProblemDeleteRequest problemDeleteRequest,
                                             HttpSession session) {
-        if(session.getAttribute("userId") == null) {
+        if(!SessionUtil.existSession(session)) {
             return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
         }
         if(problemDeleteRequest.isComplete()) {
@@ -135,7 +141,7 @@ public class PaperController {
     @DeleteMapping("/deletePolymerizationProblem")
     public ResponseBody<PaperDetailVO> deletePolymerizationProblem(@RequestBody PolymerizationProblemDeleteRequest polymerizationProblemDeleteRequest,
                                                 HttpSession session) {
-        if(session.getAttribute("userId") == null) {
+        if(!SessionUtil.existSession(session)) {
             return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
         }
         if(polymerizationProblemDeleteRequest.isComplete()) {
