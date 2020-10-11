@@ -1,12 +1,17 @@
 package com.bjfu.exam.controller;
 
-import com.bjfu.exam.dto.UserDTO;
+import com.bjfu.exam.dto.user.UserDTO;
+import com.bjfu.exam.dto.user.UserDetailDTO;
 import com.bjfu.exam.enums.ResponseBodyEnum;
 import com.bjfu.exam.request.LoginRequest;
 import com.bjfu.exam.request.UserChangePasswordRequest;
 import com.bjfu.exam.request.UserRegisterRequest;
 import com.bjfu.exam.service.UserService;
+import com.bjfu.exam.util.DTOConvertToVOUtil;
+import com.bjfu.exam.util.SessionUtil;
 import com.bjfu.exam.vo.ResponseBody;
+import com.bjfu.exam.vo.user.UserDetailVO;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,15 +25,14 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/loginCheck")
-    public ResponseBody<Void> loginCheck(@RequestBody LoginRequest loginRequest,
+    public ResponseBody<UserDetailVO> loginCheck(@RequestBody LoginRequest loginRequest,
                                          HttpSession session) {
         if(loginRequest.isComplete()) {
-            UserDTO userDTO = userService.loginCheck(loginRequest);
-            if(userDTO != null) {
-                session.setAttribute("userId", userDTO.getId());
-                session.setAttribute("account", userDTO.getAccount());
-                session.setAttribute("type", userDTO.getType());
-                return new ResponseBody<>(ResponseBodyEnum.SUCCESS);
+            UserDetailDTO userDetailDTO = userService.loginCheck(loginRequest);
+            if(userDetailDTO != null) {
+                SessionUtil.initSession(session, userDetailDTO);
+                UserDetailVO userDetailVO = DTOConvertToVOUtil.convertUserDTOToDetail(userDetailDTO);
+                return new ResponseBody<>(ResponseBodyEnum.SUCCESS, userDetailVO);
             }
             return new ResponseBody<>(ResponseBodyEnum.LOGIN_FAILED);
         }
@@ -36,15 +40,14 @@ public class UserController {
     }
 
     @PutMapping("/register")
-    public ResponseBody<Void> register(@RequestBody UserRegisterRequest userRegisterRequest,
+    public ResponseBody<UserDetailVO> register(@RequestBody UserRegisterRequest userRegisterRequest,
                                        HttpSession session) {
         if(userRegisterRequest.isComplete()) {
-            UserDTO userDTO = userService.register(userRegisterRequest);
-            if(userDTO != null) {
-                session.setAttribute("userId", userDTO.getId());
-                session.setAttribute("account", userDTO.getAccount());
-                session.setAttribute("type", userDTO.getType());
-                return new ResponseBody<>(ResponseBodyEnum.SUCCESS);
+            UserDetailDTO userDetailDTO = userService.register(userRegisterRequest);
+            if(userDetailDTO != null) {
+                SessionUtil.initSession(session, userDetailDTO);
+                UserDetailVO userDetailVO = DTOConvertToVOUtil.convertUserDTOToDetail(userDetailDTO);
+                return new ResponseBody<>(ResponseBodyEnum.SUCCESS, userDetailVO);
             }
             return new ResponseBody<>(ResponseBodyEnum.ACCOUNT_RECUR);
         }
@@ -57,7 +60,7 @@ public class UserController {
         if(userChangePasswordRequest.isComplete()) {
             UserDTO userDTO = userService.changePassword(userChangePasswordRequest);
             if(userDTO != null) {
-                session.invalidate();
+                SessionUtil.deleteSession(session);
                 return new ResponseBody<>(ResponseBodyEnum.SUCCESS);
             }
             return new ResponseBody<>(ResponseBodyEnum.CHANGE_PASSWORD_FAILED);
@@ -67,8 +70,23 @@ public class UserController {
 
     @GetMapping("/logout")
     public ResponseBody<Void> logout(HttpSession session) {
-        session.invalidate();
+        SessionUtil.deleteSession(session);
         return new ResponseBody<>(ResponseBodyEnum.SUCCESS);
+    }
+
+    @GetMapping("/getUserDetail")
+    public ResponseBody<UserDetailVO> getUserDetail(Long id, HttpSession session) {
+        if(id == null) {
+            return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
+        } else {
+            if(SessionUtil.existSession(session)) {
+                UserDetailDTO userDetailDTO = userService.getUserDetail(id);
+                UserDetailVO userDetailVO = DTOConvertToVOUtil.convertUserDTOToDetail(userDetailDTO);
+                return new ResponseBody<>(ResponseBodyEnum.SUCCESS, userDetailVO);
+            } else {
+                return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
+            }
+        }
     }
 
 }

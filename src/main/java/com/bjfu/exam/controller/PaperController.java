@@ -1,21 +1,23 @@
 package com.bjfu.exam.controller;
 
-import com.bjfu.exam.dto.PaperDTO;
-import com.bjfu.exam.dto.PolymerizationProblemDTO;
-import com.bjfu.exam.dto.ProblemDTO;
+import com.bjfu.exam.dto.paper.PaperDTO;
+import com.bjfu.exam.dto.paper.PaperDetailDTO;
+import com.bjfu.exam.dto.paper.PolymerizationProblemDTO;
+import com.bjfu.exam.dto.paper.ProblemDTO;
 import com.bjfu.exam.enums.ResponseBodyEnum;
 import com.bjfu.exam.request.*;
 import com.bjfu.exam.service.PaperService;
-import com.bjfu.exam.vo.PaperVO;
+import com.bjfu.exam.util.DTOConvertToVOUtil;
 import com.bjfu.exam.vo.ResponseBody;
-import org.springframework.beans.BeanUtils;
+import com.bjfu.exam.vo.paper.PaperDetailVO;
+import com.bjfu.exam.vo.paper.PaperVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/paper")
@@ -31,25 +33,22 @@ public class PaperController {
         }
         PaperDTO paperDTO = paperService.getPaper(code);
         if(paperDTO != null) {
-            PaperVO paperVO = new PaperVO();
-            BeanUtils.copyProperties(paperDTO, paperVO);
+            PaperVO paperVO = DTOConvertToVOUtil.convertPaperDTO(paperDTO);
             return new ResponseBody<>(ResponseBodyEnum.SUCCESS, paperVO);
         }
         return new ResponseBody<>(ResponseBodyEnum.FIND_FAILED);
     }
+
     @GetMapping("/get")
-    public ResponseBody<List<PaperVO>> getMyPaper(HttpSession session) {
+    public ResponseBody<List<PaperDetailVO>> getMyPaper(HttpSession session) {
         if(session.getAttribute("userId") == null) {
             return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
         }
-        List<PaperDTO> paperDTOS = paperService.getAllPaperByCreatorId((Long) session.getAttribute("userId"));
-        List<PaperVO> paperVOS = new ArrayList<>(paperDTOS.size());
-        paperDTOS.forEach( paperDTO -> {
-            PaperVO paperVO = new PaperVO();
-            BeanUtils.copyProperties(paperDTO, paperVO);
-            paperVOS.add(paperVO);
-        });
-        return new ResponseBody<>(ResponseBodyEnum.SUCCESS, paperVOS);
+        List<PaperDetailDTO> paperDetailDTOS = paperService.getAllPaperByCreatorId((Long) session.getAttribute("userId"));
+        List<PaperDetailVO> paperDetailVO = paperDetailDTOS.stream()
+                .map(DTOConvertToVOUtil::convertPaperDetailDTO)
+                .collect(Collectors.toList());
+        return new ResponseBody<>(ResponseBodyEnum.SUCCESS, paperDetailVO);
     }
 
     @PostMapping("/create")
@@ -62,8 +61,7 @@ public class PaperController {
             if(paperDTO == null) {
                 return new ResponseBody<>(ResponseBodyEnum.UNKNOWN_WRONG);
             }
-            PaperVO paperVO = new PaperVO();
-            BeanUtils.copyProperties(paperDTO, paperVO);
+            PaperVO paperVO = DTOConvertToVOUtil.convertPaperDTO(paperDTO);
             return new ResponseBody<>(ResponseBodyEnum.SUCCESS, paperVO);
         }
         return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
@@ -117,35 +115,37 @@ public class PaperController {
     }
 
     @DeleteMapping("/deleteProblem")
-    public ResponseBody<PaperDTO> deleteProblem(@RequestBody ProblemDeleteRequest problemDeleteRequest,
+    public ResponseBody<PaperDetailVO> deleteProblem(@RequestBody ProblemDeleteRequest problemDeleteRequest,
                                             HttpSession session) {
         if(session.getAttribute("userId") == null) {
             return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
         }
         if(problemDeleteRequest.isComplete()) {
             Long userId = (Long) session.getAttribute("userId");
-            PaperDTO paperDTO = paperService.deleteProblem(userId, problemDeleteRequest);
-            if(paperDTO == null) {
+            PaperDetailDTO paperDetailDTO = paperService.deleteProblem(userId, problemDeleteRequest);
+            if(paperDetailDTO == null) {
                 return new ResponseBody<>(ResponseBodyEnum.PARAM_NOT_MATCH);
             }
-            return new ResponseBody<>(ResponseBodyEnum.SUCCESS, paperDTO);
+            PaperDetailVO paperDetailVO = DTOConvertToVOUtil.convertPaperDetailDTO(paperDetailDTO);
+            return new ResponseBody<>(ResponseBodyEnum.SUCCESS, paperDetailVO);
         }
         return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
     }
 
     @DeleteMapping("/deletePolymerizationProblem")
-    public ResponseBody<PaperDTO> deletePolymerizationProblem(@RequestBody PolymerizationProblemDeleteRequest polymerizationProblemDeleteRequest,
+    public ResponseBody<PaperDetailVO> deletePolymerizationProblem(@RequestBody PolymerizationProblemDeleteRequest polymerizationProblemDeleteRequest,
                                                 HttpSession session) {
         if(session.getAttribute("userId") == null) {
             return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
         }
         if(polymerizationProblemDeleteRequest.isComplete()) {
             Long userId = (Long) session.getAttribute("userId");
-            PaperDTO paperDTO = paperService.deletePolymerizationProblem(userId, polymerizationProblemDeleteRequest);
-            if(paperDTO == null) {
+            PaperDetailDTO paperDetailDTO = paperService.deletePolymerizationProblem(userId, polymerizationProblemDeleteRequest);
+            if(paperDetailDTO == null) {
                 return new ResponseBody<>(ResponseBodyEnum.PARAM_NOT_MATCH);
             }
-            return new ResponseBody<>(ResponseBodyEnum.SUCCESS, paperDTO);
+            PaperDetailVO paperDetailVO = DTOConvertToVOUtil.convertPaperDetailDTO(paperDetailDTO);
+            return new ResponseBody<>(ResponseBodyEnum.SUCCESS, paperDetailVO);
         }
         return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
     }

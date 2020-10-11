@@ -1,13 +1,17 @@
 package com.bjfu.exam.service.impl;
 
-import com.bjfu.exam.dto.UserDTO;
+import com.bjfu.exam.dto.user.UserDTO;
+import com.bjfu.exam.dto.user.UserDetailDTO;
 import com.bjfu.exam.entity.user.User;
 import com.bjfu.exam.enums.UserTypeEnum;
+import com.bjfu.exam.exception.NotAllowOperationException;
+import com.bjfu.exam.exception.UserNotExistException;
 import com.bjfu.exam.repository.user.UserRepository;
 import com.bjfu.exam.request.LoginRequest;
 import com.bjfu.exam.request.UserChangePasswordRequest;
 import com.bjfu.exam.request.UserRegisterRequest;
 import com.bjfu.exam.service.UserService;
+import com.bjfu.exam.util.EntityConvertToDTOUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,16 +26,14 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Override
-    public UserDTO loginCheck(LoginRequest loginRequest) {
+    public UserDetailDTO loginCheck(LoginRequest loginRequest) {
         Optional<User> userOptional = userRepository.findByAccount(loginRequest.getAccount());
         if(userOptional.isEmpty()) {
             return null;
         } else {
             User user = userOptional.get();
             if(user.getPassword().equals(loginRequest.getPassword())) {
-                UserDTO userDTO = new UserDTO();
-                BeanUtils.copyProperties(user, userDTO);
-                return userDTO;
+                return EntityConvertToDTOUtil.convertUserToDetail(user);
             } else {
                 return null;
             }
@@ -40,7 +42,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserDTO register(UserRegisterRequest userRegisterRequest) {
+    public UserDetailDTO register(UserRegisterRequest userRegisterRequest) {
         if(userRegisterRequest.getType().equals(UserTypeEnum.STUDENT.getType())
                 || userRegisterRequest.getType().equals(UserTypeEnum.TEACHER.getType())) {
             if(userRepository.existsByAccount(userRegisterRequest.getAccount())) {
@@ -49,12 +51,10 @@ public class UserServiceImpl implements UserService {
                 User user = new User();
                 BeanUtils.copyProperties(userRegisterRequest, user);
                 user = userRepository.save(user);
-                UserDTO userDTO = new UserDTO();
-                BeanUtils.copyProperties(user, userDTO);
-                return userDTO;
+                return EntityConvertToDTOUtil.convertUserToDetail(user);
             }
         } else {
-            return null;
+            throw new NotAllowOperationException("企图创建其他类型账号");
         }
     }
 
@@ -62,18 +62,27 @@ public class UserServiceImpl implements UserService {
     public UserDTO changePassword(UserChangePasswordRequest userChangePasswordRequest) {
         Optional<User> userOptional = userRepository.findByAccount(userChangePasswordRequest.getAccount());
         if(userOptional.isEmpty()) {
-            return null;
+            throw new UserNotExistException(userChangePasswordRequest.getAccount(), "修改密码的用户不存在");
         } else {
             User user = userOptional.get();
             if(user.getPassword().equals(userChangePasswordRequest.getOldPassword())) {
                 user.setPassword(userChangePasswordRequest.getNewPassword());
                 user = userRepository.save(user);
-                UserDTO userDTO = new UserDTO();
-                BeanUtils.copyProperties(user, userDTO);
-                return userDTO;
+                return EntityConvertToDTOUtil.convertUser(user);
             } else {
                 return null;
             }
+        }
+    }
+
+    @Override
+    public UserDetailDTO getUserDetail(Long id) {
+        Optional<User> userOptional = userRepository.findById(id);
+        if(userOptional.isEmpty()) {
+            return null;
+        } else {
+            User user = userOptional.get();
+            return EntityConvertToDTOUtil.convertUserToDetail(user);
         }
     }
 

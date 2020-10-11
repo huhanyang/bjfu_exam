@@ -1,6 +1,5 @@
 package com.bjfu.exam.entity.paper;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 

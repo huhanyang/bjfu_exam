@@ -1,11 +1,11 @@
-package com.bjfu.exam.dto;
+package com.bjfu.exam.dto.user;
 
 import lombok.Data;
 
 @Data
 public class UserDTO {
     /**
-     * id
+     * 用户id
      */
     private Long id;
     /**

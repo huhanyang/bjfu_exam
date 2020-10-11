@@ -14,7 +14,7 @@ public interface PaperRepository extends CrudRepository<Paper, Long> {
 
     Optional<Paper> findByCode(String code);
 
-    Iterable<Paper> findAllByCreator(User user);
+    List<Paper> findAllByCreator(User user);
 
     @Lock(value = LockModeType.PESSIMISTIC_WRITE)
     boolean existsByCode(String code);

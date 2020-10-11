@@ -1,11 +1,11 @@
-package com.bjfu.exam.dto;
+package com.bjfu.exam.vo.paper;
 
 import lombok.Data;
 
 @Data
-public class ProblemDTO {
+public class ProblemVO {
     /**
-     * 题目的id
+     * 题目id
      */
     private Long id;
     /**

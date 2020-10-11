@@ -1,9 +1,14 @@
-package com.bjfu.exam.dto;
+package com.bjfu.exam.vo.paper;
 
+import com.bjfu.exam.vo.user.UserVO;
 import lombok.Data;
 
 @Data
-public class PaperDTO {
+public class PaperVO {
+    /**
+     * 试卷id
+     */
+    private Long id;
     /**
      * 试卷代号
      */
@@ -25,19 +30,11 @@ public class PaperDTO {
      */
     private String collection;
     /**
-     * 创建者姓名
+     * 创建者
      */
-    private String creatorName;
-    /**
-     * 导出excel位置
-     */
-    private String excelUrl;
+    private UserVO creator;
     /**
      * 试卷状态
      */
     private int status;
-    /**
-     * 题目总数
-     */
-    private int problemCount;
 }

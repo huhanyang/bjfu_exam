@@ -1,8 +1,9 @@
 package com.bjfu.exam.service;
 
-import com.bjfu.exam.dto.PaperDTO;
-import com.bjfu.exam.dto.PolymerizationProblemDTO;
-import com.bjfu.exam.dto.ProblemDTO;
+import com.bjfu.exam.dto.paper.PaperDTO;
+import com.bjfu.exam.dto.paper.PaperDetailDTO;
+import com.bjfu.exam.dto.paper.PolymerizationProblemDTO;
+import com.bjfu.exam.dto.paper.ProblemDTO;
 import com.bjfu.exam.request.*;
 
 import java.io.File;
@@ -16,7 +17,7 @@ public interface PaperService {
     /**
      * 根据创建人Id获取试卷
      */
-    List<PaperDTO> getAllPaperByCreatorId(Long creatorId);
+    List<PaperDetailDTO> getAllPaperByCreatorId(Long creatorId);
     /**
      * 创建试卷(未创建题目)
      */
@@ -40,11 +41,11 @@ public interface PaperService {
     /**
      * 删除题目
      */
-    PaperDTO deleteProblem(Long userId, ProblemDeleteRequest problemDeleteRequest);
+    PaperDetailDTO deleteProblem(Long userId, ProblemDeleteRequest problemDeleteRequest);
     /**
      * 删除组合题目
      */
-    PaperDTO deletePolymerizationProblem(Long userId, PolymerizationProblemDeleteRequest polymerizationProblemDeleteRequest);
+    PaperDetailDTO deletePolymerizationProblem(Long userId, PolymerizationProblemDeleteRequest polymerizationProblemDeleteRequest);
     /**
      * 删除试卷
      */

@@ -1,11 +1,11 @@
-package com.bjfu.exam.dto;
+package com.bjfu.exam.dto.paper;
 
 import lombok.Data;
 
 @Data
-public class PolymerizationProblemDTO {
+public class ProblemDTO {
     /**
-     * 题目的id
+     * 题目id
      */
     private Long id;
     /**
@@ -24,4 +24,12 @@ public class PolymerizationProblemDTO {
      * 图片(JSON Array)
      */
     private String images;
+    /**
+     * 类型
+     */
+    private Integer type;
+    /**
+     * 答案(JSON)
+     */
+    private String answer;
 }
