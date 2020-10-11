@@ -11,7 +11,6 @@ import com.bjfu.exam.util.DTOConvertToVOUtil;
 import com.bjfu.exam.util.SessionUtil;
 import com.bjfu.exam.vo.ResponseBody;
 import com.bjfu.exam.vo.user.UserDetailVO;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,5 +1,8 @@
 package com.bjfu.exam.exception;
 
+import lombok.Getter;
+
+@Getter
 public class UserNotExistException extends RuntimeException {
 
     private final String userId;

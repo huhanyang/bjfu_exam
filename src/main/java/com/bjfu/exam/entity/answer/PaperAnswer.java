@@ -2,7 +2,6 @@ package com.bjfu.exam.entity.answer;
 
 import com.bjfu.exam.entity.user.User;
 import com.bjfu.exam.entity.paper.Paper;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
