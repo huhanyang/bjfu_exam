@@ -1,5 +1,6 @@
-package com.bjfu.exam.request;
+package com.bjfu.exam.request.user;
 
+import com.bjfu.exam.request.BaseRequest;
 import lombok.Data;
 import org.springframework.util.StringUtils;
 

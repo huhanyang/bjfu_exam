@@ -5,7 +5,7 @@ import com.bjfu.exam.dto.paper.PaperDetailDTO;
 import com.bjfu.exam.dto.paper.PolymerizationProblemDTO;
 import com.bjfu.exam.dto.paper.ProblemDTO;
 import com.bjfu.exam.enums.ResponseBodyEnum;
-import com.bjfu.exam.request.*;
+import com.bjfu.exam.request.paper.*;
 import com.bjfu.exam.service.PaperService;
 import com.bjfu.exam.util.DTOConvertToVOUtil;
 import com.bjfu.exam.util.SessionUtil;
@@ -70,19 +70,6 @@ public class PaperController {
         return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
     }
 
-    @DeleteMapping("/delete")
-    public ResponseBody<Void> deletePaper(Long paperId, HttpSession session) {
-        if(!SessionUtil.existSession(session)) {
-            return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
-        }
-        if(paperId == null) {
-            return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
-        }
-        Long userId = (Long) session.getAttribute("userId");
-        paperService.deletePaper(userId, paperId);
-        return new ResponseBody<>(ResponseBodyEnum.SUCCESS);
-    }
-
     @PutMapping("/addPolymerizationProblem")
     public ResponseBody<PolymerizationProblemVO> addPolymerizationProblem(@RequestBody PolymerizationProblemAddRequest polymerizationProblemAddRequest,
                                                                           HttpSession session) {
@@ -103,6 +90,39 @@ public class PaperController {
         return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
     }
 
+    @PutMapping("/addImageInPolymerizationProblem")
+    public ResponseBody<PolymerizationProblemVO> addImageInPolymerizationProblem(@RequestBody ImageInPolymerizationProblemAddRequest imageInPolymerizationProblemAddRequest,
+                                                          HttpSession session) {
+        if(!SessionUtil.existSession(session)) {
+            return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
+        }
+        if(imageInPolymerizationProblemAddRequest.isComplete()) {
+            Long userId = (Long) session.getAttribute("userId");
+            PolymerizationProblemDTO polymerizationProblemDTO =
+                    paperService.addImageInPolymerizationProblem(userId, imageInPolymerizationProblemAddRequest);
+            PolymerizationProblemVO polymerizationProblemVO =
+                    DTOConvertToVOUtil.convertPolymerizationProblemDTO(polymerizationProblemDTO);
+            return new ResponseBody<>(ResponseBodyEnum.SUCCESS, polymerizationProblemVO);
+        }
+        return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
+    }
+
+    @DeleteMapping("/deleteImageInPolymerizationProblem")
+    public ResponseBody<PolymerizationProblemVO> deleteImageInPolymerizationProblem(@RequestBody ImageInPolymerizationProblemDeleteRequest imageInPolymerizationProblemDeleteRequest,
+                                                        HttpSession session) {
+        if(!SessionUtil.existSession(session)) {
+            return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
+        }
+        if(imageInPolymerizationProblemDeleteRequest.isComplete()) {
+            Long userId = (Long) session.getAttribute("userId");
+            PolymerizationProblemDTO polymerizationProblemDTO =
+                    paperService.deleteImageInPolymerizationProblem(userId, imageInPolymerizationProblemDeleteRequest);
+            PolymerizationProblemVO polymerizationProblemVO = DTOConvertToVOUtil.convertPolymerizationProblemDTO(polymerizationProblemDTO);
+            return new ResponseBody<>(ResponseBodyEnum.SUCCESS, polymerizationProblemVO);
+        }
+        return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
+    }
+
     @PutMapping("/addProblem")
     public ResponseBody<ProblemVO> addProblem(@RequestBody ProblemAddRequest problemAddRequest, HttpSession session) {
         if(!SessionUtil.existSession(session)) {
@@ -114,6 +134,36 @@ public class PaperController {
             if(problemDTO == null) {
                 return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
             }
+            ProblemVO problemVO = DTOConvertToVOUtil.convertProblemDTO(problemDTO);
+            return new ResponseBody<>(ResponseBodyEnum.SUCCESS, problemVO);
+        }
+        return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
+    }
+
+    @PutMapping("/addImageInProblem")
+    public ResponseBody<ProblemVO> addImageInProblem(@RequestBody ImageInProblemAddRequest imageInProblemAddRequest,
+                                                                                 HttpSession session) {
+        if(!SessionUtil.existSession(session)) {
+            return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
+        }
+        if(imageInProblemAddRequest.isComplete()) {
+            Long userId = (Long) session.getAttribute("userId");
+            ProblemDTO problemDTO = paperService.addImageInProblem(userId, imageInProblemAddRequest);
+            ProblemVO problemVO = DTOConvertToVOUtil.convertProblemDTO(problemDTO);
+            return new ResponseBody<>(ResponseBodyEnum.SUCCESS, problemVO);
+        }
+        return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
+    }
+
+    @DeleteMapping("/deleteImageInProblem")
+    public ResponseBody<ProblemVO> deleteImageInProblem(@RequestBody ImageInProblemDeleteRequest imageInProblemDeleteRequest,
+                                               HttpSession session) {
+        if(!SessionUtil.existSession(session)) {
+            return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
+        }
+        if(imageInProblemDeleteRequest.isComplete()) {
+            Long userId = (Long) session.getAttribute("userId");
+            ProblemDTO problemDTO = paperService.deleteImageInProblem(userId, imageInProblemDeleteRequest);
             ProblemVO problemVO = DTOConvertToVOUtil.convertProblemDTO(problemDTO);
             return new ResponseBody<>(ResponseBodyEnum.SUCCESS, problemVO);
         }
@@ -154,5 +204,18 @@ public class PaperController {
             return new ResponseBody<>(ResponseBodyEnum.SUCCESS, paperDetailVO);
         }
         return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseBody<Void> deletePaper(Long paperId, HttpSession session) {
+        if(!SessionUtil.existSession(session)) {
+            return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
+        }
+        if(paperId == null) {
+            return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
+        }
+        Long userId = (Long) session.getAttribute("userId");
+        paperService.deletePaper(userId, paperId);
+        return new ResponseBody<>(ResponseBodyEnum.SUCCESS);
     }
 }

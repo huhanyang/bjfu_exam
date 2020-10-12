@@ -15,7 +15,7 @@ import com.bjfu.exam.repository.paper.PaperRepository;
 import com.bjfu.exam.repository.paper.PolymerizationProblemRepository;
 import com.bjfu.exam.repository.paper.ProblemRepository;
 import com.bjfu.exam.repository.user.UserRepository;
-import com.bjfu.exam.request.*;
+import com.bjfu.exam.request.paper.*;
 import com.bjfu.exam.service.PaperService;
 import com.bjfu.exam.util.EntityConvertToDTOUtil;
 import com.bjfu.exam.util.RandomCodeUtil;
@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
-import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -110,10 +109,11 @@ public class PaperServiceImpl implements PaperService {
     }
 
     @Override
+    @Transactional
     public PolymerizationProblemDTO addImageInPolymerizationProblem(Long userId,
-                                                                 Long polymerizationProblemId, File image) {
+                                                                    ImageInPolymerizationProblemAddRequest imageInPolymerizationProblemAddRequest) {
         Optional<PolymerizationProblem> polymerizationProblemOptional =
-                polymerizationProblemRepository.findById(polymerizationProblemId);
+                polymerizationProblemRepository.findById(imageInPolymerizationProblemAddRequest.getPolymerizationProblemId());
         if(polymerizationProblemOptional.isEmpty()) {
             return null;
         } else {
@@ -128,7 +128,32 @@ public class PaperServiceImpl implements PaperService {
                 images = new JSONArray().toJSONString();
             }
             JSONArray jsonArray = JSONArray.parseArray(images);
-            jsonArray.add(url);
+            jsonArray.add(imageInPolymerizationProblemAddRequest.getIndex() + 1, url);
+            polymerizationProblem.setImages(jsonArray.toJSONString());
+            polymerizationProblem = polymerizationProblemRepository.save(polymerizationProblem);
+            return EntityConvertToDTOUtil.convertPolymerizationProblem(polymerizationProblem);
+        }
+    }
+
+    @Override
+    @Transactional
+    public PolymerizationProblemDTO deleteImageInPolymerizationProblem(Long userId, ImageInPolymerizationProblemDeleteRequest imageInPolymerizationProblemDeleteRequest) {
+        Optional<PolymerizationProblem> polymerizationProblemOptional =
+                polymerizationProblemRepository.findById(imageInPolymerizationProblemDeleteRequest.getPolymerizationProblemId());
+        if(polymerizationProblemOptional.isEmpty()) {
+            return null;
+        } else {
+            PolymerizationProblem polymerizationProblem = polymerizationProblemOptional.get();
+            if(!polymerizationProblem.getPaper().getCreator().getId().equals(userId)) {
+                return null;
+            }
+            String images = polymerizationProblem.getImages();
+            if(StringUtils.isEmpty(images)) {
+                images = new JSONArray().toJSONString();
+            }
+            JSONArray jsonArray = JSONArray.parseArray(images);
+            // todo 删除图片
+            jsonArray.remove(imageInPolymerizationProblemDeleteRequest.getIndex() + 1);
             polymerizationProblem.setImages(jsonArray.toJSONString());
             polymerizationProblem = polymerizationProblemRepository.save(polymerizationProblem);
             return EntityConvertToDTOUtil.convertPolymerizationProblem(polymerizationProblem);
@@ -148,8 +173,12 @@ public class PaperServiceImpl implements PaperService {
             }
             Problem problem = new Problem();
             if(problemAddRequest.getPaperId() != null && problemAddRequest.getPolymerizationProblemId() == null) {
+
+                //获取过滤
+
+
                 int sort = paperRepository.getProblemSize(problemAddRequest.getPaperId()) +
-                        paperRepository.getPolymerizationProblemSize(problemAddRequest.getPaperId()) +1;
+                        paperRepository.getPolymerizationProblemSize(problemAddRequest.getPaperId()) + 1;
                 BeanUtils.copyProperties(problemAddRequest, problem);
                 problem.setSort(sort);
                 problem.setPaper(paper);
@@ -176,8 +205,9 @@ public class PaperServiceImpl implements PaperService {
     }
 
     @Override
-    public ProblemDTO addImageInProblem(Long userId, Long problemId, File image) {
-        Optional<Problem> problemOptional = problemRepository.findById(problemId);
+    @Transactional
+    public ProblemDTO addImageInProblem(Long userId, ImageInProblemAddRequest imageInProblemAddRequest) {
+        Optional<Problem> problemOptional = problemRepository.findById(imageInProblemAddRequest.getProblemId());
         if(problemOptional.isEmpty()) {
             return null;
         } else {
@@ -192,7 +222,30 @@ public class PaperServiceImpl implements PaperService {
                 images = new JSONArray().toJSONString();
             }
             JSONArray jsonArray = JSONArray.parseArray(images);
-            jsonArray.add(url);
+            jsonArray.add(imageInProblemAddRequest.getIndex() + 1, url);
+            problem.setImages(jsonArray.toJSONString());
+            problem = problemRepository.save(problem);
+            return EntityConvertToDTOUtil.convertProblem(problem);
+        }
+    }
+
+    @Override
+    public ProblemDTO deleteImageInProblem(Long userId, ImageInProblemDeleteRequest imageInProblemDeleteRequest) {
+        Optional<Problem> problemOptional = problemRepository.findById(imageInProblemDeleteRequest.getProblemId());
+        if(problemOptional.isEmpty()) {
+            return null;
+        } else {
+            Problem problem = problemOptional.get();
+            if(!problem.getPaper().getCreator().getId().equals(userId)) {
+                return null;
+            }
+            String images = problem.getImages();
+            if(StringUtils.isEmpty(images)) {
+                images = new JSONArray().toJSONString();
+            }
+            JSONArray jsonArray = JSONArray.parseArray(images);
+            // todo 删除图片
+            jsonArray.remove(imageInProblemDeleteRequest.getIndex() + 1);
             problem.setImages(jsonArray.toJSONString());
             problem = problemRepository.save(problem);
             return EntityConvertToDTOUtil.convertProblem(problem);
@@ -265,6 +318,7 @@ public class PaperServiceImpl implements PaperService {
                 problems.remove(problem);
             }
             paper = paperRepository.save(paper);
+            // todo 删除图片
             problemRepository.deleteById(problemDeleteRequest.getProblemId());
             return EntityConvertToDTOUtil.convertPaperToDetail(paper);
         }
@@ -324,6 +378,7 @@ public class PaperServiceImpl implements PaperService {
             }
             paper = paperRepository.save(paper);
             problemRepository.deleteAllByPolymerizationProblem(polymerizationProblem1);
+            // todo 删除图片
             polymerizationProblemRepository.deleteById(polymerizationProblemDeleteRequest.getPolymerizationProblemId());
             return EntityConvertToDTOUtil.convertPaperToDetail(paper);
         }
@@ -336,6 +391,7 @@ public class PaperServiceImpl implements PaperService {
         if(paperOptional.isPresent()) {
             Paper paper = paperOptional.get();
             if(paper.getCreator().getId().equals(userId)) {
+                // todo 删除图片
                 problemRepository.deleteAllByPaper(paper);
                 polymerizationProblemRepository.deleteAllByPaper(paper);
                 paperRepository.deleteById(paper.getId());

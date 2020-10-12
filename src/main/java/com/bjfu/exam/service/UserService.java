@@ -2,9 +2,9 @@ package com.bjfu.exam.service;
 
 import com.bjfu.exam.dto.user.UserDTO;
 import com.bjfu.exam.dto.user.UserDetailDTO;
-import com.bjfu.exam.request.LoginRequest;
-import com.bjfu.exam.request.UserChangePasswordRequest;
-import com.bjfu.exam.request.UserRegisterRequest;
+import com.bjfu.exam.request.user.LoginRequest;
+import com.bjfu.exam.request.user.UserChangePasswordRequest;
+import com.bjfu.exam.request.user.UserRegisterRequest;
 
 public interface UserService {
     /**
