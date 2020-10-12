@@ -12,11 +12,10 @@ public class ProblemAddRequest extends BaseRequest {
     private String material;
     private Integer type;
     private String answer;
-    private Integer index;
 
     @Override
     public boolean isComplete() {
-        if(paperId == null || index == null || StringUtils.isEmpty(title) ||
+        if(paperId == null || StringUtils.isEmpty(title) ||
                 StringUtils.isEmpty(material) || type == null || StringUtils.isEmpty(answer)) {
             return false;
         }

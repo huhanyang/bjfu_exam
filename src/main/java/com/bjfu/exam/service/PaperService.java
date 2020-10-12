@@ -61,4 +61,8 @@ public interface PaperService {
      * 删除试卷
      */
     void deletePaper(Long userId, Long paperId);
+    /**
+     * 试卷大题排序
+     */
+    PaperDetailDTO resortProblemsInPaper(Long userId, ProblemsInPaperResortRequest problemsInPaperResortRequest);
 }

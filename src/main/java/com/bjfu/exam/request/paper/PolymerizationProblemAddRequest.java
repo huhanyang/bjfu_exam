@@ -9,12 +9,11 @@ public class PolymerizationProblemAddRequest extends BaseRequest {
     private Long paperId;
     private String title;
     private String material;
-    private Integer index;
     // todo 增加添加位置
 
     @Override
     public boolean isComplete() {
-        if(paperId == null || index == null || StringUtils.isEmpty(title) || StringUtils.isEmpty(material)) {
+        if(paperId == null || StringUtils.isEmpty(title) || StringUtils.isEmpty(material)) {
             return false;
         }
         return true;

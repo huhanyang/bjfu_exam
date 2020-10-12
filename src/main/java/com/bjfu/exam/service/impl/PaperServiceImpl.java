@@ -398,4 +398,52 @@ public class PaperServiceImpl implements PaperService {
             }
         }
     }
+
+    @Override
+    @Transactional
+    public PaperDetailDTO resortProblemsInPaper(Long userId, ProblemsInPaperResortRequest problemsInPaperResortRequest) {
+        Optional<Paper> paperOptional = paperRepository.findById(problemsInPaperResortRequest.getPaperId());
+        if(paperOptional.isEmpty()) {
+            return null;
+        }
+        Paper paper = paperOptional.get();
+        if(!paper.getCreator().getId().equals(userId)) {
+            throw new UnauthorizedOperationException(userId, "非试卷创建者试图排序题号");
+        }
+        // 1.按照sort将所有大题放入map中
+        Set<Problem> problems = paper.getProblems().stream()
+                .filter(problem -> problem.getPolymerizationProblem() == null)
+                .collect(Collectors.toSet());
+        Set<PolymerizationProblem> polymerizationProblems = paper.getPolymerizationProblems();
+        Map<Integer, Object> map = new HashMap<>();
+        problems.forEach(problem -> map.put(problem.getSort(), problem));
+        polymerizationProblems.forEach(polymerizationProblem ->
+                map.put(polymerizationProblem.getSort(), polymerizationProblem));
+        // 2.根据请求中的sort转换的map将原题目的sort进行更换
+        problemsInPaperResortRequest.getOldIndexToNewIndexMap().forEach((oldSort, newSort) -> {
+            Object problem = map.get(oldSort);
+            if(problem != null) {
+                if(map.containsKey(newSort)) {
+                    if(problem instanceof Problem) {
+                        ((Problem) problem).setSort(newSort);
+                    } else if(problem instanceof PolymerizationProblem) {
+                        ((PolymerizationProblem) problem).setSort(newSort);
+                    }
+                }
+            }
+        });
+        // 3.检查更新后是否所有题目按照sort排还是连续的
+        map.clear();
+        problems.forEach(problem -> map.put(problem.getSort(), problem));
+        polymerizationProblems.forEach(polymerizationProblem ->
+                map.put(polymerizationProblem.getSort(), polymerizationProblem));
+        for (int i = 1; i <= map.size() ; i++) {
+            if(!map.containsKey(i)) {
+                return null;
+            }
+        }
+        // 4. 保存
+        paper = paperRepository.save(paper);
+        return EntityConvertToDTOUtil.convertPaperToDetail(paper);
+    }
 }

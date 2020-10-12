@@ -218,4 +218,22 @@ public class PaperController {
         paperService.deletePaper(userId, paperId);
         return new ResponseBody<>(ResponseBodyEnum.SUCCESS);
     }
+
+    @PostMapping("/resortProblemsInPaper")
+    public ResponseBody<PaperDetailVO> resortProblemsInPaper(@RequestBody ProblemsInPaperResortRequest problemsInPaperResortRequest,
+                                                             HttpSession session) {
+        if(!SessionUtil.existSession(session)) {
+            return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
+        }
+        if(!problemsInPaperResortRequest.isComplete()) {
+            return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
+        }
+        PaperDetailDTO paperDetailDTO =
+                paperService.resortProblemsInPaper((Long) session.getAttribute("userId"), problemsInPaperResortRequest);
+        if(paperDetailDTO != null) {
+            PaperDetailVO paperDetailVO = DTOConvertToVOUtil.convertPaperDetailDTO(paperDetailDTO);
+            return new ResponseBody<>(ResponseBodyEnum.SUCCESS, paperDetailVO);
+        }
+        return new ResponseBody<>(ResponseBodyEnum.PARAM_NOT_MATCH);
+    }
 }
