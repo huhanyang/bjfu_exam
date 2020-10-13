@@ -1,6 +1,6 @@
 package com.bjfu.exam.entity.answer;
 
-import com.bjfu.exam.entity.paper.Paper;
+import com.bjfu.exam.entity.paper.Problem;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,7 +22,7 @@ public class ProblemAnswer {
      * 所属题目
      */
     @ManyToOne
-    private Paper paper;
+    private Problem problem;
     /**
      * 题目总耗时
      */

@@ -30,9 +30,12 @@ public class PaperController {
     private PaperService paperService;
 
     @GetMapping("/getByCode")
-    public ResponseBody<PaperVO> getPaper(String code) {
+    public ResponseBody<PaperVO> getPaper(String code, HttpSession session) {
         if(StringUtils.isEmpty(code)) {
             return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
+        }
+        if(!SessionUtil.existSession(session)) {
+            return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
         }
         PaperDTO paperDTO = paperService.getPaper(code);
         if(paperDTO != null) {
@@ -54,7 +57,7 @@ public class PaperController {
         return new ResponseBody<>(ResponseBodyEnum.SUCCESS, paperDetailVO);
     }
 
-    @PostMapping("/create")
+    @PutMapping("/create")
     public ResponseBody<PaperVO> createPaper(@RequestBody PaperCreateRequest paperCreateRequest, HttpSession session) {
         if(paperCreateRequest.isComplete()) {
             if(!SessionUtil.existSession(session)) {
