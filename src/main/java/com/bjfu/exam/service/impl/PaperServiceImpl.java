@@ -10,6 +10,7 @@ import com.bjfu.exam.entity.paper.PolymerizationProblem;
 import com.bjfu.exam.entity.paper.Problem;
 import com.bjfu.exam.entity.user.User;
 import com.bjfu.exam.enums.UserTypeEnum;
+import com.bjfu.exam.exception.CantFindUserWithSessionException;
 import com.bjfu.exam.exception.UnauthorizedOperationException;
 import com.bjfu.exam.repository.paper.PaperRepository;
 import com.bjfu.exam.repository.paper.PolymerizationProblemRepository;
@@ -53,7 +54,7 @@ public class PaperServiceImpl implements PaperService {
     public List<PaperDetailDTO> getAllPaperByCreatorId(Long creatorId) {
         Optional<User> userOptional = userRepository.findById(creatorId);
         if(userOptional.isEmpty()) {
-            return null;
+            return new ArrayList<>();
         }
         List<Paper> papers = paperRepository.findAllByCreator(userOptional.get());
         List<PaperDetailDTO> paperDetailDTOS = papers.stream()
@@ -67,7 +68,7 @@ public class PaperServiceImpl implements PaperService {
     public PaperDTO createPaper(PaperCreateRequest paperCreateRequest, Long creatorId) {
         Optional<User> userOptional = userRepository.findById(creatorId);
         if(userOptional.isEmpty()) {
-            return null;
+            throw new CantFindUserWithSessionException(creatorId);
         }
         User creator = userOptional.get();
         if(!creator.getType().equals(UserTypeEnum.TEACHER.getType())) {
@@ -89,6 +90,7 @@ public class PaperServiceImpl implements PaperService {
     @Transactional
     public PolymerizationProblemDTO addPolymerizationProblemInPaper(Long userId,
                                                                     PolymerizationProblemAddRequest polymerizationProblemAddRequest) {
+        // todo 做当前读
         Optional<Paper> paperOptional = paperRepository.findById(polymerizationProblemAddRequest.getPaperId());
         if(paperOptional.isEmpty()) {
             return null;
@@ -98,7 +100,7 @@ public class PaperServiceImpl implements PaperService {
                 throw new UnauthorizedOperationException(userId, "非创建者添加组合题目");
             }
             int sort = paperRepository.getProblemSize(polymerizationProblemAddRequest.getPaperId()) +
-                    paperRepository.getPolymerizationProblemSize(polymerizationProblemAddRequest.getPaperId()) +1;
+                    paperRepository.getPolymerizationProblemSize(polymerizationProblemAddRequest.getPaperId()) + 1;
             PolymerizationProblem polymerizationProblem = new PolymerizationProblem();
             BeanUtils.copyProperties(polymerizationProblemAddRequest, polymerizationProblem);
             polymerizationProblem.setSort(sort);
@@ -112,6 +114,7 @@ public class PaperServiceImpl implements PaperService {
     @Transactional
     public PolymerizationProblemDTO addImageInPolymerizationProblem(Long userId,
                                                                     ImageInPolymerizationProblemAddRequest imageInPolymerizationProblemAddRequest) {
+        // todo 或许需要做当前读
         Optional<PolymerizationProblem> polymerizationProblemOptional =
                 polymerizationProblemRepository.findById(imageInPolymerizationProblemAddRequest.getPolymerizationProblemId());
         if(polymerizationProblemOptional.isEmpty()) {
@@ -119,7 +122,7 @@ public class PaperServiceImpl implements PaperService {
         } else {
             PolymerizationProblem polymerizationProblem = polymerizationProblemOptional.get();
             if(!polymerizationProblem.getPaper().getCreator().getId().equals(userId)) {
-                return null;
+                throw new UnauthorizedOperationException(userId, "非试题创建者上传组合题目的图片");
             }
             // todo 保存图片获取保存位置url
             String url = "url";
@@ -128,7 +131,7 @@ public class PaperServiceImpl implements PaperService {
                 images = new JSONArray().toJSONString();
             }
             JSONArray jsonArray = JSONArray.parseArray(images);
-            jsonArray.add(imageInPolymerizationProblemAddRequest.getIndex() + 1, url);
+            jsonArray.add(imageInPolymerizationProblemAddRequest.getIndex() - 1, url);
             polymerizationProblem.setImages(jsonArray.toJSONString());
             polymerizationProblem = polymerizationProblemRepository.save(polymerizationProblem);
             return EntityConvertToDTOUtil.convertPolymerizationProblem(polymerizationProblem);
@@ -138,6 +141,7 @@ public class PaperServiceImpl implements PaperService {
     @Override
     @Transactional
     public PolymerizationProblemDTO deleteImageInPolymerizationProblem(Long userId, ImageInPolymerizationProblemDeleteRequest imageInPolymerizationProblemDeleteRequest) {
+        // todo 或许需要做当前读
         Optional<PolymerizationProblem> polymerizationProblemOptional =
                 polymerizationProblemRepository.findById(imageInPolymerizationProblemDeleteRequest.getPolymerizationProblemId());
         if(polymerizationProblemOptional.isEmpty()) {
@@ -145,7 +149,7 @@ public class PaperServiceImpl implements PaperService {
         } else {
             PolymerizationProblem polymerizationProblem = polymerizationProblemOptional.get();
             if(!polymerizationProblem.getPaper().getCreator().getId().equals(userId)) {
-                return null;
+                throw new UnauthorizedOperationException(userId, "非试题创建者删除组合题目的图片");
             }
             String images = polymerizationProblem.getImages();
             if(StringUtils.isEmpty(images)) {
@@ -153,7 +157,7 @@ public class PaperServiceImpl implements PaperService {
             }
             JSONArray jsonArray = JSONArray.parseArray(images);
             // todo 删除图片
-            jsonArray.remove(imageInPolymerizationProblemDeleteRequest.getIndex() + 1);
+            jsonArray.remove(imageInPolymerizationProblemDeleteRequest.getIndex() - 1);
             polymerizationProblem.setImages(jsonArray.toJSONString());
             polymerizationProblem = polymerizationProblemRepository.save(polymerizationProblem);
             return EntityConvertToDTOUtil.convertPolymerizationProblem(polymerizationProblem);
@@ -163,6 +167,7 @@ public class PaperServiceImpl implements PaperService {
     @Override
     @Transactional
     public ProblemDTO addProblem(Long userId, ProblemAddRequest problemAddRequest) {
+        // todo 当前读
         Optional<Paper> paperOptional = paperRepository.findById(problemAddRequest.getPaperId());
         if(paperOptional.isEmpty()) {
             return null;
@@ -173,10 +178,6 @@ public class PaperServiceImpl implements PaperService {
             }
             Problem problem = new Problem();
             if(problemAddRequest.getPaperId() != null && problemAddRequest.getPolymerizationProblemId() == null) {
-
-                //获取过滤
-
-
                 int sort = paperRepository.getProblemSize(problemAddRequest.getPaperId()) +
                         paperRepository.getPolymerizationProblemSize(problemAddRequest.getPaperId()) + 1;
                 BeanUtils.copyProperties(problemAddRequest, problem);
@@ -207,13 +208,14 @@ public class PaperServiceImpl implements PaperService {
     @Override
     @Transactional
     public ProblemDTO addImageInProblem(Long userId, ImageInProblemAddRequest imageInProblemAddRequest) {
+        // todo 做当前读
         Optional<Problem> problemOptional = problemRepository.findById(imageInProblemAddRequest.getProblemId());
         if(problemOptional.isEmpty()) {
             return null;
         } else {
             Problem problem = problemOptional.get();
             if(!problem.getPaper().getCreator().getId().equals(userId)) {
-                return null;
+                throw new UnauthorizedOperationException(userId, "非试题创建者添加题目的图片");
             }
             // todo 保存图片获取保存位置url
             String url = "url";
@@ -231,13 +233,14 @@ public class PaperServiceImpl implements PaperService {
 
     @Override
     public ProblemDTO deleteImageInProblem(Long userId, ImageInProblemDeleteRequest imageInProblemDeleteRequest) {
+        // todo 做当前读
         Optional<Problem> problemOptional = problemRepository.findById(imageInProblemDeleteRequest.getProblemId());
         if(problemOptional.isEmpty()) {
             return null;
         } else {
             Problem problem = problemOptional.get();
             if(!problem.getPaper().getCreator().getId().equals(userId)) {
-                return null;
+                throw new UnauthorizedOperationException(userId, "非试题创建者删除题目的图片");
             }
             String images = problem.getImages();
             if(StringUtils.isEmpty(images)) {
@@ -260,12 +263,16 @@ public class PaperServiceImpl implements PaperService {
             return null;
         } else {
             Paper paper = paperOptional.get();
+            if(!paper.getCreator().getId().equals(userId)) {
+                throw new UnauthorizedOperationException(userId, "非创建者删除题目");
+            }
             Optional<Problem> problemOptional = problemRepository.findById(problemDeleteRequest.getProblemId());
             if(problemOptional.isEmpty()) {
                 return null;
             }
             Problem problem = problemOptional.get();
             if(problem.getPaper() == null || !problem.getPaper().getId().equals(paper.getId())) {
+                //问题和试卷不相等
                 return null;
             }
             if(problem.getPolymerizationProblem() != null) {
@@ -284,11 +291,8 @@ public class PaperServiceImpl implements PaperService {
                     Problem p = problemMap.get(index);
                     p.setSort(sort);
                 }
-                problems.remove(problem);///////
+                problems.remove(problem);
             } else {
-                if(!paper.getCreator().getId().equals(userId)) {
-                    throw new UnauthorizedOperationException(userId, "非创建者删除题目");
-                }
                 //todo 排序操作可以抽取
                 Set<Problem> problems = paper.getProblems();
                 Set<PolymerizationProblem> polymerizationProblems = paper.getPolymerizationProblems();

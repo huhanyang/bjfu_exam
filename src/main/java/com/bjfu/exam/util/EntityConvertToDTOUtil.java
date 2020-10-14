@@ -15,13 +15,20 @@ import org.springframework.beans.BeanUtils;
 import java.util.stream.Collectors;
 
 public class EntityConvertToDTOUtil {
+
     public static UserDTO convertUser(User user) {
+        if(user == null) {
+            return null;
+        }
         UserDTO userDTO = new UserDTO();
         BeanUtils.copyProperties(user, userDTO);
         return userDTO;
     }
 
     public static UserDetailDTO convertUserToDetail(User user) {
+        if(user == null) {
+            return null;
+        }
         UserDetailDTO userDetailDTO = new UserDetailDTO();
         BeanUtils.copyProperties(user, userDetailDTO, "papers");
         userDetailDTO.setPapers(user.getPapers().stream()
@@ -31,6 +38,9 @@ public class EntityConvertToDTOUtil {
     }
 
     public static PaperDTO convertPaper(Paper paper) {
+        if(paper == null) {
+            return null;
+        }
         PaperDTO paperDTO = new PaperDTO();
         BeanUtils.copyProperties(paper, paperDTO, "creator");
         paperDTO.setCreator(convertUser(paper.getCreator()));
@@ -38,6 +48,9 @@ public class EntityConvertToDTOUtil {
     }
 
     public static PaperDetailDTO convertPaperToDetail(Paper paper) {
+        if(paper == null) {
+            return null;
+        }
         PaperDetailDTO paperDetailDTO = new PaperDetailDTO();
         BeanUtils.copyProperties(paper, paperDetailDTO,
                 "creator", "problems", "polymerizationProblems");
@@ -53,12 +66,18 @@ public class EntityConvertToDTOUtil {
     }
 
     public static ProblemDTO convertProblem(Problem problem) {
+        if(problem == null) {
+            return null;
+        }
         ProblemDTO problemDTO = new ProblemDTO();
         BeanUtils.copyProperties(problem, problemDTO);
         return problemDTO;
     }
 
     public static PolymerizationProblemDTO convertPolymerizationProblem(PolymerizationProblem polymerizationProblem) {
+        if(polymerizationProblem == null) {
+            return null;
+        }
         PolymerizationProblemDTO polymerizationProblemDTO = new PolymerizationProblemDTO();
         BeanUtils.copyProperties(polymerizationProblem, polymerizationProblemDTO, "problems");
         polymerizationProblemDTO.setProblems(polymerizationProblem.getProblems().stream()

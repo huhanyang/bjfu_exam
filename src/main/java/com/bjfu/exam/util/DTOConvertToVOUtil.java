@@ -17,12 +17,20 @@ import org.springframework.beans.BeanUtils;
 import java.util.stream.Collectors;
 
 public class DTOConvertToVOUtil {
+
     public static UserVO convertUserDTO(UserDTO userDTO) {
+        if(userDTO == null) {
+            return null;
+        }
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(userDTO, userVO);
         return userVO;
     }
+
     public static UserDetailVO convertUserDTOToDetail(UserDetailDTO userDetailDTO) {
+        if(userDetailDTO == null) {
+            return null;
+        }
         UserDetailVO userDetailVO = new UserDetailVO();
         BeanUtils.copyProperties(userDetailDTO, userDetailVO, "papers");
         userDetailVO.setPapers(userDetailDTO.getPapers().stream()
@@ -30,13 +38,21 @@ public class DTOConvertToVOUtil {
                 .collect(Collectors.toList()));
         return userDetailVO;
     }
+
     public static PaperVO convertPaperDTO(PaperDTO paperDTO) {
+        if(paperDTO == null) {
+            return null;
+        }
         PaperVO paperVO = new PaperVO();
         BeanUtils.copyProperties(paperDTO, paperVO, "creator");
         paperVO.setCreator(convertUserDTO(paperDTO.getCreator()));
         return paperVO;
     }
+
     public static PaperDetailVO convertPaperDetailDTO(PaperDetailDTO paperDetailDTO) {
+        if(paperDetailDTO == null) {
+            return null;
+        }
         PaperDetailVO paperDetailVO = new PaperDetailVO();
         BeanUtils.copyProperties(paperDetailDTO, paperDetailVO);
         paperDetailVO.setProblems(paperDetailDTO.getProblems().stream()
@@ -47,12 +63,20 @@ public class DTOConvertToVOUtil {
                 .collect(Collectors.toList()));
         return paperDetailVO;
     }
+
     public static ProblemVO convertProblemDTO(ProblemDTO problemDTO) {
+        if(problemDTO == null) {
+            return null;
+        }
         ProblemVO problemVO = new ProblemVO();
         BeanUtils.copyProperties(problemDTO, problemVO);
         return problemVO;
     }
+
     public static PolymerizationProblemVO convertPolymerizationProblemDTO(PolymerizationProblemDTO polymerizationProblemDTO) {
+        if(polymerizationProblemDTO == null) {
+            return null;
+        }
         PolymerizationProblemVO polymerizationProblemVO = new PolymerizationProblemVO();
         BeanUtils.copyProperties(polymerizationProblemDTO, polymerizationProblemVO, "problems");
         polymerizationProblemVO.setProblems(polymerizationProblemDTO.getProblems().stream()
