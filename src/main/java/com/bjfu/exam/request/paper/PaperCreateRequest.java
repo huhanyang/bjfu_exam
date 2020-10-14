@@ -1,5 +1,6 @@
 package com.bjfu.exam.request.paper;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.bjfu.exam.request.BaseRequest;
 import lombok.Data;
@@ -31,7 +32,7 @@ public class PaperCreateRequest extends BaseRequest {
             return false;
         }
         try {
-            JSONObject.toJSON(collection);
+            JSONArray.toJSON(collection);
             return true;
         } catch (Exception ignored) {
             return false;

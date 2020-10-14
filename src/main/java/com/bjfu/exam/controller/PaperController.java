@@ -129,7 +129,7 @@ public class PaperController {
 
     @PutMapping("/addProblem")
     public ResponseBody<ProblemVO> addProblem(@RequestBody ProblemAddRequest problemAddRequest, HttpSession session) {
-        if(problemAddRequest.isComplete()) {
+        if(!problemAddRequest.isComplete()) {
             return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
         }
         if(!SessionUtil.existSession(session)) {

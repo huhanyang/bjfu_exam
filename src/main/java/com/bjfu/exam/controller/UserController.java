@@ -77,15 +77,13 @@ public class UserController {
     public ResponseBody<UserDetailVO> getUserDetail(Long id, HttpSession session) {
         if(id == null) {
             return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
-        } else {
-            if(SessionUtil.existSession(session)) {
-                UserDetailDTO userDetailDTO = userService.getUserDetail(id);
-                UserDetailVO userDetailVO = DTOConvertToVOUtil.convertUserDTOToDetail(userDetailDTO);
-                return new ResponseBody<>(ResponseBodyEnum.SUCCESS, userDetailVO);
-            } else {
-                return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
-            }
         }
+        if(!SessionUtil.existSession(session)) {
+            return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
+        }
+        UserDetailDTO userDetailDTO = userService.getUserDetail(id);
+        UserDetailVO userDetailVO = DTOConvertToVOUtil.convertUserDTOToDetail(userDetailDTO);
+        return new ResponseBody<>(ResponseBodyEnum.SUCCESS, userDetailVO);
     }
 
 }

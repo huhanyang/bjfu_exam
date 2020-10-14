@@ -30,14 +30,13 @@ public class UserServiceImpl implements UserService {
         Optional<User> userOptional = userRepository.findByAccount(loginRequest.getAccount());
         if(userOptional.isEmpty()) {
             return null;
-        } else {
-            User user = userOptional.get();
-            if(user.getPassword().equals(loginRequest.getPassword())) {
-                return EntityConvertToDTOUtil.convertUserToDetail(user);
-            } else {
-                return null;
-            }
         }
+        User user = userOptional.get();
+        if(user.getPassword().equals(loginRequest.getPassword())) {
+            return EntityConvertToDTOUtil.convertUserToDetail(user);
+        }
+        return null;
+
     }
 
     @Override
@@ -47,15 +46,13 @@ public class UserServiceImpl implements UserService {
                 || userRegisterRequest.getType().equals(UserTypeEnum.TEACHER.getType())) {
             if(userRepository.existsByAccount(userRegisterRequest.getAccount())) {
                 return null;
-            } else {
-                User user = new User();
-                BeanUtils.copyProperties(userRegisterRequest, user);
-                user = userRepository.save(user);
-                return EntityConvertToDTOUtil.convertUserToDetail(user);
             }
-        } else {
-            throw new NotAllowOperationException("企图创建其他类型账号");
+            User user = new User();
+            BeanUtils.copyProperties(userRegisterRequest, user);
+            user = userRepository.save(user);
+            return EntityConvertToDTOUtil.convertUserToDetail(user);
         }
+        throw new NotAllowOperationException("企图创建其他类型账号");
     }
 
     @Override
@@ -63,16 +60,14 @@ public class UserServiceImpl implements UserService {
         Optional<User> userOptional = userRepository.findByAccount(userChangePasswordRequest.getAccount());
         if(userOptional.isEmpty()) {
             throw new UserNotExistException(userChangePasswordRequest.getAccount(), "修改密码的用户不存在");
-        } else {
-            User user = userOptional.get();
-            if(user.getPassword().equals(userChangePasswordRequest.getOldPassword())) {
-                user.setPassword(userChangePasswordRequest.getNewPassword());
-                user = userRepository.save(user);
-                return EntityConvertToDTOUtil.convertUser(user);
-            } else {
-                return null;
-            }
         }
+        User user = userOptional.get();
+        if(user.getPassword().equals(userChangePasswordRequest.getOldPassword())) {
+            user.setPassword(userChangePasswordRequest.getNewPassword());
+            user = userRepository.save(user);
+            return EntityConvertToDTOUtil.convertUser(user);
+        }
+        return null;
     }
 
     @Override
@@ -80,10 +75,9 @@ public class UserServiceImpl implements UserService {
         Optional<User> userOptional = userRepository.findById(id);
         if(userOptional.isEmpty()) {
             return null;
-        } else {
-            User user = userOptional.get();
-            return EntityConvertToDTOUtil.convertUserToDetail(user);
         }
+        User user = userOptional.get();
+        return EntityConvertToDTOUtil.convertUserToDetail(user);
     }
 
 }
