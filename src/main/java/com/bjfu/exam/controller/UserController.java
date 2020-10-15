@@ -11,6 +11,7 @@ import com.bjfu.exam.util.DTOConvertToVOUtil;
 import com.bjfu.exam.util.SessionUtil;
 import com.bjfu.exam.vo.ResponseBody;
 import com.bjfu.exam.vo.user.UserDetailVO;
+import com.bjfu.exam.vo.user.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -74,16 +75,26 @@ public class UserController {
     }
 
     @GetMapping("/getUserDetail")
-    public ResponseBody<UserDetailVO> getUserDetail(Long id, HttpSession session) {
+    public ResponseBody<UserDetailVO> getUserDetail(HttpSession session) {
+        if(!SessionUtil.existSession(session)) {
+            return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
+        }
+        UserDetailDTO userDetailDTO = userService.getUserDetail((Long) session.getAttribute("userId"));
+        UserDetailVO userDetailVO = DTOConvertToVOUtil.convertUserDTOToDetail(userDetailDTO);
+        return new ResponseBody<>(ResponseBodyEnum.SUCCESS, userDetailVO);
+    }
+
+    @GetMapping("/getUserInfo")
+    public ResponseBody<UserVO> getUserInfo(Long id, HttpSession session) {
         if(id == null) {
             return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
         }
         if(!SessionUtil.existSession(session)) {
             return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
         }
-        UserDetailDTO userDetailDTO = userService.getUserDetail(id);
-        UserDetailVO userDetailVO = DTOConvertToVOUtil.convertUserDTOToDetail(userDetailDTO);
-        return new ResponseBody<>(ResponseBodyEnum.SUCCESS, userDetailVO);
+        UserDTO userInfo = userService.getUserInfo(id);
+        UserVO userVO = DTOConvertToVOUtil.convertUserDTO(userInfo);
+        return new ResponseBody<>(ResponseBodyEnum.SUCCESS, userVO);
     }
 
 }

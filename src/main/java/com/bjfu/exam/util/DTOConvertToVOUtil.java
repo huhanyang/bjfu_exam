@@ -1,11 +1,19 @@
 package com.bjfu.exam.util;
 
+import com.bjfu.exam.dto.answer.PaperAnswerDTO;
+import com.bjfu.exam.dto.answer.PaperAnswerDetailDTO;
+import com.bjfu.exam.dto.answer.ProblemAnswerDTO;
+import com.bjfu.exam.dto.answer.ProblemAnswerDetailDTO;
 import com.bjfu.exam.dto.paper.PaperDTO;
 import com.bjfu.exam.dto.paper.PaperDetailDTO;
 import com.bjfu.exam.dto.paper.PolymerizationProblemDTO;
 import com.bjfu.exam.dto.paper.ProblemDTO;
 import com.bjfu.exam.dto.user.UserDTO;
 import com.bjfu.exam.dto.user.UserDetailDTO;
+import com.bjfu.exam.vo.answer.PaperAnswerDetailVO;
+import com.bjfu.exam.vo.answer.PaperAnswerVO;
+import com.bjfu.exam.vo.answer.ProblemAnswerDetailVO;
+import com.bjfu.exam.vo.answer.ProblemAnswerVO;
 import com.bjfu.exam.vo.paper.PaperDetailVO;
 import com.bjfu.exam.vo.paper.PaperVO;
 import com.bjfu.exam.vo.paper.PolymerizationProblemVO;
@@ -17,6 +25,8 @@ import org.springframework.beans.BeanUtils;
 import java.util.stream.Collectors;
 
 public class DTOConvertToVOUtil {
+    
+    private DTOConvertToVOUtil(){}
 
     public static UserVO convertUserDTO(UserDTO userDTO) {
         if(userDTO == null) {
@@ -84,4 +94,50 @@ public class DTOConvertToVOUtil {
                 .collect(Collectors.toList()));
         return polymerizationProblemVO;
     }
+
+    public static PaperAnswerVO convertPaperAnswerDTO(PaperAnswerDTO paperAnswerDTO) {
+        if(paperAnswerDTO == null) {
+            return null;
+        }
+        PaperAnswerVO paperAnswerVO = new PaperAnswerVO();
+        BeanUtils.copyProperties(paperAnswerDTO, paperAnswerVO);
+        return paperAnswerVO;
+    }
+
+    public static PaperAnswerDetailVO convertPaperAnswerDetailDTO(PaperAnswerDetailDTO paperAnswerDetailDTO) {
+        if(paperAnswerDetailDTO == null) {
+            return null;
+        }
+        PaperAnswerDetailVO paperAnswerDetailVO = new PaperAnswerDetailVO();
+        BeanUtils.copyProperties(paperAnswerDetailDTO, paperAnswerDetailVO,
+                "user", "paper", "problemAnswers");
+        paperAnswerDetailVO.setUser(convertUserDTO(paperAnswerDetailDTO.getUser()));
+        paperAnswerDetailVO.setPaper(convertPaperDTO(paperAnswerDetailDTO.getPaper()));
+        paperAnswerDetailVO.setProblemAnswers(paperAnswerDetailDTO.getProblemAnswers().stream()
+                .map(DTOConvertToVOUtil::convertPaperAnswerDetailDTO)
+                .collect(Collectors.toList()));
+        return paperAnswerDetailVO;
+    }
+
+    public static ProblemAnswerVO convertPaperAnswerDTO(ProblemAnswerDTO problemAnswerDTO) {
+        if(problemAnswerDTO == null) {
+            return null;
+        }
+        ProblemAnswerVO problemAnswerVO = new ProblemAnswerVO();
+        BeanUtils.copyProperties(problemAnswerDTO, problemAnswerVO);
+        return problemAnswerVO;
+    }
+
+    public static ProblemAnswerDetailVO convertPaperAnswerDetailDTO(ProblemAnswerDetailDTO problemAnswerDetailDTO) {
+        if(problemAnswerDetailDTO == null) {
+            return null;
+        }
+        ProblemAnswerDetailVO problemAnswerDetailVO = new ProblemAnswerDetailVO();
+        BeanUtils.copyProperties(problemAnswerDetailDTO, problemAnswerDetailVO,
+                "paperAnswer", "problem");
+        problemAnswerDetailVO.setPaperAnswer(convertPaperAnswerDTO(problemAnswerDetailDTO.getPaperAnswer()));
+        problemAnswerDetailVO.setProblem(convertProblemDTO(problemAnswerDetailDTO.getProblem()));
+        return problemAnswerDetailVO;
+    }
+
 }

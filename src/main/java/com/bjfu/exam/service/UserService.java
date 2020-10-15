@@ -20,7 +20,11 @@ public interface UserService {
      */
     UserDTO changePassword(UserChangePasswordRequest userChangePasswordRequest);
     /**
-     * 获取用户详情
+     * 获取用户详情信息
      */
     UserDetailDTO getUserDetail(Long id);
+    /**
+     * 获取用户的信息
+     */
+    UserDTO getUserInfo(Long id);
 }

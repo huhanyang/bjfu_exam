@@ -20,7 +20,7 @@ public interface PaperService {
     /**
      * 创建试卷(未创建题目)
      */
-    PaperDTO createPaper(PaperCreateRequest paperCreateRequest, Long creatorId);
+    PaperDetailDTO createPaper(PaperCreateRequest paperCreateRequest, Long creatorId);
     /**
      * 为试卷添加组合题目
      */
@@ -60,7 +60,7 @@ public interface PaperService {
     /**
      * 删除试卷
      */
-    void deletePaper(Long userId, Long paperId);
+    boolean deletePaper(Long userId, Long paperId);
     /**
      * 试卷大题排序
      */

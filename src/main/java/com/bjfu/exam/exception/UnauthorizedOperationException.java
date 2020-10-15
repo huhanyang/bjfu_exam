@@ -1,17 +1,16 @@
 package com.bjfu.exam.exception;
 
+import com.bjfu.exam.enums.ResponseBodyEnum;
 import lombok.Getter;
 
 @Getter
-public class UnauthorizedOperationException extends RuntimeException{
+public class UnauthorizedOperationException extends BaseException{
 
-    private final String userId;
-    private final String message;
+    private final Long userId;
 
-    public UnauthorizedOperationException(Long userId, String message) {
-        super(message);
-        this.userId = userId.toString();
-        this.message = message;
+    public UnauthorizedOperationException(Long userId, ResponseBodyEnum responseBodyEnum) {
+        super(responseBodyEnum);
+        this.userId = userId;
     }
 
 }

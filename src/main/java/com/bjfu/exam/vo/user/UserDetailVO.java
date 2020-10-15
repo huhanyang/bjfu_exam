@@ -1,5 +1,6 @@
 package com.bjfu.exam.vo.user;
 
+import com.bjfu.exam.vo.answer.PaperAnswerVO;
 import com.bjfu.exam.vo.paper.PaperVO;
 import lombok.Data;
 
@@ -23,4 +24,8 @@ public class UserDetailVO {
      * 创建的试卷
      */
     private List<PaperVO> papers;
+    /**
+     * 试卷作答
+     */
+    private List<PaperAnswerVO> paperAnswers;
 }

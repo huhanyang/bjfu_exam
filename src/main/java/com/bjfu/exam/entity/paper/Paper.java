@@ -48,7 +48,7 @@ public class Paper {
     /**
      * 试卷状态
      */
-    private int status;
+    private Integer state;
 
     /**
      * 试卷的题目

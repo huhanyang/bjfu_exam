@@ -1,5 +1,6 @@
 package com.bjfu.exam.dto.user;
 
+import com.bjfu.exam.dto.answer.PaperAnswerDTO;
 import com.bjfu.exam.dto.paper.PaperDTO;
 import lombok.Data;
 
@@ -27,4 +28,8 @@ public class UserDetailDTO {
      * 创建的试卷
      */
     private List<PaperDTO> papers;
+    /**
+     * 作答的试卷
+     */
+    private List<PaperAnswerDTO> paperAnswers;
 }

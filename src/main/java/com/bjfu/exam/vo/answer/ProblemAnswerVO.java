@@ -1,10 +1,9 @@
-package com.bjfu.exam.dto.answer;
+package com.bjfu.exam.vo.answer;
 
 import lombok.Data;
 
-
 @Data
-public class ProblemAnswerDTO {
+public class ProblemAnswerVO {
     /**
      * 答题id
      */

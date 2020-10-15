@@ -1,13 +1,14 @@
-package com.bjfu.exam.dto.answer;
+package com.bjfu.exam.vo.answer;
 
-import com.bjfu.exam.dto.paper.PaperDTO;
-import com.bjfu.exam.dto.user.UserDTO;
+import com.bjfu.exam.vo.paper.PaperVO;
+import com.bjfu.exam.vo.user.UserVO;
 import lombok.Data;
 
 import java.util.List;
 
+
 @Data
-public class PaperAnswerDetailDTO {
+public class PaperAnswerDetailVO {
     /**
      * 答卷id
      */
@@ -15,11 +16,11 @@ public class PaperAnswerDetailDTO {
     /**
      * 答题用户
      */
-    private UserDTO user;
+    private UserVO user;
     /**
      * 所答试卷
      */
-    private PaperDTO paper;
+    private PaperVO paper;
     /**
      * 收集项答案(JSON)
      */
@@ -31,5 +32,5 @@ public class PaperAnswerDetailDTO {
     /**
      * 题目答案
      */
-    List<ProblemAnswerDetailDTO> problemAnswers;
+    List<ProblemAnswerDetailVO> problemAnswers;
 }

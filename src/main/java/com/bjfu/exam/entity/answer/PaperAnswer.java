@@ -31,9 +31,9 @@ public class PaperAnswer {
      */
     private String collectionAnswer;
     /**
-     * 总耗时(秒)
+     * 答卷状态
      */
-    private Integer time;
+    private Integer state;
 
     @OneToMany(mappedBy = "paperAnswer")
     Set<ProblemAnswer> problemAnswers = new HashSet<>();

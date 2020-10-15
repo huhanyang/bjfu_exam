@@ -1,26 +1,16 @@
 package com.bjfu.exam.exception;
 
+import com.bjfu.exam.enums.ResponseBodyEnum;
 import lombok.Getter;
 
 @Getter
-public class UserNotExistException extends RuntimeException {
+public class UserNotExistException extends BaseException {
 
-    private final String userId;
-    private final String userAccount;
-    private final String message;
+    private final Long userId;
 
-    public UserNotExistException(String userAccount, String message) {
-        super(message);
-        this.userId = null;
-        this.userAccount = userAccount;
-        this.message = message;
-    }
-
-    public UserNotExistException(Long userId, String message) {
-        super(message);
-        this.userId = userId.toString();
-        this.userAccount = null;
-        this.message = message;
+    public UserNotExistException(Long userId, ResponseBodyEnum responseBodyEnum) {
+        super(responseBodyEnum);
+        this.userId = userId;
     }
 
 }

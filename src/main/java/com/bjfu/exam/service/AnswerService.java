@@ -1,11 +1,39 @@
 package com.bjfu.exam.service;
 
 import com.bjfu.exam.dto.answer.PaperAnswerDTO;
+import com.bjfu.exam.dto.answer.PaperAnswerDetailDTO;
+import com.bjfu.exam.dto.answer.ProblemAnswerDTO;
+import com.bjfu.exam.dto.paper.PolymerizationProblemDTO;
 import com.bjfu.exam.dto.paper.ProblemDTO;
 import com.bjfu.exam.request.answer.PaperAnswerCreateRequest;
+import com.bjfu.exam.request.answer.ProblemAnswerSubmitRequest;
+import com.bjfu.exam.request.answer.ProblemGetRequest;
+
+import java.util.List;
 
 public interface AnswerService {
-    PaperAnswerDTO createPaperAnswer(PaperAnswerCreateRequest paperAnswerCreateRequest);
-    // todo 获取下一题
-    ProblemDTO getNextProblem();
+    /**
+     * 获取创建的试题试卷
+     */
+    List<PaperAnswerDTO> getPaperAnswers(Long userId);
+    /**
+     * 获取试题试卷详情
+     */
+    PaperAnswerDetailDTO getPaperAnswers(Long userId, Long paperAnswerId);
+    /**
+     * 创建答题试卷
+     */
+    PaperAnswerDTO createPaperAnswer(Long userId, PaperAnswerCreateRequest paperAnswerCreateRequest);
+    /**
+     * 获取题目
+     */
+    ProblemDTO getProblem(Long userId, ProblemGetRequest problemGetRequest);
+    /**
+     * 获取组合题目
+     */
+    PolymerizationProblemDTO getPolymerizationProblem(Long userId, ProblemGetRequest problemGetRequest);
+    /**
+     * 提交单个题目答案
+     */
+    ProblemAnswerDTO submitAnswer(Long userId, ProblemAnswerSubmitRequest problemAnswerSubmitRequest);
 }

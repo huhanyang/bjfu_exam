@@ -3,9 +3,9 @@ package com.bjfu.exam.service.impl;
 import com.bjfu.exam.dto.user.UserDTO;
 import com.bjfu.exam.dto.user.UserDetailDTO;
 import com.bjfu.exam.entity.user.User;
+import com.bjfu.exam.enums.ResponseBodyEnum;
 import com.bjfu.exam.enums.UserTypeEnum;
 import com.bjfu.exam.exception.NotAllowOperationException;
-import com.bjfu.exam.exception.UserNotExistException;
 import com.bjfu.exam.repository.user.UserRepository;
 import com.bjfu.exam.request.user.LoginRequest;
 import com.bjfu.exam.request.user.UserChangePasswordRequest;
@@ -52,14 +52,14 @@ public class UserServiceImpl implements UserService {
             user = userRepository.save(user);
             return EntityConvertToDTOUtil.convertUserToDetail(user);
         }
-        throw new NotAllowOperationException("企图创建其他类型账号");
+        throw new NotAllowOperationException(ResponseBodyEnum.CREATE_NOT_ALLOW_ACCOUNT_TYPE);
     }
 
     @Override
     public UserDTO changePassword(UserChangePasswordRequest userChangePasswordRequest) {
         Optional<User> userOptional = userRepository.findByAccount(userChangePasswordRequest.getAccount());
         if(userOptional.isEmpty()) {
-            throw new UserNotExistException(userChangePasswordRequest.getAccount(), "修改密码的用户不存在");
+            return null;
         }
         User user = userOptional.get();
         if(user.getPassword().equals(userChangePasswordRequest.getOldPassword())) {
@@ -78,6 +78,16 @@ public class UserServiceImpl implements UserService {
         }
         User user = userOptional.get();
         return EntityConvertToDTOUtil.convertUserToDetail(user);
+    }
+
+    @Override
+    public UserDTO getUserInfo(Long id) {
+        Optional<User> userOptional = userRepository.findById(id);
+        if(userOptional.isEmpty()) {
+            return null;
+        }
+        User user = userOptional.get();
+        return EntityConvertToDTOUtil.convertUser(user);
     }
 
 }

@@ -9,9 +9,9 @@ import com.bjfu.exam.entity.paper.Paper;
 import com.bjfu.exam.entity.paper.PolymerizationProblem;
 import com.bjfu.exam.entity.paper.Problem;
 import com.bjfu.exam.entity.user.User;
+import com.bjfu.exam.enums.ResponseBodyEnum;
 import com.bjfu.exam.enums.UserTypeEnum;
-import com.bjfu.exam.exception.CantFindUserWithSessionException;
-import com.bjfu.exam.exception.UnauthorizedOperationException;
+import com.bjfu.exam.exception.*;
 import com.bjfu.exam.repository.paper.PaperRepository;
 import com.bjfu.exam.repository.paper.PolymerizationProblemRepository;
 import com.bjfu.exam.repository.paper.ProblemRepository;
@@ -54,7 +54,7 @@ public class PaperServiceImpl implements PaperService {
     public List<PaperDetailDTO> getAllPaperByCreatorId(Long creatorId) {
         Optional<User> userOptional = userRepository.findById(creatorId);
         if(userOptional.isEmpty()) {
-            return new ArrayList<>();
+            throw new UserNotExistException(creatorId, ResponseBodyEnum.USER_NOT_EXIST);
         }
         List<Paper> papers = paperRepository.findAllByCreator(userOptional.get());
         List<PaperDetailDTO> paperDetailDTOS = papers.stream()
@@ -65,290 +65,288 @@ public class PaperServiceImpl implements PaperService {
 
     @Override
     @Transactional
-    public PaperDTO createPaper(PaperCreateRequest paperCreateRequest, Long creatorId) {
+    public PaperDetailDTO createPaper(PaperCreateRequest paperCreateRequest, Long creatorId) {
         Optional<User> userOptional = userRepository.findById(creatorId);
         if(userOptional.isEmpty()) {
-            throw new CantFindUserWithSessionException(creatorId);
+            throw new UserNotExistException(creatorId, ResponseBodyEnum.USER_NOT_EXIST);
         }
         User creator = userOptional.get();
         if(!creator.getType().equals(UserTypeEnum.TEACHER.getType())) {
-            throw new UnauthorizedOperationException(creatorId, "非教师用户试图创建试卷");
+            throw new UnauthorizedOperationException(creatorId, ResponseBodyEnum.NOT_TEACHER_CREATE_PAPER);
         }
         Paper paper = new Paper();
         BeanUtils.copyProperties(paperCreateRequest, paper);
         paper.setCreator(creator);
         String code = RandomCodeUtil.nextCodeWithCharAndNumber();
+        // todo 6位随机码的设计需要重新考虑 参考id生成
         while(paperRepository.existsByCode(code)) {
             code = RandomCodeUtil.nextCodeWithCharAndNumber();
         }
         paper.setCode(code);
         paper = paperRepository.save(paper);
-        return EntityConvertToDTOUtil.convertPaper(paper);
+        return EntityConvertToDTOUtil.convertPaperToDetail(paper);
     }
 
     @Override
     @Transactional
     public PolymerizationProblemDTO addPolymerizationProblemInPaper(Long userId,
                                                                     PolymerizationProblemAddRequest polymerizationProblemAddRequest) {
-        // todo 做当前读
+        // 为此试卷加锁
+        paperRepository.existsById(polymerizationProblemAddRequest.getPaperId());
         Optional<Paper> paperOptional = paperRepository.findById(polymerizationProblemAddRequest.getPaperId());
         if(paperOptional.isEmpty()) {
-            return null;
-        } else {
-            Paper paper = paperOptional.get();
-            if(!paper.getCreator().getId().equals(userId)) {
-                throw new UnauthorizedOperationException(userId, "非创建者添加组合题目");
-            }
-            int sort = paperRepository.getProblemSize(polymerizationProblemAddRequest.getPaperId()) +
-                    paperRepository.getPolymerizationProblemSize(polymerizationProblemAddRequest.getPaperId()) + 1;
-            PolymerizationProblem polymerizationProblem = new PolymerizationProblem();
-            BeanUtils.copyProperties(polymerizationProblemAddRequest, polymerizationProblem);
-            polymerizationProblem.setSort(sort);
-            polymerizationProblem.setPaper(paper);
-            polymerizationProblem = polymerizationProblemRepository.save(polymerizationProblem);
-            return EntityConvertToDTOUtil.convertPolymerizationProblem(polymerizationProblem);
+            throw new BadParamException(ResponseBodyEnum.PAPER_NOT_EXIST);
         }
+        Paper paper = paperOptional.get();
+        if(!paper.getCreator().getId().equals(userId)) {
+            throw new UnauthorizedOperationException(userId, ResponseBodyEnum.NOT_CREATOR_EDIT_PAPER);
+        }
+        int sort = paperRepository.getProblemSize(polymerizationProblemAddRequest.getPaperId()) +
+                paperRepository.getPolymerizationProblemSize(polymerizationProblemAddRequest.getPaperId()) + 1;
+        PolymerizationProblem polymerizationProblem = new PolymerizationProblem();
+        BeanUtils.copyProperties(polymerizationProblemAddRequest, polymerizationProblem);
+        polymerizationProblem.setSort(sort);
+        polymerizationProblem.setPaper(paper);
+        polymerizationProblem = polymerizationProblemRepository.save(polymerizationProblem);
+        return EntityConvertToDTOUtil.convertPolymerizationProblem(polymerizationProblem);
     }
 
     @Override
     @Transactional
     public PolymerizationProblemDTO addImageInPolymerizationProblem(Long userId,
                                                                     ImageInPolymerizationProblemAddRequest imageInPolymerizationProblemAddRequest) {
-        // todo 或许需要做当前读
+        // 对此组合题目加锁
         Optional<PolymerizationProblem> polymerizationProblemOptional =
-                polymerizationProblemRepository.findById(imageInPolymerizationProblemAddRequest.getPolymerizationProblemId());
+                polymerizationProblemRepository.findByIdForUpdate(imageInPolymerizationProblemAddRequest.getPolymerizationProblemId());
         if(polymerizationProblemOptional.isEmpty()) {
-            return null;
-        } else {
-            PolymerizationProblem polymerizationProblem = polymerizationProblemOptional.get();
-            if(!polymerizationProblem.getPaper().getCreator().getId().equals(userId)) {
-                throw new UnauthorizedOperationException(userId, "非试题创建者上传组合题目的图片");
-            }
-            // todo 保存图片获取保存位置url
-            String url = "url";
-            String images = polymerizationProblem.getImages();
-            if(StringUtils.isEmpty(images)) {
-                images = new JSONArray().toJSONString();
-            }
-            JSONArray jsonArray = JSONArray.parseArray(images);
-            jsonArray.add(imageInPolymerizationProblemAddRequest.getIndex() - 1, url);
-            polymerizationProblem.setImages(jsonArray.toJSONString());
-            polymerizationProblem = polymerizationProblemRepository.save(polymerizationProblem);
-            return EntityConvertToDTOUtil.convertPolymerizationProblem(polymerizationProblem);
+            throw new BadParamException(ResponseBodyEnum.POLYMERIZATION_PROBLEM_NOT_EXIST);
         }
+        PolymerizationProblem polymerizationProblem = polymerizationProblemOptional.get();
+        if(!polymerizationProblem.getPaper().getCreator().getId().equals(userId)) {
+            throw new UnauthorizedOperationException(userId, ResponseBodyEnum.NOT_CREATOR_EDIT_PAPER);
+        }
+        // todo 保存图片获取保存位置url
+        String url = "url";
+        String images = polymerizationProblem.getImages();
+        if(StringUtils.isEmpty(images)) {
+            images = new JSONArray().toJSONString();
+        }
+        JSONArray jsonArray = JSONArray.parseArray(images);
+        jsonArray.add(imageInPolymerizationProblemAddRequest.getIndex() - 1, url);
+        polymerizationProblem.setImages(jsonArray.toJSONString());
+        polymerizationProblem = polymerizationProblemRepository.save(polymerizationProblem);
+        return EntityConvertToDTOUtil.convertPolymerizationProblem(polymerizationProblem);
     }
 
     @Override
     @Transactional
     public PolymerizationProblemDTO deleteImageInPolymerizationProblem(Long userId, ImageInPolymerizationProblemDeleteRequest imageInPolymerizationProblemDeleteRequest) {
-        // todo 或许需要做当前读
+        // 对此组合题目加锁
         Optional<PolymerizationProblem> polymerizationProblemOptional =
-                polymerizationProblemRepository.findById(imageInPolymerizationProblemDeleteRequest.getPolymerizationProblemId());
+                polymerizationProblemRepository.findByIdForUpdate(imageInPolymerizationProblemDeleteRequest.getPolymerizationProblemId());
         if(polymerizationProblemOptional.isEmpty()) {
-            return null;
-        } else {
-            PolymerizationProblem polymerizationProblem = polymerizationProblemOptional.get();
-            if(!polymerizationProblem.getPaper().getCreator().getId().equals(userId)) {
-                throw new UnauthorizedOperationException(userId, "非试题创建者删除组合题目的图片");
-            }
-            String images = polymerizationProblem.getImages();
-            if(StringUtils.isEmpty(images)) {
-                images = new JSONArray().toJSONString();
-            }
-            JSONArray jsonArray = JSONArray.parseArray(images);
-            // todo 删除图片
-            jsonArray.remove(imageInPolymerizationProblemDeleteRequest.getIndex() - 1);
-            polymerizationProblem.setImages(jsonArray.toJSONString());
-            polymerizationProblem = polymerizationProblemRepository.save(polymerizationProblem);
-            return EntityConvertToDTOUtil.convertPolymerizationProblem(polymerizationProblem);
+            throw new BadParamException(ResponseBodyEnum.POLYMERIZATION_PROBLEM_NOT_EXIST);
         }
+        PolymerizationProblem polymerizationProblem = polymerizationProblemOptional.get();
+        if(!polymerizationProblem.getPaper().getCreator().getId().equals(userId)) {
+            throw new UnauthorizedOperationException(userId, ResponseBodyEnum.NOT_CREATOR_EDIT_PAPER);
+        }
+        String images = polymerizationProblem.getImages();
+        if(StringUtils.isEmpty(images)) {
+            images = new JSONArray().toJSONString();
+        }
+        JSONArray jsonArray = JSONArray.parseArray(images);
+        // todo 删除图片
+        jsonArray.remove(imageInPolymerizationProblemDeleteRequest.getIndex() - 1);
+        polymerizationProblem.setImages(jsonArray.toJSONString());
+        polymerizationProblem = polymerizationProblemRepository.save(polymerizationProblem);
+        return EntityConvertToDTOUtil.convertPolymerizationProblem(polymerizationProblem);
     }
 
     @Override
     @Transactional
     public ProblemDTO addProblem(Long userId, ProblemAddRequest problemAddRequest) {
-        // todo 当前读
-        Optional<Paper> paperOptional = paperRepository.findById(problemAddRequest.getPaperId());
+        // 为此试卷加锁
+        Optional<Paper> paperOptional = paperRepository.findByIdForUpdate(problemAddRequest.getPaperId());
         if(paperOptional.isEmpty()) {
-            return null;
+            throw new BadParamException(ResponseBodyEnum.PAPER_NOT_EXIST);
+        }
+        Paper paper = paperOptional.get();
+        if(!paper.getCreator().getId().equals(userId)) {
+            throw new UnauthorizedOperationException(userId, ResponseBodyEnum.NOT_CREATOR_EDIT_PAPER);
+        }
+        Problem problem = new Problem();
+        if(problemAddRequest.getPaperId() != null && problemAddRequest.getPolymerizationProblemId() == null) {
+            int sort = paperRepository.getProblemSize(problemAddRequest.getPaperId()) +
+                    paperRepository.getPolymerizationProblemSize(problemAddRequest.getPaperId()) + 1;
+            BeanUtils.copyProperties(problemAddRequest, problem);
+            problem.setSort(sort);
+            problem.setPaper(paper);
+            problem = problemRepository.save(problem);
+            return EntityConvertToDTOUtil.convertProblem(problem);
+        } else if(problemAddRequest.getPaperId() != null && problemAddRequest.getPolymerizationProblemId() != null){
+            Optional<PolymerizationProblem> polymerizationProblemOptional = polymerizationProblemRepository
+                    .findById(problemAddRequest.getPolymerizationProblemId());
+            if(polymerizationProblemOptional.isEmpty()) {
+                throw new BadParamException(ResponseBodyEnum.POLYMERIZATION_PROBLEM_NOT_EXIST);
+            }
+            PolymerizationProblem polymerizationProblem = polymerizationProblemOptional.get();
+            int sort = polymerizationProblem.getProblems().size() + 1;
+            BeanUtils.copyProperties(problemAddRequest, problem);
+            problem.setSort(sort);
+            problem.setPaper(paper);
+            problem.setPolymerizationProblem(polymerizationProblem);
+            problem = problemRepository.save(problem);
+            return EntityConvertToDTOUtil.convertProblem(problem);
         } else {
-            Paper paper = paperOptional.get();
-            if(!paper.getCreator().getId().equals(userId)) {
-                throw new UnauthorizedOperationException(userId, "非创建者添加题目");
-            }
-            Problem problem = new Problem();
-            if(problemAddRequest.getPaperId() != null && problemAddRequest.getPolymerizationProblemId() == null) {
-                int sort = paperRepository.getProblemSize(problemAddRequest.getPaperId()) +
-                        paperRepository.getPolymerizationProblemSize(problemAddRequest.getPaperId()) + 1;
-                BeanUtils.copyProperties(problemAddRequest, problem);
-                problem.setSort(sort);
-                problem.setPaper(paper);
-                problem = problemRepository.save(problem);
-                return EntityConvertToDTOUtil.convertProblem(problem);
-            } else if(problemAddRequest.getPaperId() != null && problemAddRequest.getPolymerizationProblemId() != null){
-                Optional<PolymerizationProblem> polymerizationProblemOptional = polymerizationProblemRepository
-                        .findById(problemAddRequest.getPolymerizationProblemId());
-                if(polymerizationProblemOptional.isEmpty()) {
-                    return null;
-                }
-                PolymerizationProblem polymerizationProblem = polymerizationProblemOptional.get();
-                int sort = polymerizationProblem.getProblems().size() + 1;
-                BeanUtils.copyProperties(problemAddRequest, problem);
-                problem.setSort(sort);
-                problem.setPaper(paper);
-                problem.setPolymerizationProblem(polymerizationProblem);
-                problem = problemRepository.save(problem);
-                return EntityConvertToDTOUtil.convertProblem(problem);
-            } else {
-                return null;
-            }
+            throw new BadParamException(ResponseBodyEnum.PARAM_WRONG);
         }
     }
 
     @Override
     @Transactional
     public ProblemDTO addImageInProblem(Long userId, ImageInProblemAddRequest imageInProblemAddRequest) {
-        // todo 做当前读
-        Optional<Problem> problemOptional = problemRepository.findById(imageInProblemAddRequest.getProblemId());
+        // 为此问题加锁
+        Optional<Problem> problemOptional = problemRepository.findByIdForUpdate(imageInProblemAddRequest.getProblemId());
         if(problemOptional.isEmpty()) {
-            return null;
-        } else {
-            Problem problem = problemOptional.get();
-            if(!problem.getPaper().getCreator().getId().equals(userId)) {
-                throw new UnauthorizedOperationException(userId, "非试题创建者添加题目的图片");
-            }
-            // todo 保存图片获取保存位置url
-            String url = "url";
-            String images = problem.getImages();
-            if(StringUtils.isEmpty(images)) {
-                images = new JSONArray().toJSONString();
-            }
-            JSONArray jsonArray = JSONArray.parseArray(images);
-            jsonArray.add(imageInProblemAddRequest.getIndex() + 1, url);
-            problem.setImages(jsonArray.toJSONString());
-            problem = problemRepository.save(problem);
-            return EntityConvertToDTOUtil.convertProblem(problem);
+            throw new BadParamException(ResponseBodyEnum.PROBLEM_NOT_EXIST);
         }
+        Problem problem = problemOptional.get();
+        if(!problem.getPaper().getCreator().getId().equals(userId)) {
+            throw new UnauthorizedOperationException(userId, ResponseBodyEnum.NOT_CREATOR_EDIT_PAPER);
+        }
+        // todo 保存图片获取保存位置url
+        String url = "url";
+        String images = problem.getImages();
+        if(StringUtils.isEmpty(images)) {
+            images = new JSONArray().toJSONString();
+        }
+        JSONArray jsonArray = JSONArray.parseArray(images);
+        jsonArray.add(imageInProblemAddRequest.getIndex() + 1, url);
+        problem.setImages(jsonArray.toJSONString());
+        problem = problemRepository.save(problem);
+        return EntityConvertToDTOUtil.convertProblem(problem);
     }
 
     @Override
+    @Transactional
     public ProblemDTO deleteImageInProblem(Long userId, ImageInProblemDeleteRequest imageInProblemDeleteRequest) {
-        // todo 做当前读
-        Optional<Problem> problemOptional = problemRepository.findById(imageInProblemDeleteRequest.getProblemId());
+        // 为此问题加锁
+        Optional<Problem> problemOptional = problemRepository.findByIdForUpdate(imageInProblemDeleteRequest.getProblemId());
         if(problemOptional.isEmpty()) {
-            return null;
-        } else {
-            Problem problem = problemOptional.get();
-            if(!problem.getPaper().getCreator().getId().equals(userId)) {
-                throw new UnauthorizedOperationException(userId, "非试题创建者删除题目的图片");
-            }
-            String images = problem.getImages();
-            if(StringUtils.isEmpty(images)) {
-                images = new JSONArray().toJSONString();
-            }
-            JSONArray jsonArray = JSONArray.parseArray(images);
-            // todo 删除图片
-            jsonArray.remove(imageInProblemDeleteRequest.getIndex() + 1);
-            problem.setImages(jsonArray.toJSONString());
-            problem = problemRepository.save(problem);
-            return EntityConvertToDTOUtil.convertProblem(problem);
+            throw new BadParamException(ResponseBodyEnum.PROBLEM_NOT_EXIST);
         }
+        Problem problem = problemOptional.get();
+        if(!problem.getPaper().getCreator().getId().equals(userId)) {
+            throw new UnauthorizedOperationException(userId, ResponseBodyEnum.NOT_CREATOR_EDIT_PAPER);
+        }
+        String images = problem.getImages();
+        if(StringUtils.isEmpty(images)) {
+            images = new JSONArray().toJSONString();
+        }
+        JSONArray jsonArray = JSONArray.parseArray(images);
+        // todo 删除图片
+        jsonArray.remove(imageInProblemDeleteRequest.getIndex() + 1);
+        problem.setImages(jsonArray.toJSONString());
+        problem = problemRepository.save(problem);
+        return EntityConvertToDTOUtil.convertProblem(problem);
     }
 
     @Override
     @Transactional
     public PaperDetailDTO deleteProblem(Long userId, ProblemDeleteRequest problemDeleteRequest) {
-        Optional<Paper> paperOptional = paperRepository.findById(problemDeleteRequest.getPaperId());
+        // 为此试卷加锁
+        Optional<Paper> paperOptional = paperRepository.findByIdForUpdate(problemDeleteRequest.getPaperId());
         if(paperOptional.isEmpty()) {
-            return null;
+            throw new BadParamException(ResponseBodyEnum.PAPER_NOT_EXIST);
+        }
+        Paper paper = paperOptional.get();
+        if(!paper.getCreator().getId().equals(userId)) {
+            throw new UnauthorizedOperationException(userId, ResponseBodyEnum.NOT_CREATOR_EDIT_PAPER);
+        }
+        Optional<Problem> problemOptional = problemRepository.findById(problemDeleteRequest.getProblemId());
+        if(problemOptional.isEmpty()) {
+            throw new BadParamException(ResponseBodyEnum.PROBLEM_NOT_EXIST);
+        }
+        Problem problem = problemOptional.get();
+        if(problem.getPaper() == null || !problem.getPaper().getId().equals(paper.getId())) {
+            //问题和试卷不相等
+            throw new BadParamException(ResponseBodyEnum.PARAM_NOT_MATCH);
+        }
+        if(problem.getPolymerizationProblem() != null) {
+            PolymerizationProblem polymerizationProblem = problem.getPolymerizationProblem();
+            Set<Problem> problems = polymerizationProblem.getProblems();
+            Map<Integer, Problem> problemMap = new HashMap<>();
+            problems.forEach(problem1 -> {
+                if(!problem1.getId().equals(problem.getId())) {
+                    problemMap.put(problem1.getSort(), problem1);
+                }
+            });
+            for(int index = 1, sort = 1; sort <= problemMap.size(); index++, sort++) {
+                while(problemMap.get(index) == null) {
+                    index++;
+                }
+                Problem p = problemMap.get(index);
+                p.setSort(sort);
+            }
+            problems.remove(problem);
         } else {
-            Paper paper = paperOptional.get();
-            if(!paper.getCreator().getId().equals(userId)) {
-                throw new UnauthorizedOperationException(userId, "非创建者删除题目");
-            }
-            Optional<Problem> problemOptional = problemRepository.findById(problemDeleteRequest.getProblemId());
-            if(problemOptional.isEmpty()) {
-                return null;
-            }
-            Problem problem = problemOptional.get();
-            if(problem.getPaper() == null || !problem.getPaper().getId().equals(paper.getId())) {
-                //问题和试卷不相等
-                return null;
-            }
-            if(problem.getPolymerizationProblem() != null) {
-                PolymerizationProblem polymerizationProblem = problem.getPolymerizationProblem();
-                Set<Problem> problems = polymerizationProblem.getProblems();
-                Map<Integer, Problem> problemMap = new HashMap<>();
-                problems.forEach(problem1 -> {
-                    if(!problem1.getId().equals(problem.getId())) {
+            //todo 排序操作可以抽取
+            Set<Problem> problems = paper.getProblems();
+            Set<PolymerizationProblem> polymerizationProblems = paper.getPolymerizationProblems();
+            Map<Integer, Object> problemMap = new HashMap<>();
+            problems.forEach(problem1 -> {
+                if(!problem1.getId().equals(problemDeleteRequest.getProblemId())) {
+                    if(problem1.getPolymerizationProblem() == null) {
                         problemMap.put(problem1.getSort(), problem1);
                     }
-                });
-                for(int index = 1, sort = 1; sort <= problemMap.size(); index++, sort++) {
-                    while(problemMap.get(index) == null) {
-                        index++;
-                    }
-                    Problem p = problemMap.get(index);
+                }
+            });
+            polymerizationProblems.forEach(polymerizationProblem ->
+                    problemMap.put(polymerizationProblem.getSort(), polymerizationProblem));
+            for(int index = 1, sort = 1; sort <= problemMap.size(); index++, sort++) {
+                while(problemMap.get(index) == null) {
+                    index++;
+                }
+                Object problem1 = problemMap.get(index);
+                if(problem1 instanceof Problem) {
+                    Problem p = (Problem) problem1;
+                    p.setSort(sort);
+                } else if(problem1 instanceof PolymerizationProblem) {
+                    PolymerizationProblem p = (PolymerizationProblem) problem1;
                     p.setSort(sort);
                 }
-                problems.remove(problem);
-            } else {
-                //todo 排序操作可以抽取
-                Set<Problem> problems = paper.getProblems();
-                Set<PolymerizationProblem> polymerizationProblems = paper.getPolymerizationProblems();
-                Map<Integer, Object> problemMap = new HashMap<>();
-                problems.forEach(problem1 -> {
-                    if(!problem1.getId().equals(problemDeleteRequest.getProblemId())) {
-                        if(problem1.getPolymerizationProblem() == null) {
-                            problemMap.put(problem1.getSort(), problem1);
-                        }
-                    }
-                });
-                polymerizationProblems.forEach(polymerizationProblem ->
-                        problemMap.put(polymerizationProblem.getSort(), polymerizationProblem));
-                for(int index = 1, sort = 1; sort <= problemMap.size(); index++, sort++) {
-                    while(problemMap.get(index) == null) {
-                        index++;
-                    }
-                    Object problem1 = problemMap.get(index);
-                    if(problem1 instanceof Problem) {
-                        Problem p = (Problem) problem1;
-                        p.setSort(sort);
-                    } else if(problem1 instanceof PolymerizationProblem) {
-                        PolymerizationProblem p = (PolymerizationProblem) problem1;
-                        p.setSort(sort);
-                    }
-                }
-                problems.remove(problem);
             }
-            paper = paperRepository.save(paper);
-            // todo 删除图片
-            problemRepository.deleteById(problemDeleteRequest.getProblemId());
-            return EntityConvertToDTOUtil.convertPaperToDetail(paper);
+            problems.remove(problem);
         }
+        paper = paperRepository.save(paper);
+        // todo 删除图片
+        problemRepository.deleteById(problemDeleteRequest.getProblemId());
+        return EntityConvertToDTOUtil.convertPaperToDetail(paper);
     }
 
     @Override
     @Transactional
     public PaperDetailDTO deletePolymerizationProblem(Long userId,
                                                 PolymerizationProblemDeleteRequest polymerizationProblemDeleteRequest) {
-        Optional<Paper> paperOptional = paperRepository.findById(polymerizationProblemDeleteRequest.getPaperId());
+        // 为此试卷加锁
+        Optional<Paper> paperOptional = paperRepository.findByIdForUpdate(polymerizationProblemDeleteRequest.getPaperId());
         if(paperOptional.isEmpty()) {
-            return null;
+            throw new BadParamException(ResponseBodyEnum.PAPER_NOT_EXIST);
         } else {
             Paper paper = paperOptional.get();
             if(!paper.getCreator().getId().equals(userId)) {
-                return null;
+                throw new UnauthorizedOperationException(userId, ResponseBodyEnum.NOT_CREATOR_EDIT_PAPER);
             }
             Optional<PolymerizationProblem> polymerizationProblemOptional =
                     polymerizationProblemRepository.findById(polymerizationProblemDeleteRequest.getPolymerizationProblemId());
             if(polymerizationProblemOptional.isEmpty()) {
-                return null;
+                throw new BadParamException(ResponseBodyEnum.POLYMERIZATION_PROBLEM_NOT_EXIST);
             }
             PolymerizationProblem polymerizationProblem1 = polymerizationProblemOptional.get();
             if(polymerizationProblem1.getPaper() == null ||
                     !polymerizationProblem1.getPaper().getId().equals(paper.getId())) {
-                return null;
+                throw new BadParamException(ResponseBodyEnum.PARAM_NOT_MATCH);
             }
             Set<Problem> problems = paper.getProblems();
             Set<PolymerizationProblem> polymerizationProblems = paper.getPolymerizationProblems();
@@ -390,29 +388,34 @@ public class PaperServiceImpl implements PaperService {
 
     @Override
     @Transactional
-    public void deletePaper(Long userId, Long paperId) {
-        Optional<Paper> paperOptional = paperRepository.findById(paperId);
+    public boolean deletePaper(Long userId, Long paperId) {
+        // 为此试卷加锁
+        Optional<Paper> paperOptional = paperRepository.findByIdForUpdate(paperId);
         if(paperOptional.isPresent()) {
             Paper paper = paperOptional.get();
-            if(paper.getCreator().getId().equals(userId)) {
-                // todo 删除图片
-                problemRepository.deleteAllByPaper(paper);
-                polymerizationProblemRepository.deleteAllByPaper(paper);
-                paperRepository.deleteById(paper.getId());
+            if(!paper.getCreator().getId().equals(userId)) {
+                throw new UnauthorizedOperationException(userId, ResponseBodyEnum.NOT_CREATOR_EDIT_PAPER);
             }
+            // todo 删除图片
+            problemRepository.deleteAllByPaper(paper);
+            polymerizationProblemRepository.deleteAllByPaper(paper);
+            paperRepository.deleteById(paper.getId());
+            return true;
         }
+        return false;
     }
 
     @Override
     @Transactional
     public PaperDetailDTO resortProblemsInPaper(Long userId, ProblemsInPaperResortRequest problemsInPaperResortRequest) {
-        Optional<Paper> paperOptional = paperRepository.findById(problemsInPaperResortRequest.getPaperId());
+        // 为此试卷加锁
+        Optional<Paper> paperOptional = paperRepository.findByIdForUpdate(problemsInPaperResortRequest.getPaperId());
         if(paperOptional.isEmpty()) {
             return null;
         }
         Paper paper = paperOptional.get();
         if(!paper.getCreator().getId().equals(userId)) {
-            throw new UnauthorizedOperationException(userId, "非试卷创建者试图排序题号");
+            throw new UnauthorizedOperationException(userId, ResponseBodyEnum.NOT_CREATOR_EDIT_PAPER);
         }
         // 1.按照sort将所有大题放入map中
         Set<Problem> problems = paper.getProblems().stream()
@@ -423,7 +426,15 @@ public class PaperServiceImpl implements PaperService {
         problems.forEach(problem -> map.put(problem.getSort(), problem));
         polymerizationProblems.forEach(polymerizationProblem ->
                 map.put(polymerizationProblem.getSort(), polymerizationProblem));
-        // 2.根据请求中的sort转换的map将原题目的sort进行更换
+        // 2.检查题目排序是否正确
+        for (int i = 1; i <= map.size() ; i++) {
+            if(!map.containsKey(i)) {
+                // todo 可以做数据顺序恢复
+                throw new DataDamageException("试卷中题目顺序异常 paperId:"+
+                        problemsInPaperResortRequest.getPaperId().toString(), ResponseBodyEnum.DATA_WRONG);
+            }
+        }
+        // 3.根据请求中的sort转换的map将原题目的sort进行更换
         problemsInPaperResortRequest.getOldIndexToNewIndexMap().forEach((oldSort, newSort) -> {
             Object problem = map.get(oldSort);
             if(problem != null) {
@@ -436,17 +447,17 @@ public class PaperServiceImpl implements PaperService {
                 }
             }
         });
-        // 3.检查更新后是否所有题目按照sort排还是连续的
+        // 4.检查更新后是否所有题目按照sort排还是连续的
         map.clear();
         problems.forEach(problem -> map.put(problem.getSort(), problem));
         polymerizationProblems.forEach(polymerizationProblem ->
                 map.put(polymerizationProblem.getSort(), polymerizationProblem));
         for (int i = 1; i <= map.size() ; i++) {
             if(!map.containsKey(i)) {
-                return null;
+                throw new BadParamException(ResponseBodyEnum.NEW_SORT_PARAM_WRONG);
             }
         }
-        // 4. 保存
+        // 5. 保存
         paper = paperRepository.save(paper);
         return EntityConvertToDTOUtil.convertPaperToDetail(paper);
     }

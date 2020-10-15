@@ -43,7 +43,7 @@ public class PaperDetailVO {
     /**
      * 试卷状态
      */
-    private int status;
+    private int state;
     /**
      * 试卷的题目
      */
