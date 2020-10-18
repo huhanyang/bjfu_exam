@@ -23,7 +23,6 @@ import com.bjfu.exam.repository.paper.ProblemRepository;
 import com.bjfu.exam.repository.user.UserRepository;
 import com.bjfu.exam.request.answer.PaperAnswerCreateRequest;
 import com.bjfu.exam.request.answer.ProblemAnswerSubmitRequest;
-import com.bjfu.exam.request.answer.ProblemGetRequest;
 import com.bjfu.exam.service.AnswerService;
 import com.bjfu.exam.util.EntityConvertToDTOUtil;
 import org.springframework.beans.BeanUtils;
@@ -68,7 +67,7 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public PaperAnswerDetailDTO getPaperAnswers(Long userId, Long paperAnswerId) {
+    public PaperAnswerDetailDTO getPaperAnswerDetail(Long userId, Long paperAnswerId) {
         Optional<PaperAnswer> paperAnswerOptional = paperAnswerRepository.findById(paperAnswerId);
         if(paperAnswerOptional.isEmpty()) {
             throw new BadParamException(ResponseBodyEnum.PAPER_ANSWER_NOT_EXIST);
@@ -116,8 +115,8 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public ProblemDTO getProblem(Long userId, ProblemGetRequest problemGetRequest) {
-        Optional<PaperAnswer> paperAnswerOptional = paperAnswerRepository.findById(problemGetRequest.getPaperAnswerId());
+    public ProblemDTO getProblem(Long userId, Long paperAnswerId) {
+        Optional<PaperAnswer> paperAnswerOptional = paperAnswerRepository.findById(paperAnswerId);
         if(paperAnswerOptional.isEmpty()) {
             throw new BadParamException(ResponseBodyEnum.PAPER_ANSWER_NOT_EXIST);
         }
@@ -143,8 +142,8 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public PolymerizationProblemDTO getPolymerizationProblem(Long userId, ProblemGetRequest problemGetRequest) {
-        Optional<PaperAnswer> paperAnswerOptional = paperAnswerRepository.findById(problemGetRequest.getPaperAnswerId());
+    public PolymerizationProblemDTO getPolymerizationProblem(Long userId, Long paperAnswerId) {
+        Optional<PaperAnswer> paperAnswerOptional = paperAnswerRepository.findById(paperAnswerId);
         if(paperAnswerOptional.isEmpty()) {
             throw new BadParamException(ResponseBodyEnum.PAPER_ANSWER_NOT_EXIST);
         }
@@ -223,7 +222,7 @@ public class AnswerServiceImpl implements AnswerService {
         BeanUtils.copyProperties(problemAnswerSubmitRequest, problemAnswer);
         problemAnswer = problemAnswerRepository.save(problemAnswer);
         // 判断试卷是否作答完成
-        int answerProblemSize = paperAnswer.getProblemAnswers().size();
+        int answerProblemSize = paperAnswer.getProblemAnswers().size() + 1;
         int problemSize = paper.getProblems().size();
         if(answerProblemSize == problemSize) {
             paperAnswer.setState(PaperAnswerStateEnum.FINISH.getState());

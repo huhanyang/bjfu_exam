@@ -9,6 +9,7 @@ import com.bjfu.exam.entity.paper.Paper;
 import com.bjfu.exam.entity.paper.PolymerizationProblem;
 import com.bjfu.exam.entity.paper.Problem;
 import com.bjfu.exam.entity.user.User;
+import com.bjfu.exam.enums.PaperStateEnum;
 import com.bjfu.exam.enums.ResponseBodyEnum;
 import com.bjfu.exam.enums.UserTypeEnum;
 import com.bjfu.exam.exception.*;
@@ -83,6 +84,7 @@ public class PaperServiceImpl implements PaperService {
             code = RandomCodeUtil.nextCodeWithCharAndNumber();
         }
         paper.setCode(code);
+        paper.setState(PaperStateEnum.CREATING.getState());
         paper = paperRepository.save(paper);
         return EntityConvertToDTOUtil.convertPaperToDetail(paper);
     }
@@ -333,57 +335,56 @@ public class PaperServiceImpl implements PaperService {
         Optional<Paper> paperOptional = paperRepository.findByIdForUpdate(polymerizationProblemDeleteRequest.getPaperId());
         if(paperOptional.isEmpty()) {
             throw new BadParamException(ResponseBodyEnum.PAPER_NOT_EXIST);
-        } else {
-            Paper paper = paperOptional.get();
-            if(!paper.getCreator().getId().equals(userId)) {
-                throw new UnauthorizedOperationException(userId, ResponseBodyEnum.NOT_CREATOR_EDIT_PAPER);
-            }
-            Optional<PolymerizationProblem> polymerizationProblemOptional =
-                    polymerizationProblemRepository.findById(polymerizationProblemDeleteRequest.getPolymerizationProblemId());
-            if(polymerizationProblemOptional.isEmpty()) {
-                throw new BadParamException(ResponseBodyEnum.POLYMERIZATION_PROBLEM_NOT_EXIST);
-            }
-            PolymerizationProblem polymerizationProblem1 = polymerizationProblemOptional.get();
-            if(polymerizationProblem1.getPaper() == null ||
-                    !polymerizationProblem1.getPaper().getId().equals(paper.getId())) {
-                throw new BadParamException(ResponseBodyEnum.PARAM_NOT_MATCH);
-            }
-            Set<Problem> problems = paper.getProblems();
-            Set<PolymerizationProblem> polymerizationProblems = paper.getPolymerizationProblems();
-            Map<Integer, Object> problemMap = new HashMap<>();
-            problems.forEach(problem -> {
-                if(problem.getPolymerizationProblem() == null) {
-                    problemMap.put(problem.getSort(), problem);
-                }
-            });
-            polymerizationProblems.forEach(polymerizationProblem -> {
-                if(!polymerizationProblem.getId().equals(polymerizationProblemDeleteRequest.getPolymerizationProblemId())) {
-                    problemMap.put(polymerizationProblem.getSort(), polymerizationProblem);
-                }
-            });
-            problems.clear();
-            polymerizationProblems.clear();
-            for(int index = 1, sort = 1; sort <= problemMap.size(); index++, sort++) {
-                while(problemMap.get(index) == null) {
-                    index++;
-                }
-                Object problem1 = problemMap.get(index);
-                if(problem1 instanceof Problem) {
-                    Problem p = (Problem) problem1;
-                    p.setSort(sort);
-                    problems.add(p);
-                } else if(problem1 instanceof PolymerizationProblem) {
-                    PolymerizationProblem p = (PolymerizationProblem) problem1;
-                    p.setSort(sort);
-                    polymerizationProblems.add(p);
-                }
-            }
-            paper = paperRepository.save(paper);
-            problemRepository.deleteAllByPolymerizationProblem(polymerizationProblem1);
-            // todo 删除图片
-            polymerizationProblemRepository.deleteById(polymerizationProblemDeleteRequest.getPolymerizationProblemId());
-            return EntityConvertToDTOUtil.convertPaperToDetail(paper);
         }
+        Paper paper = paperOptional.get();
+        if(!paper.getCreator().getId().equals(userId)) {
+            throw new UnauthorizedOperationException(userId, ResponseBodyEnum.NOT_CREATOR_EDIT_PAPER);
+        }
+        Optional<PolymerizationProblem> polymerizationProblemOptional =
+                polymerizationProblemRepository.findById(polymerizationProblemDeleteRequest.getPolymerizationProblemId());
+        if(polymerizationProblemOptional.isEmpty()) {
+            throw new BadParamException(ResponseBodyEnum.POLYMERIZATION_PROBLEM_NOT_EXIST);
+        }
+        PolymerizationProblem polymerizationProblem1 = polymerizationProblemOptional.get();
+        if(polymerizationProblem1.getPaper() == null ||
+                !polymerizationProblem1.getPaper().getId().equals(paper.getId())) {
+            throw new BadParamException(ResponseBodyEnum.PARAM_NOT_MATCH);
+        }
+        Set<Problem> problems = paper.getProblems();
+        Set<PolymerizationProblem> polymerizationProblems = paper.getPolymerizationProblems();
+        Map<Integer, Object> problemMap = new HashMap<>();
+        problems.forEach(problem -> {
+            if(problem.getPolymerizationProblem() == null) {
+                problemMap.put(problem.getSort(), problem);
+            }
+        });
+        polymerizationProblems.forEach(polymerizationProblem -> {
+            if(!polymerizationProblem.getId().equals(polymerizationProblemDeleteRequest.getPolymerizationProblemId())) {
+                problemMap.put(polymerizationProblem.getSort(), polymerizationProblem);
+            }
+        });
+        problems.clear();
+        polymerizationProblems.clear();
+        for(int index = 1, sort = 1; sort <= problemMap.size(); index++, sort++) {
+            while(problemMap.get(index) == null) {
+                index++;
+            }
+            Object problem1 = problemMap.get(index);
+            if(problem1 instanceof Problem) {
+                Problem p = (Problem) problem1;
+                p.setSort(sort);
+                problems.add(p);
+            } else if(problem1 instanceof PolymerizationProblem) {
+                PolymerizationProblem p = (PolymerizationProblem) problem1;
+                p.setSort(sort);
+                polymerizationProblems.add(p);
+            }
+        }
+        paper = paperRepository.save(paper);
+        problemRepository.deleteAllByPolymerizationProblem(polymerizationProblem1);
+        // todo 删除图片
+        polymerizationProblemRepository.deleteById(polymerizationProblemDeleteRequest.getPolymerizationProblemId());
+        return EntityConvertToDTOUtil.convertPaperToDetail(paper);
     }
 
     @Override
@@ -460,5 +461,28 @@ public class PaperServiceImpl implements PaperService {
         // 5. 保存
         paper = paperRepository.save(paper);
         return EntityConvertToDTOUtil.convertPaperToDetail(paper);
+    }
+
+    @Override
+    public PaperDTO changePaperState(Long userId, PaperStateChangeRequest paperStateChangeRequest) {
+        Optional<Paper> paperOptional = paperRepository.findByIdForUpdate(paperStateChangeRequest.getPaperId());
+        if(paperOptional.isEmpty()) {
+            throw new BadParamException(ResponseBodyEnum.PAPER_NOT_EXIST);
+        }
+        Paper paper = paperOptional.get();
+        if(!paper.getCreator().getId().equals(userId)) {
+            throw new UnauthorizedOperationException(userId, ResponseBodyEnum.NOT_CREATOR_EDIT_PAPER);
+        }
+        if(paper.getState() == PaperStateEnum.ANSWERING.getState()
+                && paperStateChangeRequest.getState() == PaperStateEnum.CREATING.getState()) {
+            throw new NotAllowOperationException(ResponseBodyEnum.PAPER_STATE_FROM_ANSWERING_TO_CREATING);
+        }
+        if(paper.getState() == PaperStateEnum.DELETE.getState()) {
+            throw new NotAllowOperationException(ResponseBodyEnum.PAPER_STATE_FROM_DELETE_TO_OTHERS);
+        }
+        paper.setState(paperStateChangeRequest.getState());
+        paper = paperRepository.save(paper);
+        PaperDTO paperDTO = EntityConvertToDTOUtil.convertPaper(paper);
+        return paperDTO;
     }
 }

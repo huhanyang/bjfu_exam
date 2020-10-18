@@ -7,7 +7,6 @@ import com.bjfu.exam.dto.paper.PolymerizationProblemDTO;
 import com.bjfu.exam.dto.paper.ProblemDTO;
 import com.bjfu.exam.request.answer.PaperAnswerCreateRequest;
 import com.bjfu.exam.request.answer.ProblemAnswerSubmitRequest;
-import com.bjfu.exam.request.answer.ProblemGetRequest;
 
 import java.util.List;
 
@@ -19,7 +18,7 @@ public interface AnswerService {
     /**
      * 获取试题试卷详情
      */
-    PaperAnswerDetailDTO getPaperAnswers(Long userId, Long paperAnswerId);
+    PaperAnswerDetailDTO getPaperAnswerDetail(Long userId, Long paperAnswerId);
     /**
      * 创建答题试卷
      */
@@ -27,11 +26,11 @@ public interface AnswerService {
     /**
      * 获取题目
      */
-    ProblemDTO getProblem(Long userId, ProblemGetRequest problemGetRequest);
+    ProblemDTO getProblem(Long userId, Long paperAnswerId);
     /**
      * 获取组合题目
      */
-    PolymerizationProblemDTO getPolymerizationProblem(Long userId, ProblemGetRequest problemGetRequest);
+    PolymerizationProblemDTO getPolymerizationProblem(Long userId, Long paperAnswerId);
     /**
      * 提交单个题目答案
      */

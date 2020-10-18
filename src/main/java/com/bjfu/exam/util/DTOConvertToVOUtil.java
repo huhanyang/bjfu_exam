@@ -114,12 +114,12 @@ public class DTOConvertToVOUtil {
         paperAnswerDetailVO.setUser(convertUserDTO(paperAnswerDetailDTO.getUser()));
         paperAnswerDetailVO.setPaper(convertPaperDTO(paperAnswerDetailDTO.getPaper()));
         paperAnswerDetailVO.setProblemAnswers(paperAnswerDetailDTO.getProblemAnswers().stream()
-                .map(DTOConvertToVOUtil::convertPaperAnswerDetailDTO)
+                .map(DTOConvertToVOUtil::convertProblemAnswerDetailDTO)
                 .collect(Collectors.toList()));
         return paperAnswerDetailVO;
     }
 
-    public static ProblemAnswerVO convertPaperAnswerDTO(ProblemAnswerDTO problemAnswerDTO) {
+    public static ProblemAnswerVO convertProblemAnswerDTO(ProblemAnswerDTO problemAnswerDTO) {
         if(problemAnswerDTO == null) {
             return null;
         }
@@ -128,7 +128,7 @@ public class DTOConvertToVOUtil {
         return problemAnswerVO;
     }
 
-    public static ProblemAnswerDetailVO convertPaperAnswerDetailDTO(ProblemAnswerDetailDTO problemAnswerDetailDTO) {
+    public static ProblemAnswerDetailVO convertProblemAnswerDetailDTO(ProblemAnswerDetailDTO problemAnswerDetailDTO) {
         if(problemAnswerDetailDTO == null) {
             return null;
         }

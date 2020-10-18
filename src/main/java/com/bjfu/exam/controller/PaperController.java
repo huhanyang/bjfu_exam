@@ -251,4 +251,19 @@ public class PaperController {
         PaperDetailVO paperDetailVO = DTOConvertToVOUtil.convertPaperDetailDTO(paperDetailDTO);
         return new ResponseBody<>(ResponseBodyEnum.SUCCESS, paperDetailVO);
     }
+
+    @PostMapping("/changePaperState")
+    public ResponseBody<PaperVO> changePaperState(@RequestBody PaperStateChangeRequest paperStateChangeRequest,
+                                                  HttpSession session) {
+        if(!paperStateChangeRequest.isComplete()) {
+            return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
+        }
+        if(!SessionUtil.existSession(session)) {
+            return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
+        }
+        PaperDTO paperDTO =
+                paperService.changePaperState((Long) session.getAttribute("userId"), paperStateChangeRequest);
+        PaperVO paperVO = DTOConvertToVOUtil.convertPaperDTO(paperDTO);
+        return new ResponseBody<>(ResponseBodyEnum.SUCCESS, paperVO);
+    }
 }

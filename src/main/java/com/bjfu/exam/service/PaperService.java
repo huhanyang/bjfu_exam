@@ -65,4 +65,8 @@ public interface PaperService {
      * 试卷大题排序
      */
     PaperDetailDTO resortProblemsInPaper(Long userId, ProblemsInPaperResortRequest problemsInPaperResortRequest);
+    /**
+     * 改变试卷的状态
+     */
+    PaperDTO changePaperState(Long userId, PaperStateChangeRequest paperStateChangeRequest);
 }

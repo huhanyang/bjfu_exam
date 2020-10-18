@@ -10,7 +10,7 @@ public class PaperAnswerCreateRequest extends BaseRequest {
     /**
      * 试卷id
      */
-    Long paperId;
+    private Long paperId;
     /**
      * 收集项答案(JSON)
      */

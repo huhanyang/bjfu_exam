@@ -33,6 +33,9 @@ public class ProblemAnswerSubmitRequest extends BaseRequest {
                 || editTime == null || StringUtils.isEmpty(answer)) {
             return false;
         }
+        if(editTime > totalTime) {
+            return false;
+        }
         return true;
     }
 }

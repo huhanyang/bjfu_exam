@@ -36,5 +36,5 @@ public class PaperVO {
     /**
      * 试卷状态
      */
-    private int state;
+    private Integer state;
 }
