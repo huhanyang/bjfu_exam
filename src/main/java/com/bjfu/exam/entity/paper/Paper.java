@@ -1,5 +1,6 @@
 package com.bjfu.exam.entity.paper;
 
+import com.bjfu.exam.entity.export.PaperAnswerExportJob;
 import com.bjfu.exam.entity.user.User;
 import com.bjfu.exam.entity.answer.PaperAnswer;
 import lombok.Getter;
@@ -42,14 +43,15 @@ public class Paper {
     @ManyToOne
     private User creator;
     /**
-     * 导出excel位置
-     */
-    private String excelUrl;
-    /**
      * 试卷状态
      */
     private Integer state;
 
+    /**
+     * 导出任务
+     */
+    @OneToMany(mappedBy = "paper")
+    private Set<PaperAnswerExportJob> paperAnswerExportJobs = new HashSet<>();
     /**
      * 试卷的题目
      */

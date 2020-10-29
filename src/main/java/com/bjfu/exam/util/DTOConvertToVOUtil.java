@@ -4,16 +4,19 @@ import com.bjfu.exam.dto.answer.PaperAnswerDTO;
 import com.bjfu.exam.dto.answer.PaperAnswerDetailDTO;
 import com.bjfu.exam.dto.answer.ProblemAnswerDTO;
 import com.bjfu.exam.dto.answer.ProblemAnswerDetailDTO;
+import com.bjfu.exam.dto.export.PaperAnswerExportJobDTO;
 import com.bjfu.exam.dto.paper.PaperDTO;
 import com.bjfu.exam.dto.paper.PaperDetailDTO;
 import com.bjfu.exam.dto.paper.PolymerizationProblemDTO;
 import com.bjfu.exam.dto.paper.ProblemDTO;
 import com.bjfu.exam.dto.user.UserDTO;
 import com.bjfu.exam.dto.user.UserDetailDTO;
+import com.bjfu.exam.entity.export.PaperAnswerExportJob;
 import com.bjfu.exam.vo.answer.PaperAnswerDetailVO;
 import com.bjfu.exam.vo.answer.PaperAnswerVO;
 import com.bjfu.exam.vo.answer.ProblemAnswerDetailVO;
 import com.bjfu.exam.vo.answer.ProblemAnswerVO;
+import com.bjfu.exam.vo.export.PaperAnswerExportJobVO;
 import com.bjfu.exam.vo.paper.PaperDetailVO;
 import com.bjfu.exam.vo.paper.PaperVO;
 import com.bjfu.exam.vo.paper.PolymerizationProblemVO;
@@ -64,12 +67,16 @@ public class DTOConvertToVOUtil {
             return null;
         }
         PaperDetailVO paperDetailVO = new PaperDetailVO();
-        BeanUtils.copyProperties(paperDetailDTO, paperDetailVO);
+        BeanUtils.copyProperties(paperDetailDTO, paperDetailVO,
+                "problems", "polymerizationProblems", "paperAnswerExportJobs");
         paperDetailVO.setProblems(paperDetailDTO.getProblems().stream()
                 .map(DTOConvertToVOUtil::convertProblemDTO)
                 .collect(Collectors.toList()));
         paperDetailVO.setPolymerizationProblems(paperDetailDTO.getPolymerizationProblems().stream()
                 .map(DTOConvertToVOUtil::convertPolymerizationProblemDTO)
+                .collect(Collectors.toList()));
+        paperDetailVO.setPaperAnswerExportJobs(paperDetailDTO.getPaperAnswerExportJobs().stream()
+                .map(DTOConvertToVOUtil::convertPaperAnswerExportJobDTO)
                 .collect(Collectors.toList()));
         return paperDetailVO;
     }
@@ -138,6 +145,17 @@ public class DTOConvertToVOUtil {
         problemAnswerDetailVO.setPaperAnswer(convertPaperAnswerDTO(problemAnswerDetailDTO.getPaperAnswer()));
         problemAnswerDetailVO.setProblem(convertProblemDTO(problemAnswerDetailDTO.getProblem()));
         return problemAnswerDetailVO;
+    }
+
+    public static PaperAnswerExportJobVO convertPaperAnswerExportJobDTO(PaperAnswerExportJobDTO paperAnswerExportJobDTO) {
+        if(paperAnswerExportJobDTO == null) {
+            return null;
+        }
+        PaperAnswerExportJobVO paperAnswerExportJobVO = new PaperAnswerExportJobVO();
+        BeanUtils.copyProperties(paperAnswerExportJobDTO, paperAnswerExportJobVO,
+                "paper");
+        paperAnswerExportJobVO.setPaper(convertPaperDTO(paperAnswerExportJobDTO.getPaper()));
+        return paperAnswerExportJobVO;
     }
 
 }

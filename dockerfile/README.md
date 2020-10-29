@@ -17,3 +17,5 @@ docker tag 镜像名称 huhanyang.tencentcloudcr.com/project/bjfu_exam:[tag]
 docker push huhanyang.tencentcloudcr.com/project/bjfu_exam:[tag]
 
 ## 使用Docker镜像部署
+
+docker run -itd --name bjfu_exam -p 80:80 bjfu_exam

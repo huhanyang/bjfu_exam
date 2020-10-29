@@ -8,6 +8,9 @@ import com.bjfu.exam.request.paper.*;
 
 import java.util.List;
 
+/**
+ * 试卷相关
+ */
 public interface PaperService {
     /**
      * 根据试卷代码获取试卷

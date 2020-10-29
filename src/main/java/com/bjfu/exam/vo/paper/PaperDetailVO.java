@@ -1,5 +1,7 @@
 package com.bjfu.exam.vo.paper;
 
+import com.bjfu.exam.dto.export.PaperAnswerExportJobDTO;
+import com.bjfu.exam.vo.export.PaperAnswerExportJobVO;
 import com.bjfu.exam.vo.user.UserVO;
 import lombok.Data;
 
@@ -33,13 +35,13 @@ public class PaperDetailVO {
      */
     private String collection;
     /**
-     * 导出excel位置
-     */
-    private String excelUrl;
-    /**
      * 创建者
      */
     private UserVO creator;
+    /**
+     * 导出过的excel任务
+     */
+    private List<PaperAnswerExportJobVO> paperAnswerExportJobs;
     /**
      * 试卷状态
      */

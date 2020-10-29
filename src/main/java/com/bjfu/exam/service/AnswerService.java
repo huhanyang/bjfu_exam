@@ -10,6 +10,9 @@ import com.bjfu.exam.request.answer.ProblemAnswerSubmitRequest;
 
 import java.util.List;
 
+/**
+ * 作答相关
+ */
 public interface AnswerService {
     /**
      * 获取创建的试题试卷

@@ -1,6 +1,7 @@
 package com.bjfu.exam.dto.paper;
 
 
+import com.bjfu.exam.dto.export.PaperAnswerExportJobDTO;
 import com.bjfu.exam.dto.user.UserDTO;
 import lombok.Data;
 
@@ -37,9 +38,9 @@ public class PaperDetailDTO {
      */
     private UserDTO creator;
     /**
-     * 导出excel位置
+     * 导出过的excel任务
      */
-    private String excelUrl;
+    private List<PaperAnswerExportJobDTO> paperAnswerExportJobs;
     /**
      * 试卷状态
      */

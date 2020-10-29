@@ -4,6 +4,7 @@ import com.bjfu.exam.dto.answer.PaperAnswerDTO;
 import com.bjfu.exam.dto.answer.PaperAnswerDetailDTO;
 import com.bjfu.exam.dto.answer.ProblemAnswerDTO;
 import com.bjfu.exam.dto.answer.ProblemAnswerDetailDTO;
+import com.bjfu.exam.dto.export.PaperAnswerExportJobDTO;
 import com.bjfu.exam.dto.user.UserDTO;
 import com.bjfu.exam.dto.paper.PaperDTO;
 import com.bjfu.exam.dto.paper.PaperDetailDTO;
@@ -12,6 +13,7 @@ import com.bjfu.exam.dto.paper.ProblemDTO;
 import com.bjfu.exam.dto.user.UserDetailDTO;
 import com.bjfu.exam.entity.answer.PaperAnswer;
 import com.bjfu.exam.entity.answer.ProblemAnswer;
+import com.bjfu.exam.entity.export.PaperAnswerExportJob;
 import com.bjfu.exam.entity.paper.Paper;
 import com.bjfu.exam.entity.paper.PolymerizationProblem;
 import com.bjfu.exam.entity.paper.Problem;
@@ -63,7 +65,7 @@ public class EntityConvertToDTOUtil {
         }
         PaperDetailDTO paperDetailDTO = new PaperDetailDTO();
         BeanUtils.copyProperties(paper, paperDetailDTO,
-                "creator", "problems", "polymerizationProblems");
+                "creator", "problems", "polymerizationProblems", "paperAnswerExportJobs");
         paperDetailDTO.setCreator(convertUser(paper.getCreator()));
         paperDetailDTO.setProblems(paper.getProblems().stream()
                 .filter((problem) -> problem.getPolymerizationProblem() == null)
@@ -71,6 +73,9 @@ public class EntityConvertToDTOUtil {
                 .collect(Collectors.toList()));
         paperDetailDTO.setPolymerizationProblems(paper.getPolymerizationProblems().stream()
                 .map(EntityConvertToDTOUtil::convertPolymerizationProblem)
+                .collect(Collectors.toList()));
+        paperDetailDTO.setPaperAnswerExportJobs(paper.getPaperAnswerExportJobs().stream()
+                .map(EntityConvertToDTOUtil::convertPaperAnswerExportJob)
                 .collect(Collectors.toList()));
         return paperDetailDTO;
     }
@@ -139,5 +144,16 @@ public class EntityConvertToDTOUtil {
         problemAnswerDetailDTO.setPaperAnswer(convertPaperAnswer(problemAnswer.getPaperAnswer()));
         problemAnswerDetailDTO.setProblem(convertProblem(problemAnswer.getProblem()));
         return problemAnswerDetailDTO;
+    }
+
+    public static PaperAnswerExportJobDTO convertPaperAnswerExportJob(PaperAnswerExportJob paperAnswerExportJob) {
+        if(paperAnswerExportJob == null) {
+            return null;
+        }
+        PaperAnswerExportJobDTO paperAnswerExportJobDTO = new PaperAnswerExportJobDTO();
+        BeanUtils.copyProperties(paperAnswerExportJob, paperAnswerExportJobDTO,
+                "paper");
+        paperAnswerExportJobDTO.setPaper(convertPaper(paperAnswerExportJob.getPaper()));
+        return paperAnswerExportJobDTO;
     }
 }
