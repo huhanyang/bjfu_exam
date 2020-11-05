@@ -17,6 +17,10 @@ public interface PaperService {
      */
     PaperDTO getPaper(String code);
     /**
+     * 根据试卷id获取试卷
+     */
+    PaperDetailDTO getPaperDetail(Long paperId, Long userId);
+    /**
      * 根据创建人Id获取试卷
      */
     List<PaperDetailDTO> getAllPaperByCreatorId(Long creatorId);

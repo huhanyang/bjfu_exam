@@ -45,6 +45,23 @@ public class PaperController {
         return new ResponseBody<>(ResponseBodyEnum.FIND_FAILED);
     }
 
+    @GetMapping("/getByPaperId")
+    public ResponseBody<PaperDetailVO> getByPaperId(Long paperId, HttpSession session) {
+        if(paperId == null) {
+            return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
+        }
+        if(!SessionUtil.existSession(session)) {
+            return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
+        }
+        PaperDetailDTO paperDetailDTO =
+                paperService.getPaperDetail(paperId, (Long) session.getAttribute("userId"));
+        if(paperDetailDTO != null) {
+            PaperDetailVO paperDetailVO = DTOConvertToVOUtil.convertPaperDetailDTO(paperDetailDTO);
+            return new ResponseBody<>(ResponseBodyEnum.SUCCESS, paperDetailVO);
+        }
+        return new ResponseBody<>(ResponseBodyEnum.FIND_FAILED);
+    }
+
     @GetMapping("/get")
     public ResponseBody<List<PaperDetailVO>> getMyPaper(HttpSession session) {
         if(!SessionUtil.existSession(session)) {

@@ -52,6 +52,19 @@ public class PaperServiceImpl implements PaperService {
     }
 
     @Override
+    public PaperDetailDTO getPaperDetail(Long paperId ,Long userId) {
+        Optional<Paper> paperOptional = paperRepository.findById(paperId);
+        if(paperOptional.isEmpty()) {
+            return null;
+        }
+        Paper paper = paperOptional.get();
+        if(!paper.getCreator().getId().equals(userId)) {
+            throw new UnauthorizedOperationException(userId, ResponseBodyEnum.NOT_CREATOR_EDIT_PAPER);
+        }
+        return EntityConvertToDTOUtil.convertPaperToDetail(paperOptional.get());
+    }
+
+    @Override
     public List<PaperDetailDTO> getAllPaperByCreatorId(Long creatorId) {
         Optional<User> userOptional = userRepository.findById(creatorId);
         if(userOptional.isEmpty()) {
