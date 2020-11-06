@@ -200,7 +200,7 @@ public class PaperController {
     }
 
     @DeleteMapping("/deleteProblem")
-    public ResponseBody<PaperDetailVO> deleteProblem(@RequestBody ProblemDeleteRequest problemDeleteRequest,
+    public ResponseBody<PaperDetailVO> deleteProblem(ProblemDeleteRequest problemDeleteRequest,
                                             HttpSession session) {
         if(!problemDeleteRequest.isComplete()) {
             return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
@@ -218,7 +218,7 @@ public class PaperController {
     }
 
     @DeleteMapping("/deletePolymerizationProblem")
-    public ResponseBody<PaperDetailVO> deletePolymerizationProblem(@RequestBody PolymerizationProblemDeleteRequest polymerizationProblemDeleteRequest,
+    public ResponseBody<PaperDetailVO> deletePolymerizationProblem(PolymerizationProblemDeleteRequest polymerizationProblemDeleteRequest,
                                                 HttpSession session) {
         if(!polymerizationProblemDeleteRequest.isComplete()) {
             return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
