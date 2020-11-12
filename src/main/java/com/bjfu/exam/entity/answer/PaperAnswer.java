@@ -1,5 +1,6 @@
 package com.bjfu.exam.entity.answer;
 
+import com.bjfu.exam.entity.paper.Problem;
 import com.bjfu.exam.entity.user.User;
 import com.bjfu.exam.entity.paper.Paper;
 import lombok.Getter;
@@ -34,6 +35,11 @@ public class PaperAnswer {
      * 答卷状态
      */
     private Integer state;
+    /**
+     * 下一道题
+     */
+    @ManyToOne
+    private Problem nextProblem;
 
     @OneToMany(mappedBy = "paperAnswer")
     Set<ProblemAnswer> problemAnswers = new HashSet<>();

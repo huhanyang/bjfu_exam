@@ -2,8 +2,6 @@ package com.bjfu.exam.vo.paper;
 
 import lombok.Data;
 
-import java.util.List;
-
 @Data
 public class PolymerizationProblemVO {
     /**
@@ -26,8 +24,4 @@ public class PolymerizationProblemVO {
      * 图片(JSON Array)
      */
     private String images;
-    /**
-     * 组合题目所属的子问题
-     */
-    List<ProblemVO> problems;
 }

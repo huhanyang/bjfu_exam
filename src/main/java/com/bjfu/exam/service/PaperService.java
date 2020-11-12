@@ -2,7 +2,7 @@ package com.bjfu.exam.service;
 
 import com.bjfu.exam.dto.paper.PaperDTO;
 import com.bjfu.exam.dto.paper.PaperDetailDTO;
-import com.bjfu.exam.dto.paper.PolymerizationProblemDTO;
+import com.bjfu.exam.dto.paper.PolymerizationProblemDetailDTO;
 import com.bjfu.exam.dto.paper.ProblemDTO;
 import com.bjfu.exam.request.paper.*;
 
@@ -31,18 +31,18 @@ public interface PaperService {
     /**
      * 为试卷添加组合题目
      */
-    PolymerizationProblemDTO addPolymerizationProblemInPaper(Long userId,
-                                                             PolymerizationProblemAddRequest polymerizationProblemAddRequest);
+    PolymerizationProblemDetailDTO addPolymerizationProblemInPaper(Long userId,
+                                                                   PolymerizationProblemAddRequest polymerizationProblemAddRequest);
     /**
      * 为组合题目添加图片
      */
-    PolymerizationProblemDTO addImageInPolymerizationProblem(Long userId,
-                                                             ImageInPolymerizationProblemAddRequest imageInPolymerizationProblemAddRequest);
+    PolymerizationProblemDetailDTO addImageInPolymerizationProblem(Long userId,
+                                                                   ImageInPolymerizationProblemAddRequest imageInPolymerizationProblemAddRequest);
     /**
      * 删除组合题目中的图片
      */
-    PolymerizationProblemDTO deleteImageInPolymerizationProblem(Long userId,
-                                                                ImageInPolymerizationProblemDeleteRequest imageInPolymerizationProblemDeleteRequest);
+    PolymerizationProblemDetailDTO deleteImageInPolymerizationProblem(Long userId,
+                                                                      ImageInPolymerizationProblemDeleteRequest imageInPolymerizationProblemDeleteRequest);
     /**
      * 添加题目
      */

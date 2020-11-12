@@ -52,5 +52,5 @@ public class PaperDetailDTO {
     /**
      * 试卷的聚合题目
      */
-    private List<PolymerizationProblemDTO> polymerizationProblems;
+    private List<PolymerizationProblemDetailDTO> polymerizationProblems;
 }

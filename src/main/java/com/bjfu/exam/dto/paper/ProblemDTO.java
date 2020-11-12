@@ -9,6 +9,10 @@ public class ProblemDTO {
      */
     private Long id;
     /**
+     * 所属组合题目
+     */
+    private PolymerizationProblemDTO polymerizationProblem;
+    /**
      * 排序字段
      */
     private Integer sort;

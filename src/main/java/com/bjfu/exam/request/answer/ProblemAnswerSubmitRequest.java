@@ -11,10 +11,6 @@ public class ProblemAnswerSubmitRequest extends BaseRequest {
      */
     private Long paperAnswerId;
     /**
-     * 问题id
-     */
-    private Long problemId;
-    /**
      * 题目总耗时
      */
     private Integer totalTime;
@@ -29,7 +25,7 @@ public class ProblemAnswerSubmitRequest extends BaseRequest {
 
     @Override
     public boolean isComplete() {
-        if(paperAnswerId == null || problemId == null || totalTime == null
+        if(paperAnswerId == null || totalTime == null
                 || editTime == null || StringUtils.isEmpty(answer)) {
             return false;
         }

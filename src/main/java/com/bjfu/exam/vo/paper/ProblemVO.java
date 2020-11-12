@@ -9,6 +9,10 @@ public class ProblemVO {
      */
     private Long id;
     /**
+     * 所属组合题目
+     */
+    private PolymerizationProblemVO polymerizationProblem;
+    /**
      * 排序字段
      */
     private Integer sort;

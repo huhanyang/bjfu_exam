@@ -2,7 +2,7 @@ package com.bjfu.exam.controller;
 
 import com.bjfu.exam.dto.paper.PaperDTO;
 import com.bjfu.exam.dto.paper.PaperDetailDTO;
-import com.bjfu.exam.dto.paper.PolymerizationProblemDTO;
+import com.bjfu.exam.dto.paper.PolymerizationProblemDetailDTO;
 import com.bjfu.exam.dto.paper.ProblemDTO;
 import com.bjfu.exam.enums.ResponseBodyEnum;
 import com.bjfu.exam.request.paper.*;
@@ -12,7 +12,7 @@ import com.bjfu.exam.util.SessionUtil;
 import com.bjfu.exam.vo.ResponseBody;
 import com.bjfu.exam.vo.paper.PaperDetailVO;
 import com.bjfu.exam.vo.paper.PaperVO;
-import com.bjfu.exam.vo.paper.PolymerizationProblemVO;
+import com.bjfu.exam.vo.paper.PolymerizationProblemDetailVO;
 import com.bjfu.exam.vo.paper.ProblemVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
@@ -88,8 +88,8 @@ public class PaperController {
     }
 
     @PutMapping("/addPolymerizationProblem")
-    public ResponseBody<PolymerizationProblemVO> addPolymerizationProblem(@RequestBody PolymerizationProblemAddRequest polymerizationProblemAddRequest,
-                                                                          HttpSession session) {
+    public ResponseBody<PolymerizationProblemDetailVO> addPolymerizationProblem(@RequestBody PolymerizationProblemAddRequest polymerizationProblemAddRequest,
+                                                                                HttpSession session) {
         if(!polymerizationProblemAddRequest.isComplete()) {
             return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
         }
@@ -97,19 +97,19 @@ public class PaperController {
             return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
         }
         Long userId = (Long) session.getAttribute("userId");
-        PolymerizationProblemDTO polymerizationProblemDTO =
+        PolymerizationProblemDetailDTO polymerizationProblemDetailDTO =
                 paperService.addPolymerizationProblemInPaper(userId, polymerizationProblemAddRequest);
-        if(polymerizationProblemDTO == null) {
+        if(polymerizationProblemDetailDTO == null) {
             return new ResponseBody<>(ResponseBodyEnum.PARAM_NOT_MATCH);
         }
-        PolymerizationProblemVO polymerizationProblemVO =
-                DTOConvertToVOUtil.convertPolymerizationProblemDTO(polymerizationProblemDTO);
-        return new ResponseBody<>(ResponseBodyEnum.SUCCESS, polymerizationProblemVO);
+        PolymerizationProblemDetailVO polymerizationProblemDetailVO =
+                DTOConvertToVOUtil.convertPolymerizationProblemDetailDTO(polymerizationProblemDetailDTO);
+        return new ResponseBody<>(ResponseBodyEnum.SUCCESS, polymerizationProblemDetailVO);
     }
 
     @PutMapping("/addImageInPolymerizationProblem")
-    public ResponseBody<PolymerizationProblemVO> addImageInPolymerizationProblem(@RequestBody ImageInPolymerizationProblemAddRequest imageInPolymerizationProblemAddRequest,
-                                                          HttpSession session) {
+    public ResponseBody<PolymerizationProblemDetailVO> addImageInPolymerizationProblem(@RequestBody ImageInPolymerizationProblemAddRequest imageInPolymerizationProblemAddRequest,
+                                                                                       HttpSession session) {
         if(!imageInPolymerizationProblemAddRequest.isComplete()) {
             return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
         }
@@ -117,19 +117,19 @@ public class PaperController {
             return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
         }
         Long userId = (Long) session.getAttribute("userId");
-        PolymerizationProblemDTO polymerizationProblemDTO =
+        PolymerizationProblemDetailDTO polymerizationProblemDetailDTO =
                 paperService.addImageInPolymerizationProblem(userId, imageInPolymerizationProblemAddRequest);
-        if(polymerizationProblemDTO == null) {
+        if(polymerizationProblemDetailDTO == null) {
             return new ResponseBody<>(ResponseBodyEnum.PARAM_NOT_MATCH);
         }
-        PolymerizationProblemVO polymerizationProblemVO =
-                DTOConvertToVOUtil.convertPolymerizationProblemDTO(polymerizationProblemDTO);
-        return new ResponseBody<>(ResponseBodyEnum.SUCCESS, polymerizationProblemVO);
+        PolymerizationProblemDetailVO polymerizationProblemDetailVO =
+                DTOConvertToVOUtil.convertPolymerizationProblemDetailDTO(polymerizationProblemDetailDTO);
+        return new ResponseBody<>(ResponseBodyEnum.SUCCESS, polymerizationProblemDetailVO);
     }
 
     @DeleteMapping("/deleteImageInPolymerizationProblem")
-    public ResponseBody<PolymerizationProblemVO> deleteImageInPolymerizationProblem(@RequestBody ImageInPolymerizationProblemDeleteRequest imageInPolymerizationProblemDeleteRequest,
-                                                        HttpSession session) {
+    public ResponseBody<PolymerizationProblemDetailVO> deleteImageInPolymerizationProblem(@RequestBody ImageInPolymerizationProblemDeleteRequest imageInPolymerizationProblemDeleteRequest,
+                                                                                          HttpSession session) {
         if(!imageInPolymerizationProblemDeleteRequest.isComplete()) {
             return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
         }
@@ -137,13 +137,13 @@ public class PaperController {
             return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
         }
         Long userId = (Long) session.getAttribute("userId");
-        PolymerizationProblemDTO polymerizationProblemDTO =
+        PolymerizationProblemDetailDTO polymerizationProblemDetailDTO =
                 paperService.deleteImageInPolymerizationProblem(userId, imageInPolymerizationProblemDeleteRequest);
-        if(polymerizationProblemDTO == null) {
+        if(polymerizationProblemDetailDTO == null) {
             return new ResponseBody<>(ResponseBodyEnum.PARAM_NOT_MATCH);
         }
-        PolymerizationProblemVO polymerizationProblemVO = DTOConvertToVOUtil.convertPolymerizationProblemDTO(polymerizationProblemDTO);
-        return new ResponseBody<>(ResponseBodyEnum.SUCCESS, polymerizationProblemVO);
+        PolymerizationProblemDetailVO polymerizationProblemDetailVO = DTOConvertToVOUtil.convertPolymerizationProblemDetailDTO(polymerizationProblemDetailDTO);
+        return new ResponseBody<>(ResponseBodyEnum.SUCCESS, polymerizationProblemDetailVO);
     }
 
     @PutMapping("/addProblem")

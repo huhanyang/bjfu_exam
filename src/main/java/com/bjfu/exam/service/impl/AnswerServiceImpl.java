@@ -3,7 +3,6 @@ package com.bjfu.exam.service.impl;
 import com.bjfu.exam.dto.answer.PaperAnswerDTO;
 import com.bjfu.exam.dto.answer.PaperAnswerDetailDTO;
 import com.bjfu.exam.dto.answer.ProblemAnswerDTO;
-import com.bjfu.exam.dto.paper.PolymerizationProblemDTO;
 import com.bjfu.exam.dto.paper.ProblemDTO;
 import com.bjfu.exam.entity.answer.PaperAnswer;
 import com.bjfu.exam.entity.answer.ProblemAnswer;
@@ -30,10 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -53,17 +49,17 @@ public class AnswerServiceImpl implements AnswerService {
     private PolymerizationProblemRepository polymerizationProblemRepository;
 
     @Override
-    public List<PaperAnswerDTO> getPaperAnswers(Long userId) {
+    public List<PaperAnswerDetailDTO> getPaperAnswers(Long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
         if(userOptional.isEmpty()) {
             throw new UserNotExistException(userId, ResponseBodyEnum.USER_NOT_EXIST);
         }
         User user = userOptional.get();
         List<PaperAnswer> paperAnswers = paperAnswerRepository.findAllByUser(user);
-        List<PaperAnswerDTO> paperAnswerDTOS = paperAnswers.stream()
-                .map(EntityConvertToDTOUtil::convertPaperAnswer)
+        List<PaperAnswerDetailDTO> paperAnswerDetailDTOS = paperAnswers.stream()
+                .map(EntityConvertToDTOUtil::convertPaperAnswerToDetail)
                 .collect(Collectors.toList());
-        return paperAnswerDTOS;
+        return paperAnswerDetailDTOS;
     }
 
     @Override
@@ -74,7 +70,7 @@ public class AnswerServiceImpl implements AnswerService {
         }
         PaperAnswer paperAnswer = paperAnswerOptional.get();
         // 非试卷创建者或答卷创建者 不能获取答卷详情
-        if(!paperAnswer.getUser().getId().equals(userId) ||
+        if(!paperAnswer.getUser().getId().equals(userId) &&
                 !paperAnswer.getPaper().getCreator().getId().equals(userId)) {
             throw new UnauthorizedOperationException(userId, ResponseBodyEnum.GET_OTHERS_PAPER_ANSWER);
         }
@@ -107,6 +103,7 @@ public class AnswerServiceImpl implements AnswerService {
         PaperAnswer paperAnswer = new PaperAnswer();
         paperAnswer.setUser(user);
         paperAnswer.setPaper(paper);
+        paperAnswer.setNextProblem(findFirstProblem(paper));
         paperAnswer.setState(PaperAnswerStateEnum.ANSWERING.getState());
         BeanUtils.copyProperties(paperAnswerCreateRequest, paperAnswer);
         paperAnswer = paperAnswerRepository.save(paperAnswer);
@@ -115,7 +112,7 @@ public class AnswerServiceImpl implements AnswerService {
     }
 
     @Override
-    public ProblemDTO getProblem(Long userId, Long paperAnswerId) {
+    public ProblemDTO getNextProblem(Long userId, Long paperAnswerId) {
         Optional<PaperAnswer> paperAnswerOptional = paperAnswerRepository.findById(paperAnswerId);
         if(paperAnswerOptional.isEmpty()) {
             throw new BadParamException(ResponseBodyEnum.PAPER_ANSWER_NOT_EXIST);
@@ -125,49 +122,8 @@ public class AnswerServiceImpl implements AnswerService {
         if(!paperAnswer.getUser().getId().equals(userId)) {
             throw new UnauthorizedOperationException(userId, ResponseBodyEnum.ANSWER_OTHERS_PAPER);
         }
-        Paper paper = paperAnswer.getPaper();
-        // 判断当前试卷可以继续作答
-        if(!paper.getState().equals(PaperStateEnum.ANSWERING.getState())) {
-            throw new NotAllowOperationException(ResponseBodyEnum.PAPER_STATE_NOT_ANSWERING);
-        }
-        // 根据题号获取试题
-        int size = paperAnswer.getProblemAnswers().size();
-        Optional<Problem> problemOptional = problemRepository.findByPaperAndSort(paper, size + 1);
-        if(problemOptional.isEmpty()) {
-            return null;
-        }
-        Problem problem = problemOptional.get();
-        ProblemDTO problemDTO = EntityConvertToDTOUtil.convertProblem(problem);
+        ProblemDTO problemDTO = EntityConvertToDTOUtil.convertProblem(paperAnswer.getNextProblem());
         return problemDTO;
-    }
-
-    @Override
-    public PolymerizationProblemDTO getPolymerizationProblem(Long userId, Long paperAnswerId) {
-        Optional<PaperAnswer> paperAnswerOptional = paperAnswerRepository.findById(paperAnswerId);
-        if(paperAnswerOptional.isEmpty()) {
-            throw new BadParamException(ResponseBodyEnum.PAPER_ANSWER_NOT_EXIST);
-        }
-        PaperAnswer paperAnswer = paperAnswerOptional.get();
-        // 判断是否为自己的答卷
-        if(!paperAnswer.getUser().getId().equals(userId)) {
-            throw new UnauthorizedOperationException(userId, ResponseBodyEnum.ANSWER_OTHERS_PAPER);
-        }
-        Paper paper = paperAnswer.getPaper();
-        // 判断当前试卷可以继续作答
-        if(!paper.getState().equals(PaperStateEnum.ANSWERING.getState())) {
-            throw new NotAllowOperationException(ResponseBodyEnum.PAPER_STATE_NOT_ANSWERING);
-        }
-        // 根据题号获取试题
-        int size = paperAnswer.getProblemAnswers().size();
-        Optional<PolymerizationProblem> polymerizationProblemOptional =
-                polymerizationProblemRepository.findByPaperAndSort(paper, size + 1);
-        if(polymerizationProblemOptional.isEmpty()) {
-            return null;
-        }
-        PolymerizationProblem polymerizationProblem = polymerizationProblemOptional.get();
-        PolymerizationProblemDTO polymerizationProblemDTO =
-                EntityConvertToDTOUtil.convertPolymerizationProblem(polymerizationProblem);
-        return polymerizationProblemDTO;
     }
 
     @Override
@@ -184,51 +140,81 @@ public class AnswerServiceImpl implements AnswerService {
         if(!paperAnswer.getUser().getId().equals(userId)) {
             throw new UnauthorizedOperationException(userId, ResponseBodyEnum.ANSWER_OTHERS_PAPER);
         }
-        Paper paper = paperAnswer.getPaper();
-        // 判断当前试卷可以继续作答
-        if(!paper.getState().equals(PaperStateEnum.ANSWERING.getState())) {
-            throw new NotAllowOperationException(ResponseBodyEnum.PAPER_STATE_NOT_ANSWERING);
-        }
-        Optional<Problem> problemOptional = problemRepository.findById(problemAnswerSubmitRequest.getProblemId());
-        if(problemOptional.isEmpty()) {
-            throw new BadParamException(ResponseBodyEnum.PARAM_WRONG);
-        }
-        Problem problem = problemOptional.get();
-        // 判断试题与试卷是否匹配
-        if(!problem.getPaper().getId().equals(paper.getId())) {
-            throw new BadParamException(ResponseBodyEnum.PARAM_WRONG);
-        }
-        PolymerizationProblem polymerizationProblem = problem.getPolymerizationProblem();
+        // 获取作答的题目
+        Problem problem = paperAnswer.getNextProblem();
+        // 保存作答题目
         ProblemAnswer problemAnswer = new ProblemAnswer();
         problemAnswer.setProblem(problem);
         problemAnswer.setPaperAnswer(paperAnswer);
-        Set<ProblemAnswer> problemAnswers = paperAnswer.getProblemAnswers();
-        // 根据是否为组合题目的小题来计算是否为连续答题
-        if(polymerizationProblem == null) {
-            int size = problemAnswers.size();
-            if(size != problem.getSort() - 1) {
-                throw new NotAllowOperationException(ResponseBodyEnum.NOT_CONTINUOUS_ANSWERING);
-            }
-        } else {
-            Map<Long, Integer> map = polymerizationProblem.getProblems().stream()
-                    .collect(Collectors.toMap(Problem::getId, Problem::getSort));
-            int size = (int) problemAnswers.stream()
-                    .filter(problemAnswer1 -> map.containsKey(problemAnswer1.getProblem().getId()))
-                    .count();
-            if(size != problem.getSort() - 1) {
-                throw new NotAllowOperationException(ResponseBodyEnum.NOT_CONTINUOUS_ANSWERING);
-            }
-        }
         BeanUtils.copyProperties(problemAnswerSubmitRequest, problemAnswer);
         problemAnswer = problemAnswerRepository.save(problemAnswer);
+        // 为答卷设置需要答的下一道题
+        Problem nextProblem = findNextProblem(problem);
+        paperAnswer.setNextProblem(nextProblem);
         // 判断试卷是否作答完成
-        int answerProblemSize = paperAnswer.getProblemAnswers().size() + 1;
-        int problemSize = paper.getProblems().size();
-        if(answerProblemSize == problemSize) {
+        if(nextProblem == null) {
             paperAnswer.setState(PaperAnswerStateEnum.FINISH.getState());
-            paperAnswerRepository.save(paperAnswer);
         }
+        paperAnswerRepository.save(paperAnswer);
         ProblemAnswerDTO problemAnswerDTO = EntityConvertToDTOUtil.convertProblemAnswer(problemAnswer);
         return problemAnswerDTO;
+    }
+
+    /**
+     * 根据小题获取下一题
+     */
+    private Problem findNextProblem(Problem problem) {
+        if(problem == null) {
+            return null;
+        }
+        Paper paper = problem.getPaper();
+        int nextSort = problem.getSort() + 1;
+        PolymerizationProblem polymerizationProblem = problem.getPolymerizationProblem();
+        if(polymerizationProblem != null) {
+            Optional<Problem> problem2 = polymerizationProblem.getProblems().stream()
+                    .filter((problem1 -> problem1.getSort() > problem.getSort()))
+                    .min(Comparator.comparingInt(Problem::getSort));
+            if(problem2.isPresent()) {
+               return problem2.get();
+            } else {
+                nextSort = polymerizationProblem.getSort() + 1;
+            }
+        }
+        Optional<Problem> problemOptional
+                = problemRepository.findByPaperAndPolymerizationProblemAndSort(paper, null, nextSort);
+        if(problemOptional.isPresent()) {
+            return problemOptional.get();
+        }
+        Optional<PolymerizationProblem> polymerizationProblemOptional
+                = polymerizationProblemRepository.findByPaperAndSort(paper, nextSort);
+        if (polymerizationProblemOptional.isPresent()) {
+            PolymerizationProblem polymerizationProblem1 = polymerizationProblemOptional.get();
+            Optional<Problem> problem1 = polymerizationProblem1.getProblems().stream()
+                    .min(Comparator.comparingInt(Problem::getSort));
+            if(problem1.isPresent()) {
+                return problem1.get();
+            }
+        }
+        return null;
+    }
+    /**
+     * 获取试卷中的第一题
+     */
+    private Problem findFirstProblem(Paper paper) {
+        Optional<Problem> problemOptional =
+                problemRepository.findByPaperAndPolymerizationProblemAndSort(paper, null, 1);
+        if(problemOptional.isPresent()) {
+            return problemOptional.get();
+        }
+        Optional<PolymerizationProblem> polymerizationProblemOptional =
+                polymerizationProblemRepository.findByPaperAndSort(paper, 1);
+        if(polymerizationProblemOptional.isPresent()) {
+            PolymerizationProblem polymerizationProblem = polymerizationProblemOptional.get();
+            Optional<Problem> problemOptional1 = polymerizationProblem.getProblems().stream().min(Comparator.comparingInt(Problem::getSort));
+            if(problemOptional1.isPresent() && problemOptional1.get().getSort() == 1) {
+                return problemOptional1.get();
+            }
+        }
+        return null;
     }
 }

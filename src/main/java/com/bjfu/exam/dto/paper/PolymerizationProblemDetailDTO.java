@@ -2,8 +2,10 @@ package com.bjfu.exam.dto.paper;
 
 import lombok.Data;
 
+import java.util.List;
+
 @Data
-public class PolymerizationProblemDTO {
+public class PolymerizationProblemDetailDTO {
     /**
      * 聚合题目id
      */
@@ -24,4 +26,8 @@ public class PolymerizationProblemDTO {
      * 图片(JSON Array)
      */
     private String images;
+    /**
+     * 组合题目所属的子问题
+     */
+    List<ProblemDTO> problems;
 }

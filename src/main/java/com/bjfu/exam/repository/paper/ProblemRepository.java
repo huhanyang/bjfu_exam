@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface ProblemRepository extends CrudRepository<Problem, Long> {
     void deleteAllByPaper(Paper paper);
     void deleteAllByPolymerizationProblem(PolymerizationProblem polymerizationProblem);
-    Optional<Problem> findByPaperAndSort(Paper paper, Integer sort);
+    Optional<Problem> findByPaperAndPolymerizationProblemAndSort(Paper paper, PolymerizationProblem polymerizationProblem, Integer sort);
 
     // todo 改写hql
     @Query(value = "select * from exam.exam_polymerization_problem p where p.id=?1 for update", nativeQuery = true)

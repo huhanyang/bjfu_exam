@@ -3,7 +3,7 @@ package com.bjfu.exam.service.impl;
 import com.alibaba.fastjson.JSONArray;
 import com.bjfu.exam.dto.paper.PaperDTO;
 import com.bjfu.exam.dto.paper.PaperDetailDTO;
-import com.bjfu.exam.dto.paper.PolymerizationProblemDTO;
+import com.bjfu.exam.dto.paper.PolymerizationProblemDetailDTO;
 import com.bjfu.exam.dto.paper.ProblemDTO;
 import com.bjfu.exam.entity.paper.Paper;
 import com.bjfu.exam.entity.paper.PolymerizationProblem;
@@ -104,8 +104,8 @@ public class PaperServiceImpl implements PaperService {
 
     @Override
     @Transactional
-    public PolymerizationProblemDTO addPolymerizationProblemInPaper(Long userId,
-                                                                    PolymerizationProblemAddRequest polymerizationProblemAddRequest) {
+    public PolymerizationProblemDetailDTO addPolymerizationProblemInPaper(Long userId,
+                                                                          PolymerizationProblemAddRequest polymerizationProblemAddRequest) {
         // 为此试卷加锁
         paperRepository.existsById(polymerizationProblemAddRequest.getPaperId());
         Optional<Paper> paperOptional = paperRepository.findById(polymerizationProblemAddRequest.getPaperId());
@@ -123,13 +123,13 @@ public class PaperServiceImpl implements PaperService {
         polymerizationProblem.setSort(sort);
         polymerizationProblem.setPaper(paper);
         polymerizationProblem = polymerizationProblemRepository.save(polymerizationProblem);
-        return EntityConvertToDTOUtil.convertPolymerizationProblem(polymerizationProblem);
+        return EntityConvertToDTOUtil.convertPolymerizationProblemDetail(polymerizationProblem);
     }
 
     @Override
     @Transactional
-    public PolymerizationProblemDTO addImageInPolymerizationProblem(Long userId,
-                                                                    ImageInPolymerizationProblemAddRequest imageInPolymerizationProblemAddRequest) {
+    public PolymerizationProblemDetailDTO addImageInPolymerizationProblem(Long userId,
+                                                                          ImageInPolymerizationProblemAddRequest imageInPolymerizationProblemAddRequest) {
         // 对此组合题目加锁
         Optional<PolymerizationProblem> polymerizationProblemOptional =
                 polymerizationProblemRepository.findByIdForUpdate(imageInPolymerizationProblemAddRequest.getPolymerizationProblemId());
@@ -150,12 +150,12 @@ public class PaperServiceImpl implements PaperService {
         jsonArray.add(imageInPolymerizationProblemAddRequest.getIndex() - 1, url);
         polymerizationProblem.setImages(jsonArray.toJSONString());
         polymerizationProblem = polymerizationProblemRepository.save(polymerizationProblem);
-        return EntityConvertToDTOUtil.convertPolymerizationProblem(polymerizationProblem);
+        return EntityConvertToDTOUtil.convertPolymerizationProblemDetail(polymerizationProblem);
     }
 
     @Override
     @Transactional
-    public PolymerizationProblemDTO deleteImageInPolymerizationProblem(Long userId, ImageInPolymerizationProblemDeleteRequest imageInPolymerizationProblemDeleteRequest) {
+    public PolymerizationProblemDetailDTO deleteImageInPolymerizationProblem(Long userId, ImageInPolymerizationProblemDeleteRequest imageInPolymerizationProblemDeleteRequest) {
         // 对此组合题目加锁
         Optional<PolymerizationProblem> polymerizationProblemOptional =
                 polymerizationProblemRepository.findByIdForUpdate(imageInPolymerizationProblemDeleteRequest.getPolymerizationProblemId());
@@ -175,7 +175,7 @@ public class PaperServiceImpl implements PaperService {
         jsonArray.remove(imageInPolymerizationProblemDeleteRequest.getIndex() - 1);
         polymerizationProblem.setImages(jsonArray.toJSONString());
         polymerizationProblem = polymerizationProblemRepository.save(polymerizationProblem);
-        return EntityConvertToDTOUtil.convertPolymerizationProblem(polymerizationProblem);
+        return EntityConvertToDTOUtil.convertPolymerizationProblemDetail(polymerizationProblem);
     }
 
     @Override

@@ -5,22 +5,15 @@ import com.bjfu.exam.dto.answer.PaperAnswerDetailDTO;
 import com.bjfu.exam.dto.answer.ProblemAnswerDTO;
 import com.bjfu.exam.dto.answer.ProblemAnswerDetailDTO;
 import com.bjfu.exam.dto.export.PaperAnswerExportJobDTO;
-import com.bjfu.exam.dto.paper.PaperDTO;
-import com.bjfu.exam.dto.paper.PaperDetailDTO;
-import com.bjfu.exam.dto.paper.PolymerizationProblemDTO;
-import com.bjfu.exam.dto.paper.ProblemDTO;
+import com.bjfu.exam.dto.paper.*;
 import com.bjfu.exam.dto.user.UserDTO;
 import com.bjfu.exam.dto.user.UserDetailDTO;
-import com.bjfu.exam.entity.export.PaperAnswerExportJob;
 import com.bjfu.exam.vo.answer.PaperAnswerDetailVO;
 import com.bjfu.exam.vo.answer.PaperAnswerVO;
 import com.bjfu.exam.vo.answer.ProblemAnswerDetailVO;
 import com.bjfu.exam.vo.answer.ProblemAnswerVO;
 import com.bjfu.exam.vo.export.PaperAnswerExportJobVO;
-import com.bjfu.exam.vo.paper.PaperDetailVO;
-import com.bjfu.exam.vo.paper.PaperVO;
-import com.bjfu.exam.vo.paper.PolymerizationProblemVO;
-import com.bjfu.exam.vo.paper.ProblemVO;
+import com.bjfu.exam.vo.paper.*;
 import com.bjfu.exam.vo.user.UserDetailVO;
 import com.bjfu.exam.vo.user.UserVO;
 import org.springframework.beans.BeanUtils;
@@ -73,7 +66,7 @@ public class DTOConvertToVOUtil {
                 .map(DTOConvertToVOUtil::convertProblemDTO)
                 .collect(Collectors.toList()));
         paperDetailVO.setPolymerizationProblems(paperDetailDTO.getPolymerizationProblems().stream()
-                .map(DTOConvertToVOUtil::convertPolymerizationProblemDTO)
+                .map(DTOConvertToVOUtil::convertPolymerizationProblemDetailDTO)
                 .collect(Collectors.toList()));
         paperDetailVO.setPaperAnswerExportJobs(paperDetailDTO.getPaperAnswerExportJobs().stream()
                 .map(DTOConvertToVOUtil::convertPaperAnswerExportJobDTO)
@@ -86,7 +79,8 @@ public class DTOConvertToVOUtil {
             return null;
         }
         ProblemVO problemVO = new ProblemVO();
-        BeanUtils.copyProperties(problemDTO, problemVO);
+        BeanUtils.copyProperties(problemDTO, problemVO, "polymerizationProblem");
+        problemVO.setPolymerizationProblem(convertPolymerizationProblemDTO(problemDTO.getPolymerizationProblem()));
         return problemVO;
     }
 
@@ -96,10 +90,19 @@ public class DTOConvertToVOUtil {
         }
         PolymerizationProblemVO polymerizationProblemVO = new PolymerizationProblemVO();
         BeanUtils.copyProperties(polymerizationProblemDTO, polymerizationProblemVO, "problems");
-        polymerizationProblemVO.setProblems(polymerizationProblemDTO.getProblems().stream()
+        return polymerizationProblemVO;
+    }
+
+    public static PolymerizationProblemDetailVO convertPolymerizationProblemDetailDTO(PolymerizationProblemDetailDTO polymerizationProblemDetailDTO) {
+        if(polymerizationProblemDetailDTO == null) {
+            return null;
+        }
+        PolymerizationProblemDetailVO polymerizationProblemDetailVO = new PolymerizationProblemDetailVO();
+        BeanUtils.copyProperties(polymerizationProblemDetailDTO, polymerizationProblemDetailVO, "problems");
+        polymerizationProblemDetailVO.setProblems(polymerizationProblemDetailDTO.getProblems().stream()
                 .map(DTOConvertToVOUtil::convertProblemDTO)
                 .collect(Collectors.toList()));
-        return polymerizationProblemVO;
+        return polymerizationProblemDetailVO;
     }
 
     public static PaperAnswerVO convertPaperAnswerDTO(PaperAnswerDTO paperAnswerDTO) {

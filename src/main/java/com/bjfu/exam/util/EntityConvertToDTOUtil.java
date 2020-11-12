@@ -5,11 +5,8 @@ import com.bjfu.exam.dto.answer.PaperAnswerDetailDTO;
 import com.bjfu.exam.dto.answer.ProblemAnswerDTO;
 import com.bjfu.exam.dto.answer.ProblemAnswerDetailDTO;
 import com.bjfu.exam.dto.export.PaperAnswerExportJobDTO;
+import com.bjfu.exam.dto.paper.*;
 import com.bjfu.exam.dto.user.UserDTO;
-import com.bjfu.exam.dto.paper.PaperDTO;
-import com.bjfu.exam.dto.paper.PaperDetailDTO;
-import com.bjfu.exam.dto.paper.PolymerizationProblemDTO;
-import com.bjfu.exam.dto.paper.ProblemDTO;
 import com.bjfu.exam.dto.user.UserDetailDTO;
 import com.bjfu.exam.entity.answer.PaperAnswer;
 import com.bjfu.exam.entity.answer.ProblemAnswer;
@@ -72,7 +69,7 @@ public class EntityConvertToDTOUtil {
                 .map(EntityConvertToDTOUtil::convertProblem)
                 .collect(Collectors.toList()));
         paperDetailDTO.setPolymerizationProblems(paper.getPolymerizationProblems().stream()
-                .map(EntityConvertToDTOUtil::convertPolymerizationProblem)
+                .map(EntityConvertToDTOUtil::convertPolymerizationProblemDetail)
                 .collect(Collectors.toList()));
         paperDetailDTO.setPaperAnswerExportJobs(paper.getPaperAnswerExportJobs().stream()
                 .map(EntityConvertToDTOUtil::convertPaperAnswerExportJob)
@@ -85,7 +82,8 @@ public class EntityConvertToDTOUtil {
             return null;
         }
         ProblemDTO problemDTO = new ProblemDTO();
-        BeanUtils.copyProperties(problem, problemDTO);
+        BeanUtils.copyProperties(problem, problemDTO, "polymerizationProblem");
+        problemDTO.setPolymerizationProblem(convertPolymerizationProblem(problem.getPolymerizationProblem()));
         return problemDTO;
     }
 
@@ -94,11 +92,20 @@ public class EntityConvertToDTOUtil {
             return null;
         }
         PolymerizationProblemDTO polymerizationProblemDTO = new PolymerizationProblemDTO();
-        BeanUtils.copyProperties(polymerizationProblem, polymerizationProblemDTO, "problems");
-        polymerizationProblemDTO.setProblems(polymerizationProblem.getProblems().stream()
+        BeanUtils.copyProperties(polymerizationProblem, polymerizationProblemDTO);
+        return polymerizationProblemDTO;
+    }
+
+    public static PolymerizationProblemDetailDTO convertPolymerizationProblemDetail(PolymerizationProblem polymerizationProblem) {
+        if(polymerizationProblem == null) {
+            return null;
+        }
+        PolymerizationProblemDetailDTO polymerizationProblemDetailDTO = new PolymerizationProblemDetailDTO();
+        BeanUtils.copyProperties(polymerizationProblem, polymerizationProblemDetailDTO, "problems");
+        polymerizationProblemDetailDTO.setProblems(polymerizationProblem.getProblems().stream()
                 .map(EntityConvertToDTOUtil::convertProblem)
                 .collect(Collectors.toList()));
-        return polymerizationProblemDTO;
+        return polymerizationProblemDetailDTO;
     }
 
     public static PaperAnswerDTO convertPaperAnswer(PaperAnswer paperAnswer) {

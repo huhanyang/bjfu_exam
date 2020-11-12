@@ -1,6 +1,5 @@
 package com.bjfu.exam.vo.paper;
 
-import com.bjfu.exam.dto.export.PaperAnswerExportJobDTO;
 import com.bjfu.exam.vo.export.PaperAnswerExportJobVO;
 import com.bjfu.exam.vo.user.UserVO;
 import lombok.Data;
@@ -53,5 +52,5 @@ public class PaperDetailVO {
     /**
      * 试卷的聚合题目
      */
-    private List<PolymerizationProblemVO> polymerizationProblems;
+    private List<PolymerizationProblemDetailVO> polymerizationProblems;
 }
