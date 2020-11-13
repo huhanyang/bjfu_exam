@@ -29,6 +29,10 @@ public class PaperAnswerDetailDTO {
      */
     private Integer state;
     /**
+     * 答卷总用时(秒)
+     */
+    private Long totalTime;
+    /**
      * 题目答案
      */
     List<ProblemAnswerDetailDTO> problemAnswers;

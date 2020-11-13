@@ -36,6 +36,10 @@ public class PaperAnswer {
      */
     private Integer state;
     /**
+     * 答卷总用时(秒)
+     */
+    private Long totalTime;
+    /**
      * 下一道题
      */
     @ManyToOne

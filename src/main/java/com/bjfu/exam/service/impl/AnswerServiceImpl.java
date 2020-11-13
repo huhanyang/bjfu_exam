@@ -105,6 +105,7 @@ public class AnswerServiceImpl implements AnswerService {
         paperAnswer.setPaper(paper);
         paperAnswer.setNextProblem(findFirstProblem(paper));
         paperAnswer.setState(PaperAnswerStateEnum.ANSWERING.getState());
+        paperAnswer.setTotalTime(0L);
         BeanUtils.copyProperties(paperAnswerCreateRequest, paperAnswer);
         paperAnswer = paperAnswerRepository.save(paperAnswer);
         PaperAnswerDTO paperAnswerDTO = EntityConvertToDTOUtil.convertPaperAnswer(paperAnswer);
@@ -151,8 +152,13 @@ public class AnswerServiceImpl implements AnswerService {
         // 为答卷设置需要答的下一道题
         Problem nextProblem = findNextProblem(problem);
         paperAnswer.setNextProblem(nextProblem);
-        // 判断试卷是否作答完成
-        if(nextProblem == null) {
+        // 更新所用作答时间
+        paperAnswer.setTotalTime(paperAnswer.getTotalTime() + problemAnswerSubmitRequest.getTotalTime());
+        // 更新试卷状态
+        boolean isOverTime = paperAnswer.getTotalTime() > paperAnswer.getPaper().getTime() * 60;
+        if(isOverTime) {
+            paperAnswer.setState(PaperAnswerStateEnum.OVERTIME.getState());
+        } else if(nextProblem == null) {
             paperAnswer.setState(PaperAnswerStateEnum.FINISH.getState());
         }
         paperAnswerRepository.save(paperAnswer);

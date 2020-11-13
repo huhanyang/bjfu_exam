@@ -26,6 +26,10 @@ public class PaperAnswerDetailVO {
      */
     private String collectionAnswer;
     /**
+     * 答卷总用时(秒)
+     */
+    private Long totalTime;
+    /**
      * 答卷状态
      */
     private Integer state;
