@@ -3,7 +3,7 @@ package com.bjfu.exam.service.impl;
 import com.bjfu.exam.dto.user.UserDTO;
 import com.bjfu.exam.dto.user.UserDetailDTO;
 import com.bjfu.exam.entity.user.User;
-import com.bjfu.exam.enums.ResponseBodyEnum;
+import com.bjfu.exam.enums.ResultEnum;
 import com.bjfu.exam.enums.UserTypeEnum;
 import com.bjfu.exam.exception.NotAllowOperationException;
 import com.bjfu.exam.repository.user.UserRepository;
@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
             user = userRepository.save(user);
             return EntityConvertToDTOUtil.convertUserToDetail(user);
         }
-        throw new NotAllowOperationException(ResponseBodyEnum.CREATE_NOT_ALLOW_ACCOUNT_TYPE);
+        throw new NotAllowOperationException(ResultEnum.CREATE_NOT_ALLOW_ACCOUNT_TYPE);
     }
 
     @Override

@@ -4,13 +4,14 @@ import com.bjfu.exam.dto.answer.PaperAnswerDTO;
 import com.bjfu.exam.dto.answer.PaperAnswerDetailDTO;
 import com.bjfu.exam.dto.answer.ProblemAnswerDTO;
 import com.bjfu.exam.dto.paper.ProblemDTO;
-import com.bjfu.exam.enums.ResponseBodyEnum;
+import com.bjfu.exam.enums.ResultEnum;
 import com.bjfu.exam.request.answer.PaperAnswerCreateRequest;
 import com.bjfu.exam.request.answer.ProblemAnswerSubmitRequest;
+import com.bjfu.exam.security.annotation.RequireStudent;
 import com.bjfu.exam.service.AnswerService;
 import com.bjfu.exam.util.DTOConvertToVOUtil;
 import com.bjfu.exam.util.SessionUtil;
-import com.bjfu.exam.vo.ResponseBody;
+import com.bjfu.exam.vo.BaseResult;
 import com.bjfu.exam.vo.answer.PaperAnswerDetailVO;
 import com.bjfu.exam.vo.answer.PaperAnswerVO;
 import com.bjfu.exam.vo.answer.ProblemAnswerVO;
@@ -30,74 +31,79 @@ public class AnswerController {
     private AnswerService answerService;
 
     @GetMapping("/getPaperAnswers")
-    public ResponseBody<List<PaperAnswerDetailVO>> getPaperAnswers(HttpSession session) {
-        if(!SessionUtil.existSession(session)) {
-            return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
+    @RequireStudent
+    public BaseResult<List<PaperAnswerDetailVO>> getPaperAnswers(HttpSession session) {
+        if(SessionUtil.existSession(session)) {
+            return new BaseResult<>(ResultEnum.NEED_TO_LOGIN);
         }
         List<PaperAnswerDetailDTO> paperAnswerDetailDTOS =
                 answerService.getPaperAnswers((Long) session.getAttribute("userId"));
         List<PaperAnswerDetailVO> paperAnswerDetailVOS = paperAnswerDetailDTOS.stream()
                 .map(DTOConvertToVOUtil::convertPaperAnswerDetailDTO)
                 .collect(Collectors.toList());
-        return new ResponseBody<>(ResponseBodyEnum.SUCCESS, paperAnswerDetailVOS);
+        return new BaseResult<>(ResultEnum.SUCCESS, paperAnswerDetailVOS);
     }
 
     @GetMapping("/getPaperAnswerDetail")
-    public ResponseBody<PaperAnswerDetailVO> getPaperAnswerDetail(Long paperAnswerId, HttpSession session) {
+    @RequireStudent
+    public BaseResult<PaperAnswerDetailVO> getPaperAnswerDetail(Long paperAnswerId, HttpSession session) {
         if(paperAnswerId == null) {
-            return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
+            return new BaseResult<>(ResultEnum.PARAM_WRONG);
         }
-        if(!SessionUtil.existSession(session)) {
-            return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
+        if(SessionUtil.existSession(session)) {
+            return new BaseResult<>(ResultEnum.NEED_TO_LOGIN);
         }
         PaperAnswerDetailDTO paperAnswerDetailDTO =
                 answerService.getPaperAnswerDetail((Long) session.getAttribute("userId"), paperAnswerId);
         PaperAnswerDetailVO paperAnswerDetailVO = DTOConvertToVOUtil.convertPaperAnswerDetailDTO(paperAnswerDetailDTO);
-        return new ResponseBody<>(ResponseBodyEnum.SUCCESS, paperAnswerDetailVO);
+        return new BaseResult<>(ResultEnum.SUCCESS, paperAnswerDetailVO);
     }
 
     @PutMapping("/createPaperAnswer")
-    public ResponseBody<PaperAnswerVO> createPaperAnswer(@RequestBody PaperAnswerCreateRequest paperAnswerCreateRequest,
-                                                         HttpSession session) {
+    @RequireStudent
+    public BaseResult<PaperAnswerVO> createPaperAnswer(@RequestBody PaperAnswerCreateRequest paperAnswerCreateRequest,
+                                                       HttpSession session) {
         if(!paperAnswerCreateRequest.isComplete()) {
-            return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
+            return new BaseResult<>(ResultEnum.PARAM_WRONG);
         }
-        if(!SessionUtil.existSession(session)) {
-            return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
+        if(SessionUtil.existSession(session)) {
+            return new BaseResult<>(ResultEnum.NEED_TO_LOGIN);
         }
         PaperAnswerDTO paperAnswerDTO =
                 answerService.createPaperAnswer((Long) session.getAttribute("userId"), paperAnswerCreateRequest);
         PaperAnswerVO paperAnswerVO = DTOConvertToVOUtil.convertPaperAnswerDTO(paperAnswerDTO);
-        return new ResponseBody<>(ResponseBodyEnum.SUCCESS, paperAnswerVO);
+        return new BaseResult<>(ResultEnum.SUCCESS, paperAnswerVO);
     }
 
     @GetMapping("/getNextProblem")
-    public ResponseBody<ProblemVO> getNextProblem(Long paperAnswerId, HttpSession session) {
+    @RequireStudent
+    public BaseResult<ProblemVO> getNextProblem(Long paperAnswerId, HttpSession session) {
         if(paperAnswerId == null) {
-            return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
+            return new BaseResult<>(ResultEnum.PARAM_WRONG);
         }
-        if(!SessionUtil.existSession(session)) {
-            return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
+        if(SessionUtil.existSession(session)) {
+            return new BaseResult<>(ResultEnum.NEED_TO_LOGIN);
         }
         ProblemDTO problemDTO =
                 answerService.getNextProblem((Long) session.getAttribute("userId"), paperAnswerId);
         ProblemVO problemVO = DTOConvertToVOUtil.convertProblemDTO(problemDTO);
-        return new ResponseBody<>(ResponseBodyEnum.SUCCESS, problemVO);
+        return new BaseResult<>(ResultEnum.SUCCESS, problemVO);
     }
 
     @PutMapping("/submitAnswer")
-    public ResponseBody<ProblemAnswerVO> submitAnswer(@RequestBody ProblemAnswerSubmitRequest problemAnswerSubmitRequest,
-                                                      HttpSession session) {
+    @RequireStudent
+    public BaseResult<ProblemAnswerVO> submitAnswer(@RequestBody ProblemAnswerSubmitRequest problemAnswerSubmitRequest,
+                                                    HttpSession session) {
         if(!problemAnswerSubmitRequest.isComplete()) {
-            return new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
+            return new BaseResult<>(ResultEnum.PARAM_WRONG);
         }
-        if(!SessionUtil.existSession(session)) {
-            return new ResponseBody<>(ResponseBodyEnum.NEED_TO_RELOGIN);
+        if(SessionUtil.existSession(session)) {
+            return new BaseResult<>(ResultEnum.NEED_TO_LOGIN);
         }
         ProblemAnswerDTO problemAnswerDTO =
                 answerService.submitAnswer((Long) session.getAttribute("userId"), problemAnswerSubmitRequest);
         ProblemAnswerVO problemAnswerVO = DTOConvertToVOUtil.convertProblemAnswerDTO(problemAnswerDTO);
-        return new ResponseBody<>(ResponseBodyEnum.SUCCESS, problemAnswerVO);
+        return new BaseResult<>(ResultEnum.SUCCESS, problemAnswerVO);
     }
 
 

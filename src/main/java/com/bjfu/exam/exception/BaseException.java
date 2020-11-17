@@ -1,15 +1,15 @@
 package com.bjfu.exam.exception;
 
-import com.bjfu.exam.enums.ResponseBodyEnum;
+import com.bjfu.exam.enums.ResultEnum;
 import lombok.Getter;
 
 @Getter
 public class BaseException extends RuntimeException {
 
-    private final ResponseBodyEnum responseBodyEnum;
+    private final ResultEnum resultEnum;
 
-    public BaseException(ResponseBodyEnum responseBodyEnum) {
-        super(responseBodyEnum.getMsg());
-        this.responseBodyEnum = responseBodyEnum;
+    public BaseException(ResultEnum resultEnum) {
+        super(resultEnum.getMsg());
+        this.resultEnum = resultEnum;
     }
 }

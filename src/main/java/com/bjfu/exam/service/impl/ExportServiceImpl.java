@@ -7,8 +7,10 @@ import com.bjfu.exam.entity.answer.ProblemAnswer;
 import com.bjfu.exam.entity.paper.Paper;
 import com.bjfu.exam.entity.paper.PolymerizationProblem;
 import com.bjfu.exam.entity.paper.Problem;
-import com.bjfu.exam.enums.ResponseBodyEnum;
+import com.bjfu.exam.enums.PaperStateEnum;
+import com.bjfu.exam.enums.ResultEnum;
 import com.bjfu.exam.exception.BadParamException;
+import com.bjfu.exam.exception.NotAllowOperationException;
 import com.bjfu.exam.exception.UnauthorizedOperationException;
 import com.bjfu.exam.repository.paper.PaperRepository;
 import com.bjfu.exam.service.ExportService;
@@ -32,11 +34,14 @@ public class ExportServiceImpl implements ExportService {
     public void exportPaperAnswersToExcel(Long paperId, Long userId, OutputStream outputStream) {
         Optional<Paper> paperOptional = paperRepository.findById(paperId);
         if(paperOptional.isEmpty()) {
-            throw new BadParamException(ResponseBodyEnum.PAPER_NOT_EXIST);
+            throw new BadParamException(ResultEnum.PAPER_NOT_EXIST);
         }
         Paper paper = paperOptional.get();
         if(!paper.getCreator().getId().equals(userId)) {
-            throw new UnauthorizedOperationException(userId, ResponseBodyEnum.NOT_CREATOR_EXPORT_PAPER);
+            throw new UnauthorizedOperationException(userId, ResultEnum.NOT_CREATOR_EXPORT_PAPER);
+        }
+        if(!paper.getState().equals(PaperStateEnum.END_ANSWER.getState())) {
+            throw new NotAllowOperationException(ResultEnum.PAPER_STATE_IS_NOT_END_ANSWER);
         }
         // 1.试题按照sort排序(考虑组合题目)
         List<Problem> problems = paper.getProblems().stream()

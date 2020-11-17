@@ -12,7 +12,7 @@ import com.bjfu.exam.entity.paper.Problem;
 import com.bjfu.exam.entity.user.User;
 import com.bjfu.exam.enums.PaperAnswerStateEnum;
 import com.bjfu.exam.enums.PaperStateEnum;
-import com.bjfu.exam.enums.ResponseBodyEnum;
+import com.bjfu.exam.enums.ResultEnum;
 import com.bjfu.exam.exception.*;
 import com.bjfu.exam.repository.answer.PaperAnswerRepository;
 import com.bjfu.exam.repository.answer.ProblemAnswerRepository;
@@ -52,30 +52,28 @@ public class AnswerServiceImpl implements AnswerService {
     public List<PaperAnswerDetailDTO> getPaperAnswers(Long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
         if(userOptional.isEmpty()) {
-            throw new UserNotExistException(userId, ResponseBodyEnum.USER_NOT_EXIST);
+            throw new UserNotExistException(userId, ResultEnum.USER_NOT_EXIST);
         }
         User user = userOptional.get();
         List<PaperAnswer> paperAnswers = paperAnswerRepository.findAllByUser(user);
-        List<PaperAnswerDetailDTO> paperAnswerDetailDTOS = paperAnswers.stream()
+        return paperAnswers.stream()
                 .map(EntityConvertToDTOUtil::convertPaperAnswerToDetail)
                 .collect(Collectors.toList());
-        return paperAnswerDetailDTOS;
     }
 
     @Override
     public PaperAnswerDetailDTO getPaperAnswerDetail(Long userId, Long paperAnswerId) {
         Optional<PaperAnswer> paperAnswerOptional = paperAnswerRepository.findById(paperAnswerId);
         if(paperAnswerOptional.isEmpty()) {
-            throw new BadParamException(ResponseBodyEnum.PAPER_ANSWER_NOT_EXIST);
+            throw new BadParamException(ResultEnum.PAPER_ANSWER_NOT_EXIST);
         }
         PaperAnswer paperAnswer = paperAnswerOptional.get();
         // 非试卷创建者或答卷创建者 不能获取答卷详情
         if(!paperAnswer.getUser().getId().equals(userId) &&
                 !paperAnswer.getPaper().getCreator().getId().equals(userId)) {
-            throw new UnauthorizedOperationException(userId, ResponseBodyEnum.GET_OTHERS_PAPER_ANSWER);
+            throw new UnauthorizedOperationException(userId, ResultEnum.GET_OTHERS_PAPER_ANSWER);
         }
-        PaperAnswerDetailDTO paperAnswerDetailDTO = EntityConvertToDTOUtil.convertPaperAnswerToDetail(paperAnswer);
-        return paperAnswerDetailDTO;
+        return EntityConvertToDTOUtil.convertPaperAnswerToDetail(paperAnswer);
     }
 
     @Override
@@ -84,21 +82,21 @@ public class AnswerServiceImpl implements AnswerService {
         // 针对此用户加锁
         Optional<User> userOptional = userRepository.findByIdForUpdate(userId);
         if(userOptional.isEmpty()) {
-            throw new UserNotExistException(userId, ResponseBodyEnum.USER_NOT_EXIST);
+            throw new UserNotExistException(userId, ResultEnum.USER_NOT_EXIST);
         }
         Optional<Paper> paperOptional = paperRepository.findById(paperAnswerCreateRequest.getPaperId());
         if(paperOptional.isEmpty()) {
-            throw new BadParamException(ResponseBodyEnum.PAPER_NOT_EXIST);
+            throw new BadParamException(ResultEnum.PAPER_NOT_EXIST);
         }
         Paper paper = paperOptional.get();
         User user = userOptional.get();
         // 判断此试卷当前是否可以作答
         if(!paper.getState().equals(PaperStateEnum.ANSWERING.getState())) {
-            throw new NotAllowOperationException(ResponseBodyEnum.PAPER_STATE_NOT_ANSWERING);
+            throw new NotAllowOperationException(ResultEnum.PAPER_STATE_NOT_ANSWERING);
         }
         // 判断是否已经作答过此试卷
         if(paperAnswerRepository.findByUserAndPaper(user, paper).isPresent()) {
-            throw new NotAllowOperationException(ResponseBodyEnum.ANSWER_TWICE);
+            throw new NotAllowOperationException(ResultEnum.ANSWER_TWICE);
         }
         PaperAnswer paperAnswer = new PaperAnswer();
         paperAnswer.setUser(user);
@@ -108,23 +106,21 @@ public class AnswerServiceImpl implements AnswerService {
         paperAnswer.setTotalTime(0L);
         BeanUtils.copyProperties(paperAnswerCreateRequest, paperAnswer);
         paperAnswer = paperAnswerRepository.save(paperAnswer);
-        PaperAnswerDTO paperAnswerDTO = EntityConvertToDTOUtil.convertPaperAnswer(paperAnswer);
-        return paperAnswerDTO;
+        return EntityConvertToDTOUtil.convertPaperAnswer(paperAnswer);
     }
 
     @Override
     public ProblemDTO getNextProblem(Long userId, Long paperAnswerId) {
         Optional<PaperAnswer> paperAnswerOptional = paperAnswerRepository.findById(paperAnswerId);
         if(paperAnswerOptional.isEmpty()) {
-            throw new BadParamException(ResponseBodyEnum.PAPER_ANSWER_NOT_EXIST);
+            throw new BadParamException(ResultEnum.PAPER_ANSWER_NOT_EXIST);
         }
         PaperAnswer paperAnswer = paperAnswerOptional.get();
         // 判断是否为自己的答卷
         if(!paperAnswer.getUser().getId().equals(userId)) {
-            throw new UnauthorizedOperationException(userId, ResponseBodyEnum.ANSWER_OTHERS_PAPER);
+            throw new UnauthorizedOperationException(userId, ResultEnum.ANSWER_OTHERS_PAPER);
         }
-        ProblemDTO problemDTO = EntityConvertToDTOUtil.convertProblem(paperAnswer.getNextProblem());
-        return problemDTO;
+        return EntityConvertToDTOUtil.convertProblem(paperAnswer.getNextProblem());
     }
 
     @Override
@@ -134,12 +130,12 @@ public class AnswerServiceImpl implements AnswerService {
         Optional<PaperAnswer> paperAnswerOptional =
                 paperAnswerRepository.findByIdForUpdate(problemAnswerSubmitRequest.getPaperAnswerId());
         if(paperAnswerOptional.isEmpty()) {
-            throw new BadParamException(ResponseBodyEnum.PAPER_ANSWER_NOT_EXIST);
+            throw new BadParamException(ResultEnum.PAPER_ANSWER_NOT_EXIST);
         }
         PaperAnswer paperAnswer = paperAnswerOptional.get();
         // 判断是否为自己的答卷
         if(!paperAnswer.getUser().getId().equals(userId)) {
-            throw new UnauthorizedOperationException(userId, ResponseBodyEnum.ANSWER_OTHERS_PAPER);
+            throw new UnauthorizedOperationException(userId, ResultEnum.ANSWER_OTHERS_PAPER);
         }
         // 获取作答的题目
         Problem problem = paperAnswer.getNextProblem();
@@ -162,8 +158,7 @@ public class AnswerServiceImpl implements AnswerService {
             paperAnswer.setState(PaperAnswerStateEnum.FINISH.getState());
         }
         paperAnswerRepository.save(paperAnswer);
-        ProblemAnswerDTO problemAnswerDTO = EntityConvertToDTOUtil.convertProblemAnswer(problemAnswer);
-        return problemAnswerDTO;
+        return EntityConvertToDTOUtil.convertProblemAnswer(problemAnswer);
     }
 
     /**

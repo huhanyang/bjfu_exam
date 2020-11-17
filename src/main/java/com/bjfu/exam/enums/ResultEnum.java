@@ -3,7 +3,7 @@ package com.bjfu.exam.enums;
 import lombok.Getter;
 
 @Getter
-public enum ResponseBodyEnum {
+public enum ResultEnum {
 
     UNKNOWN_WRONG(0, "未知的错误，请重新登陆后再试"),
     SUCCESS(1, "成功"),
@@ -11,7 +11,7 @@ public enum ResponseBodyEnum {
     LOGIN_FAILED(3, "登录失败，账号或密码错误"),
     ACCOUNT_RECUR(4, "账号重复"),
     FIND_FAILED(5, "查找失败"),
-    NEED_TO_RELOGIN(6, "需要重新登录"),
+    NEED_TO_LOGIN(6, "需要登录"),
     CHANGE_PASSWORD_FAILED(7, "修改密码失败，账号或密码错误"),
     PARAM_NOT_MATCH(8, "参数不相互匹配"),
     ANSWER_TWICE(9, "多次作答"),
@@ -32,13 +32,19 @@ public enum ResponseBodyEnum {
     PAPER_STATE_FROM_ANSWERING_TO_CREATING(24, "试卷状态不允许从作答修改回创建状态"),
     PAPER_STATE_FROM_DELETE_TO_OTHERS(25, "试卷状态不允许从删除状态修改为其他状态"),
     NOT_CREATOR_EXPORT_PAPER(26, "非试卷创建者导出试卷"),
-    EXPORT_PAPER_FAILED(27, "导出excel失败");
+    EXPORT_PAPER_FAILED(27, "导出excel失败"),
+    FILE_UPLOAD_FAILED(28, "文件上传失败"),
+    REQUIRE_STUDENT(29, "此请求只允许学生账号"),
+    REQUIRE_TEACHER(30, "此请求只允许教师账号"),
+    PAPER_STATE_CHANGE_NOT_ALLOW(31, "此状态变更不允许"),
+    PAPER_STATE_IS_NOT_CREATING(32, "试卷非创建状态不允许修改"),
+    PAPER_STATE_IS_NOT_END_ANSWER(33, "试卷状态非结束作答");
 
 
     private final int code;
     private final String msg;
 
-    ResponseBodyEnum(int code, String msg) {
+    ResultEnum(int code, String msg) {
         this.code = code;
         this.msg = msg;
     }

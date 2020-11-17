@@ -1,11 +1,11 @@
 package com.bjfu.exam.exception;
 
-import com.bjfu.exam.enums.ResponseBodyEnum;
+import com.bjfu.exam.enums.ResultEnum;
 
 public class NotAllowOperationException extends BaseException{
 
-    public NotAllowOperationException(ResponseBodyEnum responseBodyEnum) {
-        super(responseBodyEnum);
+    public NotAllowOperationException(ResultEnum resultEnum) {
+        super(resultEnum);
     }
 
 }

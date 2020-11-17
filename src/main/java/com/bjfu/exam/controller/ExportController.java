@@ -1,9 +1,10 @@
 package com.bjfu.exam.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.bjfu.exam.enums.ResponseBodyEnum;
+import com.bjfu.exam.enums.ResultEnum;
+import com.bjfu.exam.security.annotation.RequireTeacher;
 import com.bjfu.exam.service.ExportService;
-import com.bjfu.exam.vo.ResponseBody;
+import com.bjfu.exam.vo.BaseResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,7 @@ public class ExportController {
     private ExportService exportService;
 
     @GetMapping("/exportPaper")
+    @RequireTeacher
     public void exportPaper(Long paperId, HttpServletResponse response, HttpSession session) throws IOException {
         if(paperId != null) {
             try {
@@ -38,15 +40,15 @@ public class ExportController {
                 response.reset();
                 response.setContentType("application/json");
                 response.setCharacterEncoding("utf-8");
-                ResponseBody<Void> responseBody = new ResponseBody<>(ResponseBodyEnum.EXPORT_PAPER_FAILED);
-                String responseString = JSONObject.toJSON(responseBody).toString();
+                BaseResult<Void> baseResult = new BaseResult<>(ResultEnum.EXPORT_PAPER_FAILED);
+                String responseString = JSONObject.toJSON(baseResult).toString();
                 response.getWriter().println(responseString);
             }
         } else {
             response.setContentType("application/json");
             response.setCharacterEncoding("utf-8");
-            ResponseBody<Void> responseBody = new ResponseBody<>(ResponseBodyEnum.PARAM_WRONG);
-            String responseString = JSONObject.toJSON(responseBody).toString();
+            BaseResult<Void> baseResult = new BaseResult<>(ResultEnum.PARAM_WRONG);
+            String responseString = JSONObject.toJSON(baseResult).toString();
             response.getWriter().println(responseString);
         }
     }

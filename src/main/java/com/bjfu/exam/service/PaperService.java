@@ -6,6 +6,7 @@ import com.bjfu.exam.dto.paper.PolymerizationProblemDetailDTO;
 import com.bjfu.exam.dto.paper.ProblemDTO;
 import com.bjfu.exam.request.paper.*;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -37,7 +38,7 @@ public interface PaperService {
      * 为组合题目添加图片
      */
     PolymerizationProblemDetailDTO addImageInPolymerizationProblem(Long userId,
-                                                                   ImageInPolymerizationProblemAddRequest imageInPolymerizationProblemAddRequest);
+                                                                   ImageInPolymerizationProblemAddRequest imageInPolymerizationProblemAddRequest) throws IOException;
     /**
      * 删除组合题目中的图片
      */
@@ -50,7 +51,7 @@ public interface PaperService {
     /**
      * 为题目添加图片
      */
-    ProblemDTO addImageInProblem(Long userId, ImageInProblemAddRequest imageInProblemAddRequest);
+    ProblemDTO addImageInProblem(Long userId, ImageInProblemAddRequest imageInProblemAddRequest) throws IOException;
     /**
      * 删除题目中的图片
      */
