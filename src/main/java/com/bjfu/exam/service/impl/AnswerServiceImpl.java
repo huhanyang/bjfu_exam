@@ -91,8 +91,14 @@ public class AnswerServiceImpl implements AnswerService {
         Paper paper = paperOptional.get();
         User user = userOptional.get();
         // 判断此试卷当前是否可以作答
-        if(!paper.getState().equals(PaperStateEnum.ANSWERING.getState())) {
+        if(!paper.getState().equals(PaperStateEnum.ANSWERING.getState()) &&
+                !paper.getState().equals(PaperStateEnum.READY_TO_ANSWERING.getState())) {
             throw new NotAllowOperationException(ResultEnum.PAPER_STATE_NOT_ANSWERING);
+        }
+        // 更新试卷状态为作答中
+        if(paper.getState().equals(PaperStateEnum.READY_TO_ANSWERING.getState())) {
+            paper.setState(PaperStateEnum.ANSWERING.getState());
+            paperRepository.save(paper);
         }
         // 判断是否已经作答过此试卷
         if(paperAnswerRepository.findByUserAndPaper(user, paper).isPresent()) {

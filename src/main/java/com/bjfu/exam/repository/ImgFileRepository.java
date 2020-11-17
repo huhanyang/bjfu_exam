@@ -26,7 +26,7 @@ public class ImgFileRepository {
 
     public void uploadFile(String fileName, InputStream inputStream) {
         try {
-            minioClient.putObject(imgBucket, fileName, inputStream, null);
+            minioClient.putObject(imgBucket, fileName, inputStream, "application/octet-stream");
         } catch (InvalidBucketNameException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {

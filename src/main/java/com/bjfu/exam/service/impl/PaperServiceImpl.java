@@ -33,9 +33,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * todo 修改考试卷状态
- */
 @Service
 public class PaperServiceImpl implements PaperService {
 
@@ -99,7 +96,6 @@ public class PaperServiceImpl implements PaperService {
         BeanUtils.copyProperties(paperCreateRequest, paper);
         paper.setCreator(creator);
         String code = RandomCodeUtil.nextCodeWithCharAndNumber();
-        // todo 6位随机码的设计需要重新考虑 参考id生成
         while(paperRepository.existsByCode(code)) {
             code = RandomCodeUtil.nextCodeWithCharAndNumber();
         }
