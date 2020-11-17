@@ -5,8 +5,8 @@ spring:
   datasource:
     username: root
     password: 123456
-    #url: jdbc:mysql://host.docker.internal:3306/exam?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
-    url: jdbc:mysql://127.0.0.1:3306/exam?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://host.docker.internal:3306/exam?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    #url: jdbc:mysql://127.0.0.1:3306/exam?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     database: mysql

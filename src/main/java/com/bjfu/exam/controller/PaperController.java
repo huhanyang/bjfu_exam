@@ -10,7 +10,6 @@ import com.bjfu.exam.security.annotation.RequireStudent;
 import com.bjfu.exam.security.annotation.RequireTeacher;
 import com.bjfu.exam.service.PaperService;
 import com.bjfu.exam.util.DTOConvertToVOUtil;
-import com.bjfu.exam.util.SessionUtil;
 import com.bjfu.exam.vo.BaseResult;
 import com.bjfu.exam.vo.paper.PaperDetailVO;
 import com.bjfu.exam.vo.paper.PaperVO;
@@ -256,4 +255,7 @@ public class PaperController {
         PaperVO paperVO = DTOConvertToVOUtil.convertPaperDTO(paperDTO);
         return new BaseResult<>(ResultEnum.SUCCESS, paperVO);
     }
+
+
+
 }
