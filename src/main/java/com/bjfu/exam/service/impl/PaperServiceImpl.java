@@ -532,9 +532,8 @@ public class PaperServiceImpl implements PaperService {
     {
         stateChange.add(PaperStateEnum.CREATING.getState()+"-"+PaperStateEnum.READY_TO_ANSWERING.getState());
         stateChange.add(PaperStateEnum.READY_TO_ANSWERING.getState()+"-"+PaperStateEnum.CREATING.getState());
-        stateChange.add(PaperStateEnum.CREATING.getState()+"-"+PaperStateEnum.END_ANSWER.getState());
         stateChange.add(PaperStateEnum.ANSWERING.getState()+"-"+PaperStateEnum.END_ANSWER.getState());
-        stateChange.add(PaperStateEnum.READY_TO_ANSWERING.getState()+"-"+PaperStateEnum.END_ANSWER.getState());
+        stateChange.add(PaperStateEnum.END_ANSWER.getState()+"-"+PaperStateEnum.ANSWERING.getState());
     }
 
     @Override

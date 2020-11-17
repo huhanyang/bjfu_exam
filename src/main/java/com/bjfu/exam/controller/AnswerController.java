@@ -33,9 +33,6 @@ public class AnswerController {
     @GetMapping("/getPaperAnswers")
     @RequireStudent
     public BaseResult<List<PaperAnswerDetailVO>> getPaperAnswers(HttpSession session) {
-        if(SessionUtil.existSession(session)) {
-            return new BaseResult<>(ResultEnum.NEED_TO_LOGIN);
-        }
         List<PaperAnswerDetailDTO> paperAnswerDetailDTOS =
                 answerService.getPaperAnswers((Long) session.getAttribute("userId"));
         List<PaperAnswerDetailVO> paperAnswerDetailVOS = paperAnswerDetailDTOS.stream()
@@ -50,9 +47,6 @@ public class AnswerController {
         if(paperAnswerId == null) {
             return new BaseResult<>(ResultEnum.PARAM_WRONG);
         }
-        if(SessionUtil.existSession(session)) {
-            return new BaseResult<>(ResultEnum.NEED_TO_LOGIN);
-        }
         PaperAnswerDetailDTO paperAnswerDetailDTO =
                 answerService.getPaperAnswerDetail((Long) session.getAttribute("userId"), paperAnswerId);
         PaperAnswerDetailVO paperAnswerDetailVO = DTOConvertToVOUtil.convertPaperAnswerDetailDTO(paperAnswerDetailDTO);
@@ -66,9 +60,6 @@ public class AnswerController {
         if(!paperAnswerCreateRequest.isComplete()) {
             return new BaseResult<>(ResultEnum.PARAM_WRONG);
         }
-        if(SessionUtil.existSession(session)) {
-            return new BaseResult<>(ResultEnum.NEED_TO_LOGIN);
-        }
         PaperAnswerDTO paperAnswerDTO =
                 answerService.createPaperAnswer((Long) session.getAttribute("userId"), paperAnswerCreateRequest);
         PaperAnswerVO paperAnswerVO = DTOConvertToVOUtil.convertPaperAnswerDTO(paperAnswerDTO);
@@ -80,9 +71,6 @@ public class AnswerController {
     public BaseResult<ProblemVO> getNextProblem(Long paperAnswerId, HttpSession session) {
         if(paperAnswerId == null) {
             return new BaseResult<>(ResultEnum.PARAM_WRONG);
-        }
-        if(SessionUtil.existSession(session)) {
-            return new BaseResult<>(ResultEnum.NEED_TO_LOGIN);
         }
         ProblemDTO problemDTO =
                 answerService.getNextProblem((Long) session.getAttribute("userId"), paperAnswerId);
@@ -96,9 +84,6 @@ public class AnswerController {
                                                     HttpSession session) {
         if(!problemAnswerSubmitRequest.isComplete()) {
             return new BaseResult<>(ResultEnum.PARAM_WRONG);
-        }
-        if(SessionUtil.existSession(session)) {
-            return new BaseResult<>(ResultEnum.NEED_TO_LOGIN);
         }
         ProblemAnswerDTO problemAnswerDTO =
                 answerService.submitAnswer((Long) session.getAttribute("userId"), problemAnswerSubmitRequest);
