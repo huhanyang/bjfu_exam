@@ -528,13 +528,13 @@ public class PaperServiceImpl implements PaperService {
         return EntityConvertToDTOUtil.convertPaperToDetail(paper);
     }
 
-    private final Map<Integer, Integer> stateChangeMap = new HashMap<>();
+    private final Set<String> stateChange = new HashSet<>();
     {
-        stateChangeMap.put(PaperStateEnum.CREATING.getState(), PaperStateEnum.READY_TO_ANSWERING.getState());
-        stateChangeMap.put(PaperStateEnum.READY_TO_ANSWERING.getState(), PaperStateEnum.CREATING.getState());
-        stateChangeMap.put(PaperStateEnum.CREATING.getState(), PaperStateEnum.END_ANSWER.getState());
-        stateChangeMap.put(PaperStateEnum.ANSWERING.getState(), PaperStateEnum.END_ANSWER.getState());
-        stateChangeMap.put(PaperStateEnum.READY_TO_ANSWERING.getState(), PaperStateEnum.END_ANSWER.getState());
+        stateChange.add(PaperStateEnum.CREATING.getState()+"-"+PaperStateEnum.READY_TO_ANSWERING.getState());
+        stateChange.add(PaperStateEnum.READY_TO_ANSWERING.getState()+"-"+PaperStateEnum.CREATING.getState());
+        stateChange.add(PaperStateEnum.CREATING.getState()+"-"+PaperStateEnum.END_ANSWER.getState());
+        stateChange.add(PaperStateEnum.ANSWERING.getState()+"-"+PaperStateEnum.END_ANSWER.getState());
+        stateChange.add(PaperStateEnum.READY_TO_ANSWERING.getState()+"-"+PaperStateEnum.END_ANSWER.getState());
     }
 
     @Override
@@ -547,7 +547,7 @@ public class PaperServiceImpl implements PaperService {
         if(!paper.getCreator().getId().equals(userId)) {
             throw new UnauthorizedOperationException(userId, ResultEnum.NOT_CREATOR_EDIT_PAPER);
         }
-        if(!stateChangeMap.get(paper.getState()).equals(paperStateChangeRequest.getState())) {
+        if(!stateChange.contains(paper.getState()+"-"+paperStateChangeRequest.getState())) {
             throw new NotAllowOperationException(ResultEnum.PAPER_STATE_CHANGE_NOT_ALLOW);
         }
         if(paperStateChangeRequest.getState().equals(PaperStateEnum.END_ANSWER.getState())) {
