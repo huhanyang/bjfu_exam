@@ -10,7 +10,6 @@ import com.bjfu.exam.request.answer.ProblemAnswerSubmitRequest;
 import com.bjfu.exam.security.annotation.RequireStudent;
 import com.bjfu.exam.service.AnswerService;
 import com.bjfu.exam.util.DTOConvertToVOUtil;
-import com.bjfu.exam.util.SessionUtil;
 import com.bjfu.exam.vo.BaseResult;
 import com.bjfu.exam.vo.answer.PaperAnswerDetailVO;
 import com.bjfu.exam.vo.answer.PaperAnswerVO;

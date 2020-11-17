@@ -143,6 +143,11 @@ public class AnswerServiceImpl implements AnswerService {
         if(!paperAnswer.getUser().getId().equals(userId)) {
             throw new UnauthorizedOperationException(userId, ResultEnum.ANSWER_OTHERS_PAPER);
         }
+        // 判断此试卷当前是否可以作答
+        if(!paperAnswer.getPaper().getState().equals(PaperStateEnum.ANSWERING.getState()) &&
+                !paperAnswer.getPaper().getState().equals(PaperStateEnum.READY_TO_ANSWERING.getState())) {
+            throw new NotAllowOperationException(ResultEnum.PAPER_STATE_NOT_ANSWERING);
+        }
         // 获取作答的题目
         Problem problem = paperAnswer.getNextProblem();
         // 保存作答题目
