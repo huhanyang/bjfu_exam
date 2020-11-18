@@ -119,7 +119,7 @@ public class PaperController {
 
     @DeleteMapping("/deleteImageInPolymerizationProblem")
     @RequireTeacher
-    public BaseResult<PolymerizationProblemDetailVO> deleteImageInPolymerizationProblem(@RequestBody ImageInPolymerizationProblemDeleteRequest imageInPolymerizationProblemDeleteRequest,
+    public BaseResult<PolymerizationProblemDetailVO> deleteImageInPolymerizationProblem(ImageInPolymerizationProblemDeleteRequest imageInPolymerizationProblemDeleteRequest,
                                                                                         HttpSession session) {
         if(!imageInPolymerizationProblemDeleteRequest.isComplete()) {
             return new BaseResult<>(ResultEnum.PARAM_WRONG);
@@ -167,7 +167,7 @@ public class PaperController {
 
     @DeleteMapping("/deleteImageInProblem")
     @RequireTeacher
-    public BaseResult<ProblemVO> deleteImageInProblem(@RequestBody ImageInProblemDeleteRequest imageInProblemDeleteRequest,
+    public BaseResult<ProblemVO> deleteImageInProblem(ImageInProblemDeleteRequest imageInProblemDeleteRequest,
                                                       HttpSession session) {
         if(!imageInProblemDeleteRequest.isComplete()) {
             return new BaseResult<>(ResultEnum.PARAM_WRONG);
