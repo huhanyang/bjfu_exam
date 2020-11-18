@@ -457,8 +457,8 @@ public class PaperServiceImpl implements PaperService {
             if(!paper.getCreator().getId().equals(userId)) {
                 throw new UnauthorizedOperationException(userId, ResultEnum.NOT_CREATOR_EDIT_PAPER);
             }
-            if(!paper.getState().equals(PaperStateEnum.CREATING.getState())) {
-                throw new NotAllowOperationException(ResultEnum.PAPER_STATE_IS_NOT_CREATING);
+            if(paper.getState().equals(PaperStateEnum.ANSWERING.getState())) {
+                throw new NotAllowOperationException(ResultEnum.PAPER_STATE_CAN_NOT_DELETE);
             }
             Set<Problem> problems = paper.getProblems();
             List<String> deleteImg = new ArrayList<>();

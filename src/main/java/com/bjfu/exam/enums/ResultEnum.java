@@ -38,6 +38,7 @@ public enum ResultEnum {
     REQUIRE_TEACHER(30, "此请求只允许教师账号"),
     PAPER_STATE_CHANGE_NOT_ALLOW(31, "此状态变更不允许"),
     PAPER_STATE_IS_NOT_CREATING(32, "试卷非创建状态不允许修改"),
+    PAPER_STATE_CAN_NOT_DELETE(34, "试卷此状态不允许删除"),
     PAPER_STATE_IS_NOT_END_ANSWER(33, "试卷状态非结束作答");
 
 
