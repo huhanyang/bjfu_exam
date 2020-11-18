@@ -6,6 +6,7 @@ import com.bjfu.exam.dto.paper.PaperDTO;
 import com.bjfu.exam.dto.paper.PaperDetailDTO;
 import com.bjfu.exam.dto.paper.PolymerizationProblemDetailDTO;
 import com.bjfu.exam.dto.paper.ProblemDTO;
+import com.bjfu.exam.entity.answer.ProblemAnswer;
 import com.bjfu.exam.entity.paper.Paper;
 import com.bjfu.exam.entity.paper.PolymerizationProblem;
 import com.bjfu.exam.entity.paper.Problem;
@@ -15,6 +16,8 @@ import com.bjfu.exam.enums.ResultEnum;
 import com.bjfu.exam.enums.UserTypeEnum;
 import com.bjfu.exam.exception.*;
 import com.bjfu.exam.repository.ImgFileRepository;
+import com.bjfu.exam.repository.answer.PaperAnswerRepository;
+import com.bjfu.exam.repository.answer.ProblemAnswerRepository;
 import com.bjfu.exam.repository.paper.PaperRepository;
 import com.bjfu.exam.repository.paper.PolymerizationProblemRepository;
 import com.bjfu.exam.repository.paper.ProblemRepository;
@@ -475,6 +478,7 @@ public class PaperServiceImpl implements PaperService {
                     deleteImg.addAll(images.toJavaList(String.class));
                 }
             });
+            // todo 删除试卷需要删除答案
             problemRepository.deleteAllByPaper(paper);
             polymerizationProblemRepository.deleteAllByPaper(paper);
             paperRepository.deleteById(paper.getId());
