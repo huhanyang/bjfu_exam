@@ -359,7 +359,6 @@ public class PaperServiceImpl implements PaperService {
             problems.remove(problem);
         }
         paper = paperRepository.save(paper);
-        // todo 删除图片
         problemRepository.deleteById(problemDeleteRequest.getProblemId());
         String imagesJson = problem.getImages();
         JSONArray images = (JSONArray) JSONObject.parse(imagesJson);
@@ -565,9 +564,6 @@ public class PaperServiceImpl implements PaperService {
         }
         if(!stateChange.contains(paper.getState()+"-"+paperStateChangeRequest.getState())) {
             throw new NotAllowOperationException(ResultEnum.PAPER_STATE_CHANGE_NOT_ALLOW);
-        }
-        if(paperStateChangeRequest.getState().equals(PaperStateEnum.END_ANSWER.getState())) {
-            paper.setCode(null);
         }
         paper.setState(paperStateChangeRequest.getState());
         paper = paperRepository.save(paper);
