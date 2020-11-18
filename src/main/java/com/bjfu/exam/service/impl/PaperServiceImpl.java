@@ -363,7 +363,9 @@ public class PaperServiceImpl implements PaperService {
         problemRepository.deleteById(problemDeleteRequest.getProblemId());
         String imagesJson = problem.getImages();
         JSONArray images = (JSONArray) JSONObject.parse(imagesJson);
-        imgFileRepository.deleteFiles(images.toJavaList(String.class));
+        if(images != null) {
+            imgFileRepository.deleteFiles(images.toJavaList(String.class));
+        }
         return EntityConvertToDTOUtil.convertPaperToDetail(paper);
     }
 
@@ -431,12 +433,18 @@ public class PaperServiceImpl implements PaperService {
         Set<Problem> deleteProblems = polymerizationProblem1.getProblems();
         deleteProblems.forEach(problem -> {
             JSONArray images = (JSONArray) JSONObject.parse(problem.getImages());
-            deleteImg.addAll(images.toJavaList(String.class));
+            if(images != null) {
+                deleteImg.addAll(images.toJavaList(String.class));
+            }
         });
+        JSONArray images = (JSONArray) JSONObject.parse(polymerizationProblem1.getImages());
         paper = paperRepository.save(paper);
         problemRepository.deleteAllByPolymerizationProblem(polymerizationProblem1);
         polymerizationProblemRepository.deleteById(polymerizationProblemDeleteRequest.getPolymerizationProblemId());
         imgFileRepository.deleteFiles(deleteImg);
+        if(images != null) {
+            imgFileRepository.deleteFiles(images.toJavaList(String.class));
+        }
         return EntityConvertToDTOUtil.convertPaperToDetail(paper);
     }
 
@@ -457,7 +465,16 @@ public class PaperServiceImpl implements PaperService {
             List<String> deleteImg = new ArrayList<>();
             problems.forEach(problem -> {
                 JSONArray images = (JSONArray) JSONObject.parse(problem.getImages());
-                deleteImg.addAll(images.toJavaList(String.class));
+                if(images != null) {
+                    deleteImg.addAll(images.toJavaList(String.class));
+                }
+            });
+            Set<PolymerizationProblem> polymerizationProblems = paper.getPolymerizationProblems();
+            polymerizationProblems.forEach(polymerizationProblem -> {
+                JSONArray images = (JSONArray) JSONObject.parse(polymerizationProblem.getImages());
+                if(images != null) {
+                    deleteImg.addAll(images.toJavaList(String.class));
+                }
             });
             problemRepository.deleteAllByPaper(paper);
             polymerizationProblemRepository.deleteAllByPaper(paper);
