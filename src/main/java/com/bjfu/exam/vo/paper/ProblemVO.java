@@ -11,7 +11,7 @@ public class ProblemVO {
     /**
      * 所属组合题目
      */
-    private PolymerizationProblemVO polymerizationProblem;
+    private ProblemVO fatherProblem;
     /**
      * 排序字段
      */

@@ -2,7 +2,7 @@ package com.bjfu.exam.controller;
 
 import com.bjfu.exam.dto.paper.PaperDTO;
 import com.bjfu.exam.dto.paper.PaperDetailDTO;
-import com.bjfu.exam.dto.paper.PolymerizationProblemDetailDTO;
+import com.bjfu.exam.dto.paper.PaperWithProblemsDTO;
 import com.bjfu.exam.dto.paper.ProblemDTO;
 import com.bjfu.exam.enums.ResultEnum;
 import com.bjfu.exam.request.paper.*;
@@ -13,18 +13,24 @@ import com.bjfu.exam.util.DTOConvertToVOUtil;
 import com.bjfu.exam.vo.BaseResult;
 import com.bjfu.exam.vo.paper.PaperDetailVO;
 import com.bjfu.exam.vo.paper.PaperVO;
-import com.bjfu.exam.vo.paper.PolymerizationProblemDetailVO;
+import com.bjfu.exam.vo.paper.PaperWithProblemsVO;
 import com.bjfu.exam.vo.paper.ProblemVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static com.bjfu.exam.util.SessionUtil.getUserId;
+
 @RestController
+@Validated
 @RequestMapping("/paper")
 public class PaperController {
 
@@ -37,7 +43,7 @@ public class PaperController {
         if(StringUtils.isEmpty(code)) {
             return new BaseResult<>(ResultEnum.PARAM_WRONG);
         }
-        PaperDTO paperDTO = paperService.getPaper(code);
+        PaperDTO paperDTO = paperService.getPaperByCode(code);
         if(paperDTO != null) {
             PaperVO paperVO = DTOConvertToVOUtil.convertPaperDTO(paperDTO);
             return new BaseResult<>(ResultEnum.SUCCESS, paperVO);
@@ -47,104 +53,43 @@ public class PaperController {
 
     @GetMapping("/getByPaperId")
     @RequireTeacher
-    public BaseResult<PaperDetailVO> getByPaperId(Long paperId, HttpSession session) {
-        if(paperId == null) {
-            return new BaseResult<>(ResultEnum.PARAM_WRONG);
-        }
-        PaperDetailDTO paperDetailDTO =
-                paperService.getPaperDetail(paperId, (Long) session.getAttribute("userId"));
-        if(paperDetailDTO != null) {
-            PaperDetailVO paperDetailVO = DTOConvertToVOUtil.convertPaperDetailDTO(paperDetailDTO);
-            return new BaseResult<>(ResultEnum.SUCCESS, paperDetailVO);
+    public BaseResult<PaperWithProblemsVO> getByPaperId(@NotNull(message = "试卷id不能为空!") Long paperId,
+                                                        HttpSession session) {
+        PaperWithProblemsDTO paperWithProblemsDTO =
+                paperService.getPaperDetail(paperId, getUserId(session));
+        if(paperWithProblemsDTO != null) {
+            PaperWithProblemsVO paperWithProblemsVO = DTOConvertToVOUtil.convertPaperWithProblemsDTO(paperWithProblemsDTO);
+            return new BaseResult<>(ResultEnum.SUCCESS, paperWithProblemsVO);
         }
         return new BaseResult<>(ResultEnum.FIND_FAILED);
     }
 
     @GetMapping("/get")
     @RequireTeacher
-    public BaseResult<List<PaperDetailVO>> getMyPaper(HttpSession session) {
-        List<PaperDetailDTO> paperDetailDTOS = paperService.getAllPaperByCreatorId((Long) session.getAttribute("userId"));
-        List<PaperDetailVO> paperDetailVO = paperDetailDTOS.stream()
-                .map(DTOConvertToVOUtil::convertPaperDetailDTO)
+    public BaseResult<List<PaperVO>> getMyPaper(HttpSession session) {
+        List<PaperDTO> paperDTOS = paperService.getAllPaperByCreatorId(getUserId(session));
+        List<PaperVO> paperVOS = paperDTOS.stream()
+                .map(DTOConvertToVOUtil::convertPaperDTO)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-        return new BaseResult<>(ResultEnum.SUCCESS, paperDetailVO);
+        return new BaseResult<>(ResultEnum.SUCCESS, paperVOS);
     }
 
-    @PutMapping("/create")
+    @PutMapping("/createPaper")
     @RequireTeacher
-    public BaseResult<PaperDetailVO> createPaper(@RequestBody PaperCreateRequest paperCreateRequest, HttpSession session) {
-        if(!paperCreateRequest.isComplete()) {
-            return new BaseResult<>(ResultEnum.PARAM_WRONG);
-        }
-        PaperDetailDTO paperDetailDTO = paperService.createPaper(paperCreateRequest, (Long) session.getAttribute("userId"));
+    public BaseResult<PaperDetailVO> createPaper(@Validated @RequestBody PaperCreateRequest paperCreateRequest,
+                                                 HttpSession session) {
+        PaperDetailDTO paperDetailDTO = paperService.createPaper(paperCreateRequest, getUserId(session));
         PaperDetailVO paperDetailVO = DTOConvertToVOUtil.convertPaperDetailDTO(paperDetailDTO);
         return new BaseResult<>(ResultEnum.SUCCESS, paperDetailVO);
     }
 
-    @PutMapping("/addPolymerizationProblem")
-    @RequireTeacher
-    public BaseResult<PolymerizationProblemDetailVO> addPolymerizationProblem(@RequestBody PolymerizationProblemAddRequest polymerizationProblemAddRequest,
-                                                                              HttpSession session) {
-        if(!polymerizationProblemAddRequest.isComplete()) {
-            return new BaseResult<>(ResultEnum.PARAM_WRONG);
-        }
-        Long userId = (Long) session.getAttribute("userId");
-        PolymerizationProblemDetailDTO polymerizationProblemDetailDTO =
-                paperService.addPolymerizationProblemInPaper(userId, polymerizationProblemAddRequest);
-        if(polymerizationProblemDetailDTO == null) {
-            return new BaseResult<>(ResultEnum.PARAM_NOT_MATCH);
-        }
-        PolymerizationProblemDetailVO polymerizationProblemDetailVO =
-                DTOConvertToVOUtil.convertPolymerizationProblemDetailDTO(polymerizationProblemDetailDTO);
-        return new BaseResult<>(ResultEnum.SUCCESS, polymerizationProblemDetailVO);
-    }
-
-    @PutMapping("/addImageInPolymerizationProblem")
-    @RequireTeacher
-    public BaseResult<PolymerizationProblemDetailVO> addImageInPolymerizationProblem(ImageInPolymerizationProblemAddRequest imageInPolymerizationProblemAddRequest,
-                                                                                     HttpSession session) throws IOException {
-        if(!imageInPolymerizationProblemAddRequest.isComplete()) {
-            return new BaseResult<>(ResultEnum.PARAM_WRONG);
-        }
-        Long userId = (Long) session.getAttribute("userId");
-        PolymerizationProblemDetailDTO polymerizationProblemDetailDTO =
-                paperService.addImageInPolymerizationProblem(userId, imageInPolymerizationProblemAddRequest);
-        if(polymerizationProblemDetailDTO == null) {
-            return new BaseResult<>(ResultEnum.PARAM_NOT_MATCH);
-        }
-        PolymerizationProblemDetailVO polymerizationProblemDetailVO =
-                DTOConvertToVOUtil.convertPolymerizationProblemDetailDTO(polymerizationProblemDetailDTO);
-        return new BaseResult<>(ResultEnum.SUCCESS, polymerizationProblemDetailVO);
-    }
-
-    @DeleteMapping("/deleteImageInPolymerizationProblem")
-    @RequireTeacher
-    public BaseResult<PolymerizationProblemDetailVO> deleteImageInPolymerizationProblem(ImageInPolymerizationProblemDeleteRequest imageInPolymerizationProblemDeleteRequest,
-                                                                                        HttpSession session) {
-        if(!imageInPolymerizationProblemDeleteRequest.isComplete()) {
-            return new BaseResult<>(ResultEnum.PARAM_WRONG);
-        }
-        Long userId = (Long) session.getAttribute("userId");
-        PolymerizationProblemDetailDTO polymerizationProblemDetailDTO =
-                paperService.deleteImageInPolymerizationProblem(userId, imageInPolymerizationProblemDeleteRequest);
-        if(polymerizationProblemDetailDTO == null) {
-            return new BaseResult<>(ResultEnum.PARAM_NOT_MATCH);
-        }
-        PolymerizationProblemDetailVO polymerizationProblemDetailVO = DTOConvertToVOUtil.convertPolymerizationProblemDetailDTO(polymerizationProblemDetailDTO);
-        return new BaseResult<>(ResultEnum.SUCCESS, polymerizationProblemDetailVO);
-    }
-
     @PutMapping("/addProblem")
     @RequireTeacher
-    public BaseResult<ProblemVO> addProblem(@RequestBody ProblemAddRequest problemAddRequest, HttpSession session) {
-        if(!problemAddRequest.isComplete()) {
-            return new BaseResult<>(ResultEnum.PARAM_WRONG);
-        }
-        Long userId = (Long) session.getAttribute("userId");
+    public BaseResult<ProblemVO> addProblem(@Validated @RequestBody ProblemAddRequest problemAddRequest,
+                                            HttpSession session) {
+        Long userId = getUserId(session);
         ProblemDTO problemDTO = paperService.addProblem(userId, problemAddRequest);
-        if(problemDTO == null) {
-            return new BaseResult<>(ResultEnum.PARAM_NOT_MATCH);
-        }
         ProblemVO problemVO = DTOConvertToVOUtil.convertProblemDTO(problemDTO);
         return new BaseResult<>(ResultEnum.SUCCESS, problemVO);
     }
@@ -153,14 +98,8 @@ public class PaperController {
     @RequireTeacher
     public BaseResult<ProblemVO> addImageInProblem(ImageInProblemAddRequest imageInProblemAddRequest,
                                                    HttpSession session) throws IOException {
-        if(!imageInProblemAddRequest.isComplete()) {
-            return new BaseResult<>(ResultEnum.PARAM_WRONG);
-        }
-        Long userId = (Long) session.getAttribute("userId");
+        Long userId = getUserId(session);
         ProblemDTO problemDTO = paperService.addImageInProblem(userId, imageInProblemAddRequest);
-        if(problemDTO == null) {
-            return new BaseResult<>(ResultEnum.PARAM_NOT_MATCH);
-        }
         ProblemVO problemVO = DTOConvertToVOUtil.convertProblemDTO(problemDTO);
         return new BaseResult<>(ResultEnum.SUCCESS, problemVO);
     }
@@ -169,14 +108,8 @@ public class PaperController {
     @RequireTeacher
     public BaseResult<ProblemVO> deleteImageInProblem(ImageInProblemDeleteRequest imageInProblemDeleteRequest,
                                                       HttpSession session) {
-        if(!imageInProblemDeleteRequest.isComplete()) {
-            return new BaseResult<>(ResultEnum.PARAM_WRONG);
-        }
-        Long userId = (Long) session.getAttribute("userId");
+        Long userId = getUserId(session);
         ProblemDTO problemDTO = paperService.deleteImageInProblem(userId, imageInProblemDeleteRequest);
-        if(problemDTO == null) {
-            return new BaseResult<>(ResultEnum.PARAM_NOT_MATCH);
-        }
         ProblemVO problemVO = DTOConvertToVOUtil.convertProblemDTO(problemDTO);
         return new BaseResult<>(ResultEnum.SUCCESS, problemVO);
     }
@@ -185,73 +118,25 @@ public class PaperController {
     @RequireTeacher
     public BaseResult<PaperDetailVO> deleteProblem(ProblemDeleteRequest problemDeleteRequest,
                                                    HttpSession session) {
-        if(!problemDeleteRequest.isComplete()) {
-            return new BaseResult<>(ResultEnum.PARAM_WRONG);
-        }
-        Long userId = (Long) session.getAttribute("userId");
-        PaperDetailDTO paperDetailDTO = paperService.deleteProblem(userId, problemDeleteRequest);
-        if(paperDetailDTO == null) {
-            return new BaseResult<>(ResultEnum.PARAM_NOT_MATCH);
-        }
-        PaperDetailVO paperDetailVO = DTOConvertToVOUtil.convertPaperDetailDTO(paperDetailDTO);
-        return new BaseResult<>(ResultEnum.SUCCESS, paperDetailVO);
-    }
-
-    @DeleteMapping("/deletePolymerizationProblem")
-    @RequireTeacher
-    public BaseResult<PaperDetailVO> deletePolymerizationProblem(PolymerizationProblemDeleteRequest polymerizationProblemDeleteRequest,
-                                                                 HttpSession session) {
-        if(!polymerizationProblemDeleteRequest.isComplete()) {
-            return new BaseResult<>(ResultEnum.PARAM_WRONG);
-        }
-        Long userId = (Long) session.getAttribute("userId");
-        PaperDetailDTO paperDetailDTO = paperService.deletePolymerizationProblem(userId, polymerizationProblemDeleteRequest);
-        if(paperDetailDTO == null) {
-            return new BaseResult<>(ResultEnum.PARAM_NOT_MATCH);
-        }
-        PaperDetailVO paperDetailVO = DTOConvertToVOUtil.convertPaperDetailDTO(paperDetailDTO);
-        return new BaseResult<>(ResultEnum.SUCCESS, paperDetailVO);
+        Long userId = getUserId(session);
+        paperService.deleteProblem(userId, problemDeleteRequest);
+        return new BaseResult<>(ResultEnum.SUCCESS);
     }
 
     @DeleteMapping("/delete")
     @RequireTeacher
-    public BaseResult<Void> deletePaper(Long paperId, HttpSession session) {
-        if(paperId == null) {
-            return new BaseResult<>(ResultEnum.PARAM_WRONG);
-        }
-        Long userId = (Long) session.getAttribute("userId");
-        boolean deletePaper = paperService.deletePaper(userId, paperId);
-        if(!deletePaper) {
-            return new BaseResult<>(ResultEnum.PARAM_NOT_MATCH);
-        }
+    public BaseResult<Void> deletePaper(@NotNull(message = "试卷id不能为空!") Long paperId,
+                                        HttpSession session) {
+        Long userId = getUserId(session);
+        paperService.deletePaper(userId, paperId);
         return new BaseResult<>(ResultEnum.SUCCESS);
     }
 
-    @PostMapping("/resortProblemsInPaper")
+    @PostMapping("/changeState")
     @RequireTeacher
-    public BaseResult<PaperDetailVO> resortProblemsInPaper(@RequestBody ProblemsInPaperResortRequest problemsInPaperResortRequest,
-                                                           HttpSession session) {
-        if(!problemsInPaperResortRequest.isComplete()) {
-            return new BaseResult<>(ResultEnum.PARAM_WRONG);
-        }
-        PaperDetailDTO paperDetailDTO =
-                paperService.resortProblemsInPaper((Long) session.getAttribute("userId"), problemsInPaperResortRequest);
-        if(paperDetailDTO == null) {
-            return new BaseResult<>(ResultEnum.PARAM_NOT_MATCH);
-        }
-        PaperDetailVO paperDetailVO = DTOConvertToVOUtil.convertPaperDetailDTO(paperDetailDTO);
-        return new BaseResult<>(ResultEnum.SUCCESS, paperDetailVO);
-    }
-
-    @PostMapping("/changePaperState")
-    @RequireTeacher
-    public BaseResult<PaperVO> changePaperState(@RequestBody PaperStateChangeRequest paperStateChangeRequest,
+    public BaseResult<PaperVO> changePaperState(@Validated @RequestBody PaperStateChangeRequest paperStateChangeRequest,
                                                 HttpSession session) {
-        if(!paperStateChangeRequest.isComplete()) {
-            return new BaseResult<>(ResultEnum.PARAM_WRONG);
-        }
-        PaperDTO paperDTO =
-                paperService.changePaperState((Long) session.getAttribute("userId"), paperStateChangeRequest);
+        PaperDTO paperDTO = paperService.changePaperState(getUserId(session), paperStateChangeRequest);
         PaperVO paperVO = DTOConvertToVOUtil.convertPaperDTO(paperDTO);
         return new BaseResult<>(ResultEnum.SUCCESS, paperVO);
     }

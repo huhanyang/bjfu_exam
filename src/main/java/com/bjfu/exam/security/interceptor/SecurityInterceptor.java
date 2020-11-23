@@ -1,6 +1,7 @@
 package com.bjfu.exam.security.interceptor;
 
 import com.bjfu.exam.enums.ResultEnum;
+import com.bjfu.exam.security.annotation.RequireAdmin;
 import com.bjfu.exam.security.annotation.RequireLogin;
 import com.bjfu.exam.security.annotation.RequireStudent;
 import com.bjfu.exam.security.annotation.RequireTeacher;
@@ -27,6 +28,7 @@ public class SecurityInterceptor extends HandlerInterceptorAdapter {
             boolean requireLogin = handlerMethod.getMethodAnnotation(RequireLogin.class) != null;
             boolean requireTeacher = handlerMethod.getMethodAnnotation(RequireTeacher.class) != null;
             boolean requireStudent = handlerMethod.getMethodAnnotation(RequireStudent.class) != null;
+            boolean requireAdmin = handlerMethod.getMethodAnnotation(RequireAdmin.class) != null;
             if(requireLogin) {
                 boolean isLogin = SessionUtil.existSession(session);
                 if(!isLogin) {
@@ -44,6 +46,12 @@ public class SecurityInterceptor extends HandlerInterceptorAdapter {
                 boolean isTeacher = SessionUtil.isTeacher(session);
                 if(!isTeacher) {
                     ResponseUtil.writeResultToResponse(ResultEnum.REQUIRE_TEACHER, response);
+                    return false;
+                }
+            } else if(requireAdmin) {
+                boolean isAdmin = SessionUtil.isAdmin(session);
+                if(!isAdmin) {
+                    ResponseUtil.writeResultToResponse(ResultEnum.REQUIRE_ADMIN, response);
                     return false;
                 }
             }

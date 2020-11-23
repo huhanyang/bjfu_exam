@@ -1,30 +1,22 @@
 package com.bjfu.exam.request.user;
 
-import com.bjfu.exam.request.BaseRequest;
 import lombok.Data;
-import org.springframework.util.StringUtils;
+import org.hibernate.validator.constraints.Length;
+
+import javax.validation.constraints.NotBlank;
 
 @Data
-public class UserChangePasswordRequest extends BaseRequest {
-    /**
-     * 账号
-     */
-    private String account;
-    /**
-     * 原密码
-     */
-    private String oldPassword;
-    /**
-     * 新密码
-     */
-    private String newPassword;
+public class UserChangePasswordRequest {
 
-    @Override
-    public boolean isComplete() {
-        if(StringUtils.isEmpty(account) || StringUtils.isEmpty(oldPassword)
-                || StringUtils.isEmpty(newPassword)) {
-            return false;
-        }
-        return true;
-    }
+    @NotBlank(message = "账号不能为空!")
+    @Length(min = 8, max = 32, message = "账号长度在8-32位!")
+    private String account;
+
+    @NotBlank(message = "原密码不能为空!")
+    @Length(min = 8, max = 32, message = "密码长度在8-32位!")
+    private String oldPassword;
+
+    @NotBlank(message = "新密码不能为空!")
+    @Length(min = 8, max = 32, message = "密码长度在8-32位!")
+    private String newPassword;
 }

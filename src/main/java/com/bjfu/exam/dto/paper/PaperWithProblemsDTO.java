@@ -3,8 +3,10 @@ package com.bjfu.exam.dto.paper;
 import com.bjfu.exam.dto.user.UserDTO;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
-public class PaperDetailDTO {
+public class PaperWithProblemsDTO {
     /**
      * 试卷id
      */
@@ -37,4 +39,8 @@ public class PaperDetailDTO {
      * 试卷收集项json格式
      */
     private String collection;
+    /**
+     * 试卷的题目
+     */
+    private List<ProblemDTO> problems;
 }

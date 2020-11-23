@@ -1,26 +1,19 @@
 package com.bjfu.exam.request.paper;
 
 
-import com.bjfu.exam.request.BaseRequest;
 import lombok.Data;
 
-@Data
-public class ImageInProblemDeleteRequest extends BaseRequest {
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
-    /**
-     * 题目id
-     */
+@Data
+public class ImageInProblemDeleteRequest {
+
+    @NotNull(message = "题目id不能为空!")
     private Long problemId;
-    /**
-     * 删除的图片
-     */
+
+    @NotNull(message = "要删除图片的位置不能为空!")
+    @Min(value = 0, message = "删除图片的位置小于0!")
     private Integer index;
 
-    @Override
-    public boolean isComplete() {
-        if(problemId == null || index == null) {
-            return false;
-        }
-        return true;
-    }
 }

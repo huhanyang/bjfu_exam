@@ -1,24 +1,30 @@
 package com.bjfu.exam.request.paper;
 
-import com.bjfu.exam.request.BaseRequest;
 import lombok.Data;
-import org.springframework.util.StringUtils;
+import org.hibernate.validator.constraints.Length;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
-public class ProblemAddRequest extends BaseRequest {
-    private Long paperId;
-    private Long polymerizationProblemId;
-    private String title;
-    private String material;
-    private Integer type;
-    private String answer;
+public class ProblemAddRequest {
 
-    @Override
-    public boolean isComplete() {
-        if(paperId == null || StringUtils.isEmpty(title) ||
-                StringUtils.isEmpty(material) || type == null || StringUtils.isEmpty(answer)) {
-            return false;
-        }
-        return true;
-    }
+    @NotNull(message = "试卷id不能为空!")
+    private Long paperId;
+
+    private Long fatherProblemId; //可选
+
+    @NotBlank(message = "标题不能为空!")
+    @Length(min = 1, max = 64, message = "标题长度在1-64位!")
+    private String title;
+
+    @NotBlank(message = "材料不能为空!")
+    @Length(min = 1, max = 256, message = "材料长度在1-256位!")
+    private String material;
+
+    @NotNull(message = "试卷id不能为空!")
+    private Integer type;
+
+    private String answer; //可选
+
 }

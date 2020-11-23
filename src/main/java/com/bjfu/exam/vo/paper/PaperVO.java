@@ -14,22 +14,6 @@ public class PaperVO {
      */
     private String code;
     /**
-     * 试卷标题
-     */
-    private String title;
-    /**
-     * 试卷简介
-     */
-    private String introduction;
-    /**
-     * 最长答题时间(分钟)
-     */
-    private Integer time;
-    /**
-     * 试卷收集项json格式
-     */
-    private String collection;
-    /**
      * 创建者
      */
     private UserVO creator;
@@ -37,4 +21,20 @@ public class PaperVO {
      * 试卷状态
      */
     private Integer state;
+    /**
+     * 试卷标题
+     */
+    private String title;
+    /**
+     * 最长答题时间(分钟)
+     */
+    private Integer time;
+    /**
+     * 总答题人数
+     */
+    private Integer paperAnswerCount;
+    /**
+     * 答题完成的人数
+     */
+    private Integer finishedPaperAnswerCount;
 }

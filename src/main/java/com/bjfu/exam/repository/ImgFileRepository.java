@@ -1,20 +1,19 @@
 package com.bjfu.exam.repository;
 
+import com.bjfu.exam.enums.ResultEnum;
+import com.bjfu.exam.exception.OSSException;
 import io.minio.MinioClient;
 import io.minio.Result;
-import io.minio.errors.*;
 import io.minio.messages.DeleteError;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.xmlpull.v1.XmlPullParserException;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
+@Slf4j
 @Component
 public class ImgFileRepository {
 
@@ -27,77 +26,27 @@ public class ImgFileRepository {
     public void uploadFile(String fileName, InputStream inputStream) {
         try {
             minioClient.putObject(imgBucket, fileName, inputStream, "application/octet-stream");
-        } catch (InvalidBucketNameException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InsufficientDataException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (NoResponseException e) {
-            e.printStackTrace();
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (ErrorResponseException e) {
-            e.printStackTrace();
-        } catch (InternalException e) {
-            e.printStackTrace();
-        } catch (InvalidArgumentException e) {
-            e.printStackTrace();
+        } catch(Exception e) {
+            log.error("oss upload file failed!" + e.getMessage());
+            throw new OSSException(ResultEnum.OSS_UPLOAD_FILE_FAILED);
         }
     }
 
     public void deleteFile(String fileName) {
         try {
             minioClient.removeObject(imgBucket, fileName);
-        } catch (InvalidBucketNameException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InsufficientDataException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (NoResponseException e) {
-            e.printStackTrace();
-        } catch (XmlPullParserException e) {
-            e.printStackTrace();
-        } catch (ErrorResponseException e) {
-            e.printStackTrace();
-        } catch (InternalException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.error("oss delete file failed!");
         }
     }
 
     public void deleteFiles(List<String> fileNames) {
         Iterable<Result<DeleteError>> results = minioClient.removeObject(imgBucket, fileNames);
         results.forEach((errorResult) -> {
-            DeleteError error = null;
             try {
-                errorResult.get();
-            } catch (InvalidBucketNameException e) {
-                e.printStackTrace();
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-            } catch (InsufficientDataException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InvalidKeyException e) {
-                e.printStackTrace();
-            } catch (NoResponseException e) {
-                e.printStackTrace();
-            } catch (XmlPullParserException e) {
-                e.printStackTrace();
-            } catch (ErrorResponseException e) {
-                e.printStackTrace();
-            } catch (InternalException e) {
-                e.printStackTrace();
+                DeleteError deleteError = errorResult.get();
+            } catch (Exception e) {
+                log.error("oss delete file failed!");
             }
         });
     }

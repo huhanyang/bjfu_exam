@@ -5,8 +5,9 @@ import lombok.Getter;
 @Getter
 public enum ProblemTypeEnum {
 
-    CHOICE_QUESTION(1, "选择题"),
-    MATERIAL_QUESTION(2, "材料题");
+    CHOICE_PROBLEM(1, "选择题"),
+    MATERIAL_PROBLEM(2, "材料题"),
+    FATHER_PROBLEM(3, "复合题目");
 
     private final int type;
     private final String msg;

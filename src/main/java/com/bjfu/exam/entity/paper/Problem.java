@@ -1,27 +1,22 @@
 package com.bjfu.exam.entity.paper;
 
+import com.bjfu.exam.entity.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
 @Entity(name = "exam_problem")
-public class Problem {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Problem extends BaseEntity {
     /**
      * 所属试卷
      */
     @ManyToOne
     private Paper paper;
-    /**
-     * 聚合题干
-     */
-    @ManyToOne
-    private PolymerizationProblem polymerizationProblem;
     /**
      * 排序字段
      */
@@ -29,21 +24,39 @@ public class Problem {
     /**
      * 标题
      */
+    @Column(length=64, nullable=false)
     private String title;
     /**
      * 材料
      */
+    @Column(length=256, nullable=false)
     private String material;
     /**
-     * 图片(JSON Array)
+     * 图片url(JSON数组)
      */
+    @Column(length=256, nullable=false)
     private String images;
     /**
      * 类型
      */
+    @Column(nullable=false)
     private Integer type;
     /**
-     * 答案(JSON)
+     * 选择题可选答案(JSON数组)
      */
+    @Column(length=256)
     private String answer;
+
+    /**
+     * 所属复合题
+     */
+    @ManyToOne
+    private Problem fatherProblem;
+    /**
+     * 复合题的小题
+     */
+    @OneToMany(mappedBy = "fatherProblem")
+    @OrderBy("sort")
+    private List<Problem> subProblems = new ArrayList<>();
+
 }

@@ -1,11 +1,7 @@
 package com.bjfu.exam.vo.paper;
 
-import com.bjfu.exam.vo.export.PaperAnswerExportJobVO;
 import com.bjfu.exam.vo.user.UserVO;
 import lombok.Data;
-
-import java.util.List;
-
 
 @Data
 public class PaperDetailVO {
@@ -17,6 +13,14 @@ public class PaperDetailVO {
      * 试卷代号
      */
     private String code;
+    /**
+     * 创建者
+     */
+    private UserVO creator;
+    /**
+     * 试卷状态
+     */
+    private Integer state;
     /**
      * 试卷标题
      */
@@ -33,24 +37,4 @@ public class PaperDetailVO {
      * 试卷收集项json格式
      */
     private String collection;
-    /**
-     * 创建者
-     */
-    private UserVO creator;
-    /**
-     * 导出过的excel任务
-     */
-    private List<PaperAnswerExportJobVO> paperAnswerExportJobs;
-    /**
-     * 试卷状态
-     */
-    private Integer state;
-    /**
-     * 试卷的题目
-     */
-    private List<ProblemVO> problems;
-    /**
-     * 试卷的聚合题目
-     */
-    private List<PolymerizationProblemDetailVO> polymerizationProblems;
 }

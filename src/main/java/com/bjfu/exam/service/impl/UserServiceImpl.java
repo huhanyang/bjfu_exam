@@ -1,11 +1,8 @@
 package com.bjfu.exam.service.impl;
 
 import com.bjfu.exam.dto.user.UserDTO;
-import com.bjfu.exam.dto.user.UserDetailDTO;
 import com.bjfu.exam.entity.user.User;
-import com.bjfu.exam.enums.ResultEnum;
 import com.bjfu.exam.enums.UserTypeEnum;
-import com.bjfu.exam.exception.NotAllowOperationException;
 import com.bjfu.exam.repository.user.UserRepository;
 import com.bjfu.exam.request.user.LoginRequest;
 import com.bjfu.exam.request.user.UserChangePasswordRequest;
@@ -26,33 +23,29 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Override
-    public UserDetailDTO loginCheck(LoginRequest loginRequest) {
+    public UserDTO loginCheck(LoginRequest loginRequest) {
         Optional<User> userOptional = userRepository.findByAccount(loginRequest.getAccount());
         if(userOptional.isEmpty()) {
             return null;
         }
         User user = userOptional.get();
         if(user.getPassword().equals(loginRequest.getPassword())) {
-            return EntityConvertToDTOUtil.convertUserToDetail(user);
+            return EntityConvertToDTOUtil.convertUser(user);
         }
         return null;
-
     }
 
     @Override
     @Transactional
-    public UserDetailDTO register(UserRegisterRequest userRegisterRequest) {
-        if(userRegisterRequest.getType().equals(UserTypeEnum.STUDENT.getType())
-                || userRegisterRequest.getType().equals(UserTypeEnum.TEACHER.getType())) {
-            if(userRepository.existsByAccount(userRegisterRequest.getAccount())) {
-                return null;
-            }
-            User user = new User();
-            BeanUtils.copyProperties(userRegisterRequest, user);
-            user = userRepository.save(user);
-            return EntityConvertToDTOUtil.convertUserToDetail(user);
+    public UserDTO register(UserRegisterRequest userRegisterRequest) {
+        if(userRepository.existsByAccount(userRegisterRequest.getAccount())) {
+            return null;
         }
-        throw new NotAllowOperationException(ResultEnum.CREATE_NOT_ALLOW_ACCOUNT_TYPE);
+        User user = new User();
+        BeanUtils.copyProperties(userRegisterRequest, user);
+        user.setType(UserTypeEnum.STUDENT.getType());
+        user = userRepository.save(user);
+        return EntityConvertToDTOUtil.convertUser(user);
     }
 
     @Override
@@ -68,16 +61,6 @@ public class UserServiceImpl implements UserService {
             return EntityConvertToDTOUtil.convertUser(user);
         }
         return null;
-    }
-
-    @Override
-    public UserDetailDTO getUserDetail(Long id) {
-        Optional<User> userOptional = userRepository.findById(id);
-        if(userOptional.isEmpty()) {
-            return null;
-        }
-        User user = userOptional.get();
-        return EntityConvertToDTOUtil.convertUserToDetail(user);
     }
 
     @Override

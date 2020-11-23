@@ -1,19 +1,17 @@
 package com.bjfu.exam.request.paper;
 
 
-import com.bjfu.exam.request.BaseRequest;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
+
 @Data
-public class ProblemDeleteRequest extends BaseRequest {
+public class ProblemDeleteRequest {
+
+    @NotNull(message = "试卷id不能为空!")
     private Long paperId;
+
+    @NotNull(message = "试题id不能为空!")
     private Long problemId;
 
-    @Override
-    public boolean isComplete() {
-        if(paperId == null || problemId == null) {
-            return false;
-        }
-        return true;
-    }
 }

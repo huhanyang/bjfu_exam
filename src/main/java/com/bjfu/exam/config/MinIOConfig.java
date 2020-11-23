@@ -1,11 +1,15 @@
 package com.bjfu.exam.config;
 
+import com.bjfu.exam.enums.ResultEnum;
+import com.bjfu.exam.exception.OSSException;
 import io.minio.MinioClient;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@Slf4j
 public class MinIOConfig {
 
     @Value("${minIO.url}")
@@ -21,7 +25,7 @@ public class MinIOConfig {
 
     @Bean
     MinioClient minioClient() {
-        MinioClient minioClient = null;
+        MinioClient minioClient;
         try {
             minioClient = new MinioClient(minIOUrl, minIOPort, accessKey, secretKey, false);
             boolean isExist = minioClient.bucketExists(imgBucket);
@@ -29,7 +33,8 @@ public class MinIOConfig {
                 minioClient.makeBucket(imgBucket);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("oss client init failed!" + e.getMessage());
+            throw new OSSException(ResultEnum.OSS_CLIENT_INIT_FAILED);
         }
         return minioClient;
     }

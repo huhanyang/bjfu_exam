@@ -1,40 +1,33 @@
 package com.bjfu.exam.request.paper;
 
-import com.alibaba.fastjson.JSONArray;
-import com.bjfu.exam.request.BaseRequest;
+import com.bjfu.exam.security.validation.annotation.JSONArray;
 import lombok.Data;
-import org.springframework.util.StringUtils;
+import org.hibernate.validator.constraints.Length;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Data
-public class PaperCreateRequest extends BaseRequest {
-    /**
-     * 试卷标题
-     */
+public class PaperCreateRequest {
+
+    @NotBlank(message = "试卷标题不能为空!")
+    @Length(min = 1, max = 64, message = "试卷标题长度在1-64位!")
     private String title;
-    /**
-     * 试卷简介
-     */
+
+    @NotBlank(message = "试卷简介不能为空!")
+    @Length(min = 1, max = 256, message = "试卷简介长度在1-256位!")
     private String introduction;
-    /**
-     * 最长答题时间(分钟)
-     */
+
+    @NotNull(message = "试卷最长作答时间不能为空!")
+    @Min(value = 1,message = "试卷作答时间禁止小于1分钟!")
+    @Max(value = 3600, message = "试卷作答时间禁止大于3600分钟!")
     private Integer time;
-    /**
-     * 试卷收集项json格式
-     */
+
+    @NotBlank(message = "试卷收集项不能为空!")
+    @Length(min = 2, max = 64, message = "试卷收集项长度在2-64位!")
+    @JSONArray(message = "试卷收集项应该为json数组!")
     private String collection;
 
-    @Override
-    public boolean isComplete() {
-        if(StringUtils.isEmpty(title) || StringUtils.isEmpty(introduction)
-                || time == null ||StringUtils.isEmpty(collection)) {
-            return false;
-        }
-        try {
-            JSONArray.toJSON(collection);
-            return true;
-        } catch (Exception ignored) {
-            return false;
-        }
-    }
 }

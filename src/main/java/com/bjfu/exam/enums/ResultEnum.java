@@ -5,42 +5,40 @@ import lombok.Getter;
 @Getter
 public enum ResultEnum {
 
-    UNKNOWN_WRONG(0, "未知的错误，请重新登陆后再试"),
-    SUCCESS(1, "成功"),
-    PARAM_WRONG(2, "参数错误"),
-    LOGIN_FAILED(3, "登录失败，账号或密码错误"),
-    ACCOUNT_RECUR(4, "账号重复"),
-    FIND_FAILED(5, "查找失败"),
-    NEED_TO_LOGIN(6, "需要登录"),
-    CHANGE_PASSWORD_FAILED(7, "修改密码失败，账号或密码错误"),
-    PARAM_NOT_MATCH(8, "参数不相互匹配"),
-    ANSWER_TWICE(9, "多次作答"),
-    PAPER_STATE_NOT_ANSWERING(10, "试卷非可作答状态"),
-    ANSWER_OTHERS_PAPER(11, "作答他人试卷"),
-    NOT_CONTINUOUS_ANSWERING(12, "非连续答题"),
-    USER_NOT_EXIST(13, "用户不存在"),
-    PAPER_NOT_EXIST(14, "试卷不存在"),
-    POLYMERIZATION_PROBLEM_NOT_EXIST(15, "组合题目不存在"),
-    PROBLEM_NOT_EXIST(16, "题目不存在"),
-    PAPER_ANSWER_NOT_EXIST(17, "答卷不存在"),
-    NOT_TEACHER_CREATE_PAPER(18, "非教师用户创建试卷"),
-    NOT_CREATOR_EDIT_PAPER(19, "非试卷创建者编辑试卷"),
-    DATA_WRONG(20, "数据错误，如仍然错误请联系管理员"),
-    NEW_SORT_PARAM_WRONG(21, "排序参数错误"),
-    CREATE_NOT_ALLOW_ACCOUNT_TYPE(22, "创建不允许的账号类型"),
-    GET_OTHERS_PAPER_ANSWER(23, "获取他人试卷"),
-    PAPER_STATE_FROM_ANSWERING_TO_CREATING(24, "试卷状态不允许从作答修改回创建状态"),
-    PAPER_STATE_FROM_DELETE_TO_OTHERS(25, "试卷状态不允许从删除状态修改为其他状态"),
-    NOT_CREATOR_EXPORT_PAPER(26, "非试卷创建者导出试卷"),
-    EXPORT_PAPER_FAILED(27, "导出excel失败"),
-    FILE_UPLOAD_FAILED(28, "文件上传失败"),
-    REQUIRE_STUDENT(29, "此请求只允许学生账号"),
-    REQUIRE_TEACHER(30, "此请求只允许教师账号"),
-    PAPER_STATE_CHANGE_NOT_ALLOW(31, "此状态变更不允许"),
-    PAPER_STATE_IS_NOT_CREATING(32, "试卷非创建状态不允许修改"),
-    PAPER_STATE_CAN_NOT_DELETE(34, "试卷此状态不允许删除"),
-    PAPER_STATE_IS_NOT_END_ANSWER(33, "试卷状态非结束作答");
+    // 基本返回码
+    SUCCESS(101, "成功"),
+    PARAM_WRONG(102, "参数错误"),
+    NEED_TO_LOGIN(103, "需要登录"),
+    REQUIRE_STUDENT(104, "此请求只允许学生账号"),
+    REQUIRE_TEACHER(105, "此请求只允许教师账号"),
+    REQUIRE_ADMIN(106, "此请求只允许管理员账号"),
 
+    // 用户操作返回码
+    LOGIN_FAILED(201, "登录失败，账号或密码错误"),
+    ACCOUNT_RECUR(202, "账号重复"),
+    CHANGE_PASSWORD_FAILED(203, "修改密码失败，账号或密码错误"),
+
+    // 业务异常返回码
+    NOT_TEACHER_CREATE_PAPER(301, "非教师用户创建试卷"),
+    NOT_PAPER_CREATOR(302, "非试卷创建者"),
+    FIND_FAILED(303, "查找失败"),
+    PAPER_STATE_NOT_ANSWERING(304, "试卷非可作答状态"),
+    ANSWER_TWICE(305, "多次作答"),
+    ANSWER_OTHERS_PAPER(306, "作答他人试卷"),
+    PAPER_NOT_EXIST(307, "试卷不存在"),
+    PROBLEM_NOT_EXIST(308, "题目不存在"),
+    PAPER_ANSWER_NOT_EXIST(309, "答卷不存在"),
+    PAPER_STATE_CHANGE_NOT_ALLOW(310, "试卷不允许变更为此状态"),
+    PAPER_STATE_IS_NOT_CREATING(311, "试卷非创建状态不允许修改"),
+    PAPER_STATE_IS_NOT_END_ANSWER(312, "试卷非结束作答状态不允许导出"),
+    PAPER_STATE_CAN_NOT_DELETE(313, "试卷此状态不允许删除"),
+    NOT_CREATOR_EXPORT_PAPER(314, "非试卷创建者不允许导出试卷"),
+    EXPORT_PAPER_FAILED(315, "导出excel失败"),
+
+    // 系统错误返回码
+    USER_NOT_EXIST(401, "用户不存在"),
+    OSS_CLIENT_INIT_FAILED(402, "oss客户端初始化失败"),
+    OSS_UPLOAD_FILE_FAILED(403, "上传文件出错");
 
     private final int code;
     private final String msg;

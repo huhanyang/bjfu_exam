@@ -11,7 +11,7 @@ public class ProblemDTO {
     /**
      * 所属组合题目
      */
-    private PolymerizationProblemDTO polymerizationProblem;
+    private ProblemDTO fatherProblem;
     /**
      * 排序字段
      */

@@ -1,10 +1,12 @@
-package com.bjfu.exam.dto.paper;
+package com.bjfu.exam.vo.paper;
 
-import com.bjfu.exam.dto.user.UserDTO;
+import com.bjfu.exam.vo.user.UserVO;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
-public class PaperDetailDTO {
+public class PaperWithProblemsVO {
     /**
      * 试卷id
      */
@@ -16,7 +18,7 @@ public class PaperDetailDTO {
     /**
      * 创建者
      */
-    private UserDTO creator;
+    private UserVO creator;
     /**
      * 试卷状态
      */
@@ -37,4 +39,8 @@ public class PaperDetailDTO {
      * 试卷收集项json格式
      */
     private String collection;
+    /**
+     * 试卷的题目
+     */
+    private List<ProblemVO> problems;
 }

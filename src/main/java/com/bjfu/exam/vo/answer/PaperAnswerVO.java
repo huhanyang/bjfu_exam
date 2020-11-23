@@ -2,6 +2,8 @@ package com.bjfu.exam.vo.answer;
 
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 public class PaperAnswerVO {
     /**
@@ -9,11 +11,15 @@ public class PaperAnswerVO {
      */
     private Long id;
     /**
-     * 收集项答案(JSON)
-     */
-    private String collectionAnswer;
-    /**
      * 答卷状态
      */
     private Integer state;
+    /**
+     * 创建时间
+     */
+    private Date createdTime;
+    /**
+     * 答题结束时间
+     */
+    private Date finishTime;
 }

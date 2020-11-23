@@ -1,8 +1,8 @@
 package com.bjfu.exam.controller;
 
 import com.bjfu.exam.dto.user.UserDTO;
-import com.bjfu.exam.dto.user.UserDetailDTO;
 import com.bjfu.exam.enums.ResultEnum;
+import com.bjfu.exam.enums.SessionKeyEnum;
 import com.bjfu.exam.request.user.LoginRequest;
 import com.bjfu.exam.request.user.UserChangePasswordRequest;
 import com.bjfu.exam.request.user.UserRegisterRequest;
@@ -11,14 +11,15 @@ import com.bjfu.exam.service.UserService;
 import com.bjfu.exam.util.DTOConvertToVOUtil;
 import com.bjfu.exam.util.SessionUtil;
 import com.bjfu.exam.vo.BaseResult;
-import com.bjfu.exam.vo.user.UserDetailVO;
 import com.bjfu.exam.vo.user.UserVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 
 @RestController
+@Validated
 @RequestMapping("/user")
 public class UserController {
 
@@ -26,47 +27,38 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/loginCheck")
-    public BaseResult<UserDetailVO> loginCheck(@RequestBody LoginRequest loginRequest,
+    public BaseResult<UserVO> loginCheck(@Validated @RequestBody LoginRequest loginRequest,
                                                HttpSession session) {
-        if(loginRequest.isComplete()) {
-            UserDetailDTO userDetailDTO = userService.loginCheck(loginRequest);
-            if(userDetailDTO != null) {
-                SessionUtil.initSession(session, userDetailDTO);
-                UserDetailVO userDetailVO = DTOConvertToVOUtil.convertUserDTOToDetail(userDetailDTO);
-                return new BaseResult<>(ResultEnum.SUCCESS, userDetailVO);
-            }
-            return new BaseResult<>(ResultEnum.LOGIN_FAILED);
+        UserDTO userDTO = userService.loginCheck(loginRequest);
+        if(userDTO != null) {
+            SessionUtil.initSession(session, userDTO);
+            UserVO userDetailVO = DTOConvertToVOUtil.convertUserDTO(userDTO);
+            return new BaseResult<>(ResultEnum.SUCCESS, userDetailVO);
         }
-        return new BaseResult<>(ResultEnum.PARAM_WRONG);
+        return new BaseResult<>(ResultEnum.LOGIN_FAILED);
     }
 
     @PutMapping("/register")
-    public BaseResult<UserDetailVO> register(@RequestBody UserRegisterRequest userRegisterRequest,
+    public BaseResult<UserVO> register(@Validated @RequestBody UserRegisterRequest userRegisterRequest,
                                              HttpSession session) {
-        if(userRegisterRequest.isComplete()) {
-            UserDetailDTO userDetailDTO = userService.register(userRegisterRequest);
-            if(userDetailDTO != null) {
-                SessionUtil.initSession(session, userDetailDTO);
-                UserDetailVO userDetailVO = DTOConvertToVOUtil.convertUserDTOToDetail(userDetailDTO);
-                return new BaseResult<>(ResultEnum.SUCCESS, userDetailVO);
-            }
-            return new BaseResult<>(ResultEnum.ACCOUNT_RECUR);
+        UserDTO userDTO = userService.register(userRegisterRequest);
+        if(userDTO != null) {
+            SessionUtil.initSession(session, userDTO);
+            UserVO userDetailVO = DTOConvertToVOUtil.convertUserDTO(userDTO);
+            return new BaseResult<>(ResultEnum.SUCCESS, userDetailVO);
         }
-        return new BaseResult<>(ResultEnum.PARAM_WRONG);
+        return new BaseResult<>(ResultEnum.ACCOUNT_RECUR);
     }
 
     @PostMapping("/changePassword")
-    public BaseResult<Void> changePassword(@RequestBody UserChangePasswordRequest userChangePasswordRequest,
+    public BaseResult<Void> changePassword(@Validated @RequestBody UserChangePasswordRequest userChangePasswordRequest,
                                            HttpSession session) {
-        if(userChangePasswordRequest.isComplete()) {
-            UserDTO userDTO = userService.changePassword(userChangePasswordRequest);
-            if(userDTO != null) {
-                SessionUtil.deleteSession(session);
-                return new BaseResult<>(ResultEnum.SUCCESS);
-            }
-            return new BaseResult<>(ResultEnum.CHANGE_PASSWORD_FAILED);
+        UserDTO userDTO = userService.changePassword(userChangePasswordRequest);
+        if(userDTO != null) {
+            SessionUtil.deleteSession(session);
+            return new BaseResult<>(ResultEnum.SUCCESS);
         }
-        return new BaseResult<>(ResultEnum.PARAM_WRONG);
+        return new BaseResult<>(ResultEnum.CHANGE_PASSWORD_FAILED);
     }
 
     @GetMapping("/logout")
@@ -75,21 +67,10 @@ public class UserController {
         return new BaseResult<>(ResultEnum.SUCCESS);
     }
 
-    @GetMapping("/getUserDetail")
-    @RequireLogin
-    public BaseResult<UserDetailVO> getUserDetail(HttpSession session) {
-        UserDetailDTO userDetailDTO = userService.getUserDetail((Long) session.getAttribute("userId"));
-        UserDetailVO userDetailVO = DTOConvertToVOUtil.convertUserDTOToDetail(userDetailDTO);
-        return new BaseResult<>(ResultEnum.SUCCESS, userDetailVO);
-    }
-
     @GetMapping("/getUserInfo")
     @RequireLogin
-    public BaseResult<UserVO> getUserInfo(Long id, HttpSession session) {
-        if(id == null) {
-            return new BaseResult<>(ResultEnum.PARAM_WRONG);
-        }
-        UserDTO userInfo = userService.getUserInfo(id);
+    public BaseResult<UserVO> getUserInfo(HttpSession session) {
+        UserDTO userInfo = userService.getUserInfo((Long) session.getAttribute(SessionKeyEnum.ACCOUNT_ID.getKey()));
         UserVO userVO = DTOConvertToVOUtil.convertUserDTO(userInfo);
         return new BaseResult<>(ResultEnum.SUCCESS, userVO);
     }
