@@ -72,8 +72,11 @@ public class EntityConvertToDTOUtil {
             return null;
         }
         ProblemDTO problemDTO = new ProblemDTO();
-        BeanUtils.copyProperties(problem, problemDTO, "fatherProblem");
+        BeanUtils.copyProperties(problem, problemDTO, "fatherProblem", "subProblems");
         problemDTO.setFatherProblem(convertProblem(problem.getFatherProblem()));
+        problemDTO.setSubProblems(problem.getSubProblems().stream()
+                .map(EntityConvertToDTOUtil::convertProblem)
+                .collect(Collectors.toList()));
         return problemDTO;
     }
 

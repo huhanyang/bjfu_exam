@@ -63,6 +63,9 @@ public class DTOConvertToVOUtil {
         ProblemVO problemVO = new ProblemVO();
         BeanUtils.copyProperties(problemDTO, problemVO, "fatherProblem");
         problemVO.setFatherProblem(convertProblemDTO(problemDTO.getFatherProblem()));
+        problemVO.setSubProblems(problemDTO.getSubProblems().stream()
+                .map(DTOConvertToVOUtil::convertProblemDTO)
+                .collect(Collectors.toList()));
         return problemVO;
     }
 

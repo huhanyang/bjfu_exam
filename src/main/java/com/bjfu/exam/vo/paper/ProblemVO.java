@@ -1,6 +1,9 @@
 package com.bjfu.exam.vo.paper;
 
+import com.bjfu.exam.dto.paper.ProblemDTO;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 public class ProblemVO {
@@ -36,4 +39,8 @@ public class ProblemVO {
      * 答案(JSON)
      */
     private String answer;
+    /**
+     * 子题目
+     */
+    private List<ProblemVO> subProblems;
 }

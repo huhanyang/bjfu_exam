@@ -1,6 +1,10 @@
 package com.bjfu.exam.dto.paper;
 
+import com.bjfu.exam.entity.paper.Problem;
 import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 public class ProblemDTO {
@@ -36,4 +40,8 @@ public class ProblemDTO {
      * 答案(JSON)
      */
     private String answer;
+    /**
+     * 子题目
+     */
+    private List<ProblemDTO> subProblems;
 }
