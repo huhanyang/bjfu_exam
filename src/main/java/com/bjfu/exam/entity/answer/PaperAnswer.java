@@ -14,7 +14,11 @@ import java.util.List;
 
 @Getter
 @Setter
-@Entity(name = "exam_paper_answer")
+@Entity
+@Table(name = "exam_paper_answer",
+        indexes = {@Index(columnList = "paper_id"),
+                @Index(name = "User_CreatedTime_Index", columnList = "user_id"),
+                @Index(name = "User_CreatedTime_Index", columnList = "createdTime")})
 public class PaperAnswer extends BaseEntity {
     /**
      * 所答试卷

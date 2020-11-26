@@ -12,12 +12,16 @@ import java.util.List;
 
 @Getter
 @Setter
-@Entity(name = "exam_paper")
+@Entity
+@Table(name = "exam_paper",
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"code"})},
+        indexes = {@Index(name = "Creator_CreatedTime_Index", columnList = "creator_id"),
+                @Index(name = "Creator_CreatedTime_Index", columnList = "createdTime")})
 public class Paper extends BaseEntity {
     /**
      * 试卷代号
      */
-    @Column(length=6, unique=true)
+    @Column(length=6)
     private String code;
     /**
      * 创建者

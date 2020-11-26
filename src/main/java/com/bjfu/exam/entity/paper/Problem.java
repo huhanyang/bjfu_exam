@@ -10,7 +10,11 @@ import java.util.List;
 
 @Getter
 @Setter
-@Entity(name = "exam_problem")
+@Entity
+@Table(name = "exam_problem",
+        indexes = {@Index(name = "Paper_Sort_Index", columnList = "paper_id"),
+                @Index(name ="Paper_Sort_Index", columnList = "sort"),
+                @Index(columnList = "father_problem_id")})
 public class Problem extends BaseEntity {
     /**
      * 所属试卷

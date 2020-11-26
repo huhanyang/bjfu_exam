@@ -10,7 +10,10 @@ import java.util.Date;
 
 @Getter
 @Setter
-@Entity(name = "exam_problem_answer")
+@Entity
+@Table(name = "exam_problem_answer",
+        indexes = {@Index(name = "PaperAnswer_CreatedTime_Index", columnList = "paper_answer_id"),
+        @Index(name = "PaperAnswer_CreatedTime_Index", columnList = "createdTime")})
 public class ProblemAnswer extends BaseEntity {
     /**
      * 所属答卷

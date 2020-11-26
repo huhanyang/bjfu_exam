@@ -301,6 +301,7 @@ public class PaperServiceImpl implements PaperService {
                 !state.equals(PaperStateEnum.END_ANSWER.getState())) {
             throw new NotAllowOperationException(ResultEnum.PAPER_STATE_CAN_NOT_DELETE);
         }
+        paper.setCode(null);
         paper.setState(PaperStateEnum.SOFT_DELETE.getState());
         paperRepository.save(paper);
     }

@@ -12,12 +12,13 @@ import java.util.List;
 
 @Getter
 @Setter
-@Entity(name = "exam_user")
+@Entity
+@Table(name = "exam_user", uniqueConstraints = {@UniqueConstraint(columnNames = {"account"})})
 public class User extends BaseEntity {
     /**
      * 用户名
      */
-    @Column(length=32, unique=true, nullable=false)
+    @Column(length=32, nullable=false)
     private String account;
     /**
      * 密码
