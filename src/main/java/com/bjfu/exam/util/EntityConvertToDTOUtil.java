@@ -9,6 +9,7 @@ import com.bjfu.exam.entity.paper.Problem;
 import com.bjfu.exam.entity.user.User;
 import com.bjfu.exam.enums.PaperAnswerStateEnum;
 import com.bjfu.exam.enums.PaperStateEnum;
+import com.bjfu.exam.vo.paper.ProblemInfoVO;
 import org.springframework.beans.BeanUtils;
 
 import java.util.List;
@@ -73,11 +74,21 @@ public class EntityConvertToDTOUtil {
         }
         ProblemDTO problemDTO = new ProblemDTO();
         BeanUtils.copyProperties(problem, problemDTO, "fatherProblem", "subProblems");
-        problemDTO.setFatherProblem(convertProblem(problem.getFatherProblem()));
+        problemDTO.setFatherProblem(convertProblemToInfo(problem.getFatherProblem()));
         problemDTO.setSubProblems(problem.getSubProblems().stream()
                 .map(EntityConvertToDTOUtil::convertProblem)
                 .collect(Collectors.toList()));
         return problemDTO;
+    }
+
+    public static ProblemInfoDTO convertProblemToInfo(Problem problem) {
+        if(problem == null) {
+            return null;
+        }
+        ProblemInfoDTO problemInfoDTO = new ProblemInfoDTO();
+        BeanUtils.copyProperties(problem, problemInfoDTO, "fatherProblem");
+        problemInfoDTO.setFatherProblem(convertProblemToInfo(problem.getFatherProblem()));
+        return problemInfoDTO;
     }
 
     public static PaperAnswerDTO convertPaperAnswer(PaperAnswer paperAnswer) {
@@ -86,6 +97,7 @@ public class EntityConvertToDTOUtil {
         }
         PaperAnswerDTO paperAnswerDTO = new PaperAnswerDTO();
         BeanUtils.copyProperties(paperAnswer, paperAnswerDTO);
+        paperAnswerDTO.setPaperTitle(paperAnswer.getPaper().getTitle());
         return paperAnswerDTO;
     }
 }

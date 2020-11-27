@@ -9,12 +9,12 @@ import com.bjfu.exam.entity.paper.Problem;
 import com.bjfu.exam.entity.user.User;
 import com.bjfu.exam.enums.PaperAnswerStateEnum;
 import com.bjfu.exam.enums.PaperStateEnum;
+import com.bjfu.exam.enums.ProblemTypeEnum;
 import com.bjfu.exam.enums.ResultEnum;
 import com.bjfu.exam.exception.*;
 import com.bjfu.exam.repository.answer.PaperAnswerRepository;
 import com.bjfu.exam.repository.answer.ProblemAnswerRepository;
 import com.bjfu.exam.repository.paper.PaperRepository;
-import com.bjfu.exam.repository.paper.ProblemRepository;
 import com.bjfu.exam.repository.user.UserRepository;
 import com.bjfu.exam.request.answer.PaperAnswerCreateRequest;
 import com.bjfu.exam.request.answer.ProblemAnswerSubmitRequest;
@@ -40,8 +40,6 @@ public class AnswerServiceImpl implements AnswerService {
     private PaperRepository paperRepository;
     @Autowired
     private UserRepository userRepository;
-    @Autowired
-    private ProblemRepository problemRepository;
 
     @Override
     public List<PaperAnswerDTO> getPaperAnswers(Long userId) {
@@ -88,13 +86,12 @@ public class AnswerServiceImpl implements AnswerService {
         paperAnswer.setUser(user);
         paperAnswer.setPaper(paper);
         paperAnswer.setState(PaperAnswerStateEnum.ANSWERING.getState());
+        // 设置下一题
+        Problem nextProblem = findNextProblem(paper, null);
 
-        List<Problem> problems = problemRepository.findByPaperAndSort(paper, 1);
-        Optional<Problem> nextProblemOptional = problems.stream()
-                .filter(problem -> problem.getFatherProblem() == null)
-                .findFirst();
-        if(nextProblemOptional.isPresent()) {
-            paperAnswer.setNextProblem(nextProblemOptional.get());
+
+        if(nextProblem != null) {
+            paperAnswer.setNextProblem(nextProblem);
         } else {
             paperAnswer.setState(PaperAnswerStateEnum.FINISH.getState());
         }
@@ -146,17 +143,9 @@ public class AnswerServiceImpl implements AnswerService {
         problemAnswer.setProblem(paperAnswer.getNextProblem());
         problemAnswer.setPaperAnswer(paperAnswer);
         BeanUtils.copyProperties(problemAnswerSubmitRequest, problemAnswer);
-        problemAnswer = problemAnswerRepository.save(problemAnswer);
+        problemAnswerRepository.save(problemAnswer);
         // 为答卷设置需要答的下一道题
-        Integer sort = paperAnswer.getNextProblem().getSort() + 1;
-        List<Problem> problems = problemRepository.findByPaperAndSort(paperAnswer.getPaper(), sort);
-        Optional<Problem> nextProblemOptional = problems.stream()
-                .filter(problem -> problem.getFatherProblem() == null)
-                .findFirst();
-        Problem nextProblem = null;
-        if(nextProblemOptional.isPresent()) {
-            nextProblem = nextProblemOptional.get();
-        }
+        Problem nextProblem = findNextProblem(paperAnswer.getPaper(), paperAnswer.getNextProblem());
         paperAnswer.setNextProblem(nextProblem);
         // 更新试卷最后作答时间
         paperAnswer.setFinishTime(new Date());
@@ -169,5 +158,38 @@ public class AnswerServiceImpl implements AnswerService {
             paperAnswer.setState(PaperAnswerStateEnum.FINISH.getState());
         }
         paperAnswerRepository.save(paperAnswer);
+    }
+
+    private Problem findNextProblem(Paper paper, Problem problem) {
+        List<Problem> problemWithoutFatherProblemList = paper.getProblems().stream()
+                .filter(problem1 -> !problem1.getType().equals(ProblemTypeEnum.FATHER_PROBLEM.getType()))
+                .sorted((problem1, problem2) -> {
+                    Problem fatherProblem1 = problem1.getFatherProblem();
+                    Problem fatherProblem2 = problem2.getFatherProblem();
+                    if (fatherProblem1 == null && fatherProblem2 == null) {
+                        return problem1.getSort() - problem2.getSort();
+                    } else if (fatherProblem1 == null) {
+                        return problem1.getSort() - fatherProblem2.getSort();
+                    } else if (fatherProblem2 == null) {
+                        return fatherProblem1.getSort() - problem2.getSort();
+                    } else {
+                        if (fatherProblem1.getSort().equals(fatherProblem2.getSort())) {
+                            return problem1.getSort() - problem2.getSort();
+                        } else {
+                            return fatherProblem1.getSort() - fatherProblem2.getSort();
+                        }
+                    }
+                })
+                .collect(Collectors.toList());
+        boolean isNext = false;
+        for (Problem problem1: problemWithoutFatherProblemList) {
+            if(isNext || problem == null) {
+                return problem1;
+            }
+            if (problem1.getId().equals(problem.getId())) {
+                isNext = true;
+            }
+        }
+        return null;
     }
 }

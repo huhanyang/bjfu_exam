@@ -1,5 +1,6 @@
 package com.bjfu.exam.dto.answer;
 
+import com.bjfu.exam.dto.paper.PaperDTO;
 import lombok.Data;
 
 import java.util.Date;
@@ -15,6 +16,10 @@ public class PaperAnswerDTO {
      * 答卷状态
      */
     private Integer state;
+    /**
+     * 试卷
+     */
+    private String paperTitle;
     /**
      * 创建时间
      */

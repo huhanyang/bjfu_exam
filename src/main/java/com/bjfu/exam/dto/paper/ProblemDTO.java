@@ -1,9 +1,7 @@
 package com.bjfu.exam.dto.paper;
 
-import com.bjfu.exam.entity.paper.Problem;
 import lombok.Data;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -15,7 +13,7 @@ public class ProblemDTO {
     /**
      * 所属组合题目
      */
-    private ProblemDTO fatherProblem;
+    private ProblemInfoDTO fatherProblem;
     /**
      * 排序字段
      */

@@ -62,11 +62,21 @@ public class DTOConvertToVOUtil {
         }
         ProblemVO problemVO = new ProblemVO();
         BeanUtils.copyProperties(problemDTO, problemVO, "fatherProblem", "subProblems");
-        problemVO.setFatherProblem(convertProblemDTO(problemDTO.getFatherProblem()));
+        problemVO.setFatherProblem(convertProblemInfoDTO(problemDTO.getFatherProblem()));
         problemVO.setSubProblems(problemDTO.getSubProblems().stream()
                 .map(DTOConvertToVOUtil::convertProblemDTO)
                 .collect(Collectors.toList()));
         return problemVO;
+    }
+
+    public static ProblemInfoVO convertProblemInfoDTO(ProblemInfoDTO problemInfoDTO) {
+        if(problemInfoDTO == null) {
+            return null;
+        }
+        ProblemInfoVO problemInfoVO = new ProblemInfoVO();
+        BeanUtils.copyProperties(problemInfoDTO, problemInfoVO, "fatherProblem");
+        problemInfoVO.setFatherProblem(convertProblemInfoDTO(problemInfoDTO.getFatherProblem()));
+        return problemInfoVO;
     }
 
     public static PaperAnswerVO convertPaperAnswerDTO(PaperAnswerDTO paperAnswerDTO) {

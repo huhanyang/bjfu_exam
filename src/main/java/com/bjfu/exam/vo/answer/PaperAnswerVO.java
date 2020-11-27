@@ -15,6 +15,10 @@ public class PaperAnswerVO {
      */
     private Integer state;
     /**
+     * 试卷
+     */
+    private String paperTitle;
+    /**
      * 创建时间
      */
     private Date createdTime;

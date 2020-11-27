@@ -1,11 +1,10 @@
-package com.bjfu.exam.vo.paper;
+package com.bjfu.exam.dto.paper;
 
 import lombok.Data;
 
-import java.util.List;
 
 @Data
-public class ProblemVO {
+public class ProblemInfoDTO {
     /**
      * 题目id
      */
@@ -13,7 +12,7 @@ public class ProblemVO {
     /**
      * 所属组合题目
      */
-    private ProblemInfoVO fatherProblem;
+    private ProblemInfoDTO fatherProblem;
     /**
      * 排序字段
      */
@@ -38,8 +37,4 @@ public class ProblemVO {
      * 答案(JSON)
      */
     private String answer;
-    /**
-     * 子题目
-     */
-    private List<ProblemVO> subProblems;
 }

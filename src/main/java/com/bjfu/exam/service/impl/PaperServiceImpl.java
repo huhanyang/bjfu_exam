@@ -143,11 +143,13 @@ public class PaperServiceImpl implements PaperService {
             if(!subProblems.isEmpty()) {
                 sort = subProblems.get(subProblems.size() - 1).getSort() + 1;
             }
+            problem.setFatherProblem(fatherProblem);
         } else {
             throw new BadParamException(ResultEnum.PARAM_WRONG);
         }
         problem.setPaper(paper);
         problem.setSort(sort);
+        problem.setImages(new JSONArray().toJSONString());
         BeanUtils.copyProperties(problemAddRequest, problem);
         problem = problemRepository.save(problem);
         return EntityConvertToDTOUtil.convertProblem(problem);
