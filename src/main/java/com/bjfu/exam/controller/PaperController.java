@@ -39,13 +39,13 @@ public class PaperController {
 
     @GetMapping("/getByCode")
     @RequireStudent
-    public BaseResult<PaperVO> getPaper(String code) {
+    public BaseResult<PaperDetailVO> getPaper(String code) {
         if(StringUtils.isEmpty(code)) {
             return new BaseResult<>(ResultEnum.PARAM_WRONG);
         }
-        PaperDTO paperDTO = paperService.getPaperByCode(code);
+        PaperDetailDTO paperDTO = paperService.getPaperByCode(code);
         if(paperDTO != null) {
-            PaperVO paperVO = DTOConvertToVOUtil.convertPaperDTO(paperDTO);
+            PaperDetailVO paperVO = DTOConvertToVOUtil.convertPaperDetailDTO(paperDTO);
             return new BaseResult<>(ResultEnum.SUCCESS, paperVO);
         }
         return new BaseResult<>(ResultEnum.FIND_FAILED);

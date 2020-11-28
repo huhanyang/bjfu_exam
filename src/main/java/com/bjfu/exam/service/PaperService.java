@@ -16,7 +16,7 @@ public interface PaperService {
     /**
      * 根据试卷代码获取试卷
      */
-    PaperDTO getPaperByCode(String code);
+    PaperDetailDTO getPaperByCode(String code);
     /**
      * 根据试卷id获取试卷详情
      */

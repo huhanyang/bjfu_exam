@@ -1,8 +1,16 @@
 FROM ubuntu:18.04
 
-COPY settings.xml /usr/src/conf/settings.xml
+COPY build.sh /usr/src/build.sh
 COPY start.sh /usr/src/start.sh
-COPY sources.list /usr/src/conf/sources.list
 
-#添加腾讯云apt源
+COPY sources.list /etc/apt/sources.list
+RUN apt-get update \
+    && sh /usr/src/build.sh \
+    && apt-get install -y openjdk-11-jre-headless \
+    && apt-get install -y maven \
+    && apt-get install -y git
+
+COPY settings.xml /usr/share/maven/conf/settings.xml
+RUN [ "sh","/usr/src/build.sh" ]
+
 ENTRYPOINT ["/usr/src/start.sh"]

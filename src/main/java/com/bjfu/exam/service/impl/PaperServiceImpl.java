@@ -44,12 +44,12 @@ public class PaperServiceImpl implements PaperService {
     ImgFileRepository imgFileRepository;
 
     @Override
-    public PaperDTO getPaperByCode(String code) {
+    public PaperDetailDTO getPaperByCode(String code) {
         Optional<Paper> paperOptional = paperRepository.findByCode(code);
         if(paperOptional.isEmpty()) {
             return null;
         }
-        return EntityConvertToDTOUtil.convertPaper(paperOptional.get());
+        return EntityConvertToDTOUtil.convertPaperToDetail(paperOptional.get());
     }
 
     @Override
