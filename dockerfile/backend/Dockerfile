@@ -15,4 +15,7 @@ RUN git clone https://github.com/tank59he/bjfu_exam.git /usr/src/bjfu_exam/ \
     && mv /usr/src/bjfu_exam/target/bjfu_exam.jar /usr/src/ \
     && rm -rf /usr/src/bjfu_exam
 
-ENTRYPOINT ["java -jar /usr/src/bjfu_exam.jar"]
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar"]
+CMD ["/usr/src/bjfu_exam.jar"]
