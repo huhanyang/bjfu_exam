@@ -19,6 +19,7 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
 minIO:
   url: host.docker.internal
+  #url: 127.0.0.1
   port: 9000
   accessKey: minioadmin
   secretKey: minioadmin

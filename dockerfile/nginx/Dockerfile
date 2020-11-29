@@ -1,12 +1,22 @@
+#构造编译环境
+FROM ubuntu:18.04
+COPY sources.list /etc/apt/sources.list
+RUN apt-get update \
+    && apt-get install -y wget \
+    && apt-get install -y git \
+    && apt-get install -y nodejs \
+    && apt-get install -y npm \
+    && npm config set registry https://registry.npm.taobao.org \
+    && npm install -g npm \
+    && npm install -g n \
+    && n stable \
+    && PATH="$PATH" \
+    && git clone https://github.com/DF11G/newexam.git /usr/src/bjfu_exam \
+    && cd /usr/src/bjfu_exam \
+    && npm install \
+    && npm run build \
+
+#生成运行环境
 FROM nginx
-
-#拷贝配置文件
 COPY nginx.conf /etc/nginx/
-
-#添加腾讯云apt源
-RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak \
-    && echo "deb http://mirrors.163.com/debian/ jessie main non-free contrib" >> /etc/apt/sources.list \
-    && echo "deb http://mirrors.163.com/debian/ jessie-proposed-updates main non-free contrib" >>/etc/apt/sources.list \
-    && echo "deb-src http://mirrors.163.com/debian/ jessie main non-free contrib" >>/etc/apt/sources.list \
-    && echo "deb-src http://mirrors.163.com/debian/ jessie-proposed-updates main non-free contrib" >>/etc/apt/sources.list \
-    #&& apt-get update
+COPY --from=0 /usr/src/bjfu_exam/build /usr/src/bjfu_exam

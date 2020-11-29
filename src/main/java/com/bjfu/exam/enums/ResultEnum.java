@@ -21,7 +21,7 @@ public enum ResultEnum {
     // 业务异常返回码
     NOT_TEACHER_CREATE_PAPER(301, "非教师用户创建试卷"),
     NOT_PAPER_CREATOR(302, "非试卷创建者"),
-    FIND_FAILED(303, "查找失败"),
+    FIND_FAILED(303, "未找到"),
     PAPER_STATE_NOT_ANSWERING(304, "试卷非可作答状态"),
     ANSWER_TWICE(305, "多次作答"),
     ANSWER_OTHERS_PAPER(306, "作答他人试卷"),

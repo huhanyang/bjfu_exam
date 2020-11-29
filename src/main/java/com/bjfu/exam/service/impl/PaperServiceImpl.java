@@ -46,7 +46,9 @@ public class PaperServiceImpl implements PaperService {
     @Override
     public PaperDetailDTO getPaperByCode(String code) {
         Optional<Paper> paperOptional = paperRepository.findByCode(code);
-        if(paperOptional.isEmpty()) {
+        if(paperOptional.isEmpty() ||
+                paperOptional.get().getState().equals(PaperStateEnum.CREATING.getState()) ||
+                paperOptional.get().getState().equals(PaperStateEnum.SOFT_DELETE.getState())) {
             return null;
         }
         return EntityConvertToDTOUtil.convertPaperToDetail(paperOptional.get());
