@@ -4,7 +4,7 @@ COPY sources.list /etc/apt/sources.list
 RUN apt-get update \
     && apt-get install -y wget \
     && apt-get install -y git \
-    && curl -sL https://deb.nodesource.com/setup_15.x | bash -
+    && curl -sL https://deb.nodesource.com/setup_15.x | bash - \
     && apt-get install -y nodejs \
     && apt-get install -y npm \
     && npm config set registry https://registry.npm.taobao.org \
