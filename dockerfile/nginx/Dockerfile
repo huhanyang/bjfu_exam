@@ -13,6 +13,7 @@ RUN apt-get update \
     && echo 'export NODE_HOME=/usr/sbin/nodejs' >> /etc/profile \
     && echo 'export PATH=$PATH:$NODE_HOME/bin' >> /etc/profile \
     && echo 'export NODE_PATH=$NODE_HOME/lib/node_modules' >> /etc/profile \
+    && source /etc/profile \
     && npm config set registry https://registry.npm.taobao.org \
     && npm install -g npm \
     && git clone https://github.com/tank59he/bjfu_exam_react.git /usr/src/bjfu_exam \
