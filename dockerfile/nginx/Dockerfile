@@ -4,9 +4,13 @@ COPY sources.list /etc/apt/sources.list
 RUN apt-get update \
     && apt-get install -y wget \
     && apt-get install -y git \
-    && curl -sL https://deb.nodesource.com/setup_15.x | bash - \
-    && apt-get install -y nodejs \
-    && apt-get install -y npm \
+    && apt-get install -y wget \
+    && wget https://npm.taobao.org/mirrors/node/v14.15.1/node-v14.15.1-linux-x64.tar.gz \
+    && tar zxvf node-v14.15.1-linux-x64.tar.gz nodejs \
+    && cd nodejs \
+    && ls \
+    && ./configure \
+    && make install \
     && npm config set registry https://registry.npm.taobao.org \
     && npm install -g n \
     && n stable \
@@ -21,3 +25,4 @@ RUN apt-get update \
 FROM nginx
 COPY nginx.conf /etc/nginx/
 COPY --from=0 /usr/src/bjfu_exam/build /usr/src/bjfu_exam
+EXPOSE 80
