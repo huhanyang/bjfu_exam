@@ -13,6 +13,6 @@ public interface ProblemRepository extends CrudRepository<Problem, Long> {
     List<Problem> findByPaperAndSort(Paper paper, Integer sort);
 
     // todo 改写hql
-    @Query(value = "select * from exam.exam_polymerization_problem p where p.id=?1 for update", nativeQuery = true)
+    @Query(value = "select * from exam.exam_problem p where p.id=?1 for update", nativeQuery = true)
     Optional<Problem> findByIdForUpdate(Long id);
 }

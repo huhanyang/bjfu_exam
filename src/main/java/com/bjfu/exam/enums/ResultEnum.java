@@ -12,6 +12,7 @@ public enum ResultEnum {
     REQUIRE_STUDENT(104, "此请求只允许学生账号"),
     REQUIRE_TEACHER(105, "此请求只允许教师账号"),
     REQUIRE_ADMIN(106, "此请求只允许管理员账号"),
+    ACCOUNT_IS_BANNED(107, "账号已被封禁"),
 
     // 用户操作返回码
     LOGIN_FAILED(201, "登录失败，账号或密码错误"),
@@ -34,6 +35,7 @@ public enum ResultEnum {
     PAPER_STATE_CAN_NOT_DELETE(313, "试卷此状态不允许删除"),
     NOT_CREATOR_EXPORT_PAPER(314, "非试卷创建者不允许导出试卷"),
     EXPORT_PAPER_FAILED(315, "导出excel失败"),
+    TEACHER_NOT_EXIST(316, "此教师不存在"),
 
     // 系统错误返回码
     USER_NOT_EXIST(401, "用户不存在"),

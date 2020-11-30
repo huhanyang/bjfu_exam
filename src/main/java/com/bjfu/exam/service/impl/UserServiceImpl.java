@@ -2,6 +2,7 @@ package com.bjfu.exam.service.impl;
 
 import com.bjfu.exam.dto.user.UserDTO;
 import com.bjfu.exam.entity.user.User;
+import com.bjfu.exam.enums.UserStateEnum;
 import com.bjfu.exam.enums.UserTypeEnum;
 import com.bjfu.exam.repository.user.UserRepository;
 import com.bjfu.exam.request.user.LoginRequest;
@@ -44,6 +45,7 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         BeanUtils.copyProperties(userRegisterRequest, user);
         user.setType(UserTypeEnum.STUDENT.getType());
+        user.setState(UserStateEnum.ACTIVE.getType());
         user = userRepository.save(user);
         return EntityConvertToDTOUtil.convertUser(user);
     }

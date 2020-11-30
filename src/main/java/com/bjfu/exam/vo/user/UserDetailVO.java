@@ -1,11 +1,11 @@
-package com.bjfu.exam.dto.user;
+package com.bjfu.exam.vo.user;
 
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
-public class UserDTO {
+public class UserDetailVO {
     /**
      * 用户id
      */
@@ -19,19 +19,11 @@ public class UserDTO {
      */
     private String name;
     /**
-     * 账号类型
-     */
-    private Integer type;
-    /**
-     * 账号状态
+     * 用户状态
      */
     private Integer state;
     /**
      * 创建时间
      */
     private Date createdTime;
-    /**
-     * 最后修改时间
-     */
-    private Date lastModifiedTime;
 }

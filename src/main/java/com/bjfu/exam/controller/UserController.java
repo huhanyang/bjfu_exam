@@ -3,6 +3,7 @@ package com.bjfu.exam.controller;
 import com.bjfu.exam.dto.user.UserDTO;
 import com.bjfu.exam.enums.ResultEnum;
 import com.bjfu.exam.enums.SessionKeyEnum;
+import com.bjfu.exam.enums.UserStateEnum;
 import com.bjfu.exam.request.user.LoginRequest;
 import com.bjfu.exam.request.user.UserChangePasswordRequest;
 import com.bjfu.exam.request.user.UserRegisterRequest;
@@ -31,6 +32,9 @@ public class UserController {
                                                HttpSession session) {
         UserDTO userDTO = userService.loginCheck(loginRequest);
         if(userDTO != null) {
+            if(userDTO.getState().equals(UserStateEnum.BANNED.getType())) {
+                return new BaseResult<>(ResultEnum.ACCOUNT_IS_BANNED);
+            }
             SessionUtil.initSession(session, userDTO);
             UserVO userDetailVO = DTOConvertToVOUtil.convertUserDTO(userDTO);
             return new BaseResult<>(ResultEnum.SUCCESS, userDetailVO);
@@ -71,6 +75,10 @@ public class UserController {
     @RequireLogin
     public BaseResult<UserVO> getUserInfo(HttpSession session) {
         UserDTO userInfo = userService.getUserInfo((Long) session.getAttribute(SessionKeyEnum.ACCOUNT_ID.getKey()));
+        if(userInfo.getState().equals(UserStateEnum.BANNED.getType())) {
+            SessionUtil.deleteSession(session);
+            return new BaseResult<>(ResultEnum.ACCOUNT_IS_BANNED);
+        }
         UserVO userVO = DTOConvertToVOUtil.convertUserDTO(userInfo);
         return new BaseResult<>(ResultEnum.SUCCESS, userVO);
     }

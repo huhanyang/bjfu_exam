@@ -5,6 +5,7 @@ import com.bjfu.exam.dto.paper.*;
 import com.bjfu.exam.dto.user.UserDTO;
 import com.bjfu.exam.vo.answer.PaperAnswerVO;
 import com.bjfu.exam.vo.paper.*;
+import com.bjfu.exam.vo.user.UserDetailVO;
 import com.bjfu.exam.vo.user.UserVO;
 import org.springframework.beans.BeanUtils;
 
@@ -21,6 +22,15 @@ public class DTOConvertToVOUtil {
         UserVO userVO = new UserVO();
         BeanUtils.copyProperties(userDTO, userVO);
         return userVO;
+    }
+
+    public static UserDetailVO convertToUserDetailVO(UserDTO userDTO) {
+        if(userDTO == null) {
+            return null;
+        }
+        UserDetailVO userDetailVO = new UserDetailVO();
+        BeanUtils.copyProperties(userDTO, userDetailVO);
+        return userDetailVO;
     }
 
     public static PaperVO convertPaperDTO(PaperDTO paperDTO) {

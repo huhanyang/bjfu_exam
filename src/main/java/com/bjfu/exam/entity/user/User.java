@@ -33,7 +33,13 @@ public class User extends BaseEntity {
     /**
      * 账号类型
      */
+    @Column(nullable=false)
     private Integer type;
+    /**
+     * 账号状态
+     */
+    @Column(nullable=false)
+    private Integer state;
 
     /**
      * 创建的试卷
