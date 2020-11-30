@@ -1,5 +1,5 @@
 #构造编译环境
-FROM node as builder
+FROM node AS builder
 RUN npm config set registry https://registry.npm.taobao.org \
     && git clone https://github.com/tank59he/bjfu_exam_react.git /usr/src/bjfu_exam \
     && cd /usr/src/bjfu_exam \
