@@ -7,10 +7,10 @@ RUN apt-get update \
     && apt-get install -y nodejs \
     && apt-get install -y npm \
     && npm config set registry https://registry.npm.taobao.org \
-    && npm install -g npm \
     && npm install -g n \
     && n stable \
     && PATH="$PATH" \
+    && npm install -g npm \
     && git clone https://github.com/tank59he/bjfu_exam_react.git /usr/src/bjfu_exam \
     && cd /usr/src/bjfu_exam \
     && npm install \
