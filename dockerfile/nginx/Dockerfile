@@ -6,6 +6,7 @@ RUN apt-get update \
     && apt-get install -y git \
     && curl -sL https://deb.nodesource.com/setup_15.x | bash - \
     && apt-get install -y nodejs \
+    && apt-get install -y npm \
     && npm config set registry https://registry.npm.taobao.org \
     && npm install -g npm \
     && git clone https://github.com/tank59he/bjfu_exam_react.git /usr/src/bjfu_exam \
