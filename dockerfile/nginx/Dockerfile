@@ -9,13 +9,9 @@ RUN apt-get update \
     && wget https://npm.taobao.org/mirrors/node/v14.15.1/node-v14.15.1-linux-x64.tar.gz \
     && tar zxvf node-v14.15.1-linux-x64.tar.gz \
     && cd node-v14.15.1-linux-x64 \
-    && ls \
-    && ./configure \
-    && make install \
+    && ln -s bin/npm   /usr/bin/
+    && ln -s bin/node   /usr/bin/
     && npm config set registry https://registry.npm.taobao.org \
-    && npm install -g n \
-    && n stable \
-    && PATH="$PATH" \
     && npm install -g npm \
     && git clone https://github.com/tank59he/bjfu_exam_react.git /usr/src/bjfu_exam \
     && cd /usr/src/bjfu_exam \
