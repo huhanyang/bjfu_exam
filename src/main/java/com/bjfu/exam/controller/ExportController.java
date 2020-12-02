@@ -5,6 +5,7 @@ import com.bjfu.exam.enums.ResultEnum;
 import com.bjfu.exam.security.annotation.RequireTeacher;
 import com.bjfu.exam.service.ExportService;
 import com.bjfu.exam.vo.BaseResult;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequestMapping("/export")
+@Slf4j
 public class ExportController {
 
     @Autowired
@@ -36,6 +38,7 @@ public class ExportController {
             exportService.exportPaperAnswersToExcel(paperId, (Long) session.getAttribute("userId"),
                     response.getOutputStream());
         } catch (Exception e) {
+            log.error("export excel failed!", e);
             // 重置response
             response.reset();
             response.setContentType("application/json");

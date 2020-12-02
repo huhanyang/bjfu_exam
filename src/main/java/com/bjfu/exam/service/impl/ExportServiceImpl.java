@@ -81,8 +81,10 @@ public class ExportServiceImpl implements ExportService {
             List<ProblemAnswer> problemAnswers = paperAnswer.getProblemAnswers();
             problemAnswers.forEach(problemAnswer -> {
                 row.add(problemAnswer.getAnswer());
-                row.add(DateUtil.calLastedTime(problemAnswer.getStartTime(), problemAnswer.getFirstEditTime()).toString());
-                row.add(problemAnswer.getEditTime().toString());
+                if(problemAnswer.getProblem().getType().equals(ProblemTypeEnum.MATERIAL_PROBLEM.getType())) {
+                    row.add(DateUtil.calLastedTime(problemAnswer.getStartTime(), problemAnswer.getFirstEditTime()).toString());
+                    row.add(problemAnswer.getEditTime().toString());
+                }
                 row.add(DateUtil.calLastedTime(problemAnswer.getStartTime(), problemAnswer.getSubmitTime()).toString());
                 row.add(problemAnswer.getStartTime().toString());
                 row.add(problemAnswer.getSubmitTime().toString());
@@ -105,10 +107,10 @@ public class ExportServiceImpl implements ExportService {
             if(bigProblem.getType().equals(ProblemTypeEnum.FATHER_PROBLEM.getType())) {
                 List<Problem> subProblems = bigProblem.getSubProblems();
                 subProblems.forEach(subProblem -> {
-                    list.addAll(getProblemHeadList(problemName+"-第"+subProblem.getSort()+"小题\n"));
+                    list.addAll(getProblemHeadList(problemName+"-第"+subProblem.getSort()+"小题\n", subProblem.getType()));
                 });
             } else {
-                list.addAll(getProblemHeadList(problemName + "\n"));
+                list.addAll(getProblemHeadList(problemName + "\n", bigProblem.getType()));
             }
         }
         return list;
@@ -117,11 +119,13 @@ public class ExportServiceImpl implements ExportService {
     /**
      * 获取一道题的表头
      */
-    private List<List<String>> getProblemHeadList(String problemName) {
+    private List<List<String>> getProblemHeadList(String problemName, int problemType) {
         List<List<String>> list = new ArrayList<>();
         list.add(Collections.singletonList(problemName + "答案"));
-        list.add(Collections.singletonList(problemName + "思考时间(秒)"));
-        list.add(Collections.singletonList(problemName + "编辑时间(秒)"));
+        if(problemType == ProblemTypeEnum.MATERIAL_PROBLEM.getType()) {
+            list.add(Collections.singletonList(problemName + "思考时间(秒)"));
+            list.add(Collections.singletonList(problemName + "编辑时间(秒)"));
+        }
         list.add(Collections.singletonList(problemName + "总用时(秒)"));
         list.add(Collections.singletonList(problemName + "开始时间"));
         list.add(Collections.singletonList(problemName + "提交时间"));
