@@ -15,5 +15,7 @@ RUN git clone https://github.com/tank59he/bjfu_exam.git /usr/src/bjfu_exam/ \
 #生成运行环境
 FROM adoptopenjdk:11-jre-hotspot
 COPY --from=0 /usr/src/bjfu_exam.jar /usr/src/bjfu_exam.jar
+RUN rm -f /etc/localtime \
+    && ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 EXPOSE 8080
 CMD ["java", "-jar", "/usr/src/bjfu_exam.jar"]
