@@ -1,7 +1,7 @@
 package com.bjfu.exam.repository;
 
 import com.bjfu.exam.enums.ResultEnum;
-import com.bjfu.exam.exception.OSSException;
+import com.bjfu.exam.exception.OSSExceptionExam;
 import io.minio.MinioClient;
 import io.minio.Result;
 import io.minio.messages.DeleteError;
@@ -28,7 +28,7 @@ public class ImgFileRepository {
             minioClient.putObject(imgBucket, fileName, inputStream, "application/octet-stream");
         } catch(Exception e) {
             log.error("oss upload file failed!" + e.getMessage());
-            throw new OSSException(ResultEnum.OSS_UPLOAD_FILE_FAILED);
+            throw new OSSExceptionExam(ResultEnum.OSS_UPLOAD_FILE_FAILED);
         }
     }
 
@@ -36,7 +36,7 @@ public class ImgFileRepository {
         try {
             minioClient.removeObject(imgBucket, fileName);
         } catch (Exception e) {
-            log.error("oss delete file failed!");
+            log.error("oss delete file failed! filename = {}", fileName);
         }
     }
 

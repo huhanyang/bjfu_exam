@@ -62,7 +62,7 @@ public class PaperServiceImpl implements PaperService {
         }
         Paper paper = paperOptional.get();
         if(!paper.getCreator().getId().equals(userId)) {
-            throw new UnauthorizedOperationException(userId, ResultEnum.NOT_PAPER_CREATOR);
+            throw new UnauthorizedOperationExceptionExam(userId, ResultEnum.NOT_PAPER_CREATOR);
         }
         return EntityConvertToDTOUtil.convertPaperToWithProblems(paperOptional.get());
     }
@@ -71,7 +71,7 @@ public class PaperServiceImpl implements PaperService {
     public List<PaperDTO> getAllPaperByCreatorId(Long creatorId) {
         Optional<User> userOptional = userRepository.findById(creatorId);
         if(userOptional.isEmpty()) {
-            throw new UserNotExistException(creatorId, ResultEnum.USER_NOT_EXIST);
+            throw new UserNotExistExceptionExam(creatorId, ResultEnum.USER_NOT_EXIST);
         }
         List<Paper> papers = paperRepository.findAllByCreator(userOptional.get());
         return papers.stream()
@@ -84,11 +84,11 @@ public class PaperServiceImpl implements PaperService {
     public PaperDetailDTO createPaper(PaperCreateRequest paperCreateRequest, Long creatorId) {
         Optional<User> userOptional = userRepository.findById(creatorId);
         if(userOptional.isEmpty()) {
-            throw new UserNotExistException(creatorId, ResultEnum.USER_NOT_EXIST);
+            throw new UserNotExistExceptionExam(creatorId, ResultEnum.USER_NOT_EXIST);
         }
         User creator = userOptional.get();
         if(!creator.getType().equals(UserTypeEnum.TEACHER.getType())) {
-            throw new UnauthorizedOperationException(creatorId, ResultEnum.NOT_TEACHER_CREATE_PAPER);
+            throw new UnauthorizedOperationExceptionExam(creatorId, ResultEnum.NOT_TEACHER_CREATE_PAPER);
         }
         Paper paper = new Paper();
         BeanUtils.copyProperties(paperCreateRequest, paper);
@@ -110,14 +110,14 @@ public class PaperServiceImpl implements PaperService {
         Optional<Paper> paperOptional = paperRepository.findByIdForUpdate(problemAddRequest.getPaperId());
         if(paperOptional.isEmpty() ||
                 paperOptional.get().getState().equals(PaperStateEnum.SOFT_DELETE.getState())) {
-            throw new BadParamException(ResultEnum.PAPER_NOT_EXIST);
+            throw new BadParamExceptionExam(ResultEnum.PAPER_NOT_EXIST);
         }
         Paper paper = paperOptional.get();
         if(!paper.getCreator().getId().equals(userId)) {
-            throw new UnauthorizedOperationException(userId, ResultEnum.NOT_PAPER_CREATOR);
+            throw new UnauthorizedOperationExceptionExam(userId, ResultEnum.NOT_PAPER_CREATOR);
         }
         if(!paper.getState().equals(PaperStateEnum.CREATING.getState())) {
-            throw new NotAllowOperationException(ResultEnum.PAPER_STATE_IS_NOT_CREATING);
+            throw new NotAllowOperationExceptionExam(ResultEnum.PAPER_STATE_IS_NOT_CREATING);
         }
         List<Problem> bigProblems = paper.getProblems().stream()
                 .filter(problem -> problem.getFatherProblem() == null)
@@ -135,11 +135,11 @@ public class PaperServiceImpl implements PaperService {
             // 为试卷中的组合题目添加小题
             Optional<Problem> fatherProblemOptional = problemRepository.findById(fatherProblemId);
             if(fatherProblemOptional.isEmpty()) {
-                throw new BadParamException(ResultEnum.PROBLEM_NOT_EXIST);
+                throw new BadParamExceptionExam(ResultEnum.PROBLEM_NOT_EXIST);
             }
             Problem fatherProblem = fatherProblemOptional.get();
             if(!fatherProblem.getType().equals(ProblemTypeEnum.FATHER_PROBLEM.getType())) {
-                throw new BadParamException(ResultEnum.PARAM_WRONG);
+                throw new BadParamExceptionExam(ResultEnum.PARAM_WRONG);
             }
             List<Problem> subProblems = fatherProblem.getSubProblems();
             if(!subProblems.isEmpty()) {
@@ -147,7 +147,7 @@ public class PaperServiceImpl implements PaperService {
             }
             problem.setFatherProblem(fatherProblem);
         } else {
-            throw new BadParamException(ResultEnum.PARAM_WRONG);
+            throw new BadParamExceptionExam(ResultEnum.PARAM_WRONG);
         }
         problem.setPaper(paper);
         problem.setSort(sort);
@@ -164,14 +164,14 @@ public class PaperServiceImpl implements PaperService {
         Optional<Problem> problemOptional = problemRepository.findByIdForUpdate(imageInProblemAddRequest.getProblemId());
         if(problemOptional.isEmpty() ||
                 problemOptional.get().getPaper().getState().equals(PaperStateEnum.SOFT_DELETE.getState())) {
-            throw new BadParamException(ResultEnum.PROBLEM_NOT_EXIST);
+            throw new BadParamExceptionExam(ResultEnum.PROBLEM_NOT_EXIST);
         }
         Problem problem = problemOptional.get();
         if(!problem.getPaper().getCreator().getId().equals(userId)) {
-            throw new UnauthorizedOperationException(userId, ResultEnum.NOT_PAPER_CREATOR);
+            throw new UnauthorizedOperationExceptionExam(userId, ResultEnum.NOT_PAPER_CREATOR);
         }
         if(!problem.getPaper().getState().equals(PaperStateEnum.CREATING.getState())) {
-            throw new NotAllowOperationException(ResultEnum.PAPER_STATE_IS_NOT_CREATING);
+            throw new NotAllowOperationExceptionExam(ResultEnum.PAPER_STATE_IS_NOT_CREATING);
         }
         String imgName = UUID.randomUUID().toString();
         String images = problem.getImages();
@@ -193,14 +193,14 @@ public class PaperServiceImpl implements PaperService {
         Optional<Problem> problemOptional = problemRepository.findByIdForUpdate(imageInProblemDeleteRequest.getProblemId());
         if(problemOptional.isEmpty() ||
                 problemOptional.get().getPaper().getState().equals(PaperStateEnum.SOFT_DELETE.getState())) {
-            throw new BadParamException(ResultEnum.PROBLEM_NOT_EXIST);
+            throw new BadParamExceptionExam(ResultEnum.PROBLEM_NOT_EXIST);
         }
         Problem problem = problemOptional.get();
         if(!problem.getPaper().getCreator().getId().equals(userId)) {
-            throw new UnauthorizedOperationException(userId, ResultEnum.NOT_PAPER_CREATOR);
+            throw new UnauthorizedOperationExceptionExam(userId, ResultEnum.NOT_PAPER_CREATOR);
         }
         if(!problem.getPaper().getState().equals(PaperStateEnum.CREATING.getState())) {
-            throw new NotAllowOperationException(ResultEnum.PAPER_STATE_IS_NOT_CREATING);
+            throw new NotAllowOperationExceptionExam(ResultEnum.PAPER_STATE_IS_NOT_CREATING);
         }
         String images = problem.getImages();
         if(StringUtils.isEmpty(images)) {
@@ -209,7 +209,7 @@ public class PaperServiceImpl implements PaperService {
         JSONArray jsonArray = JSONArray.parseArray(images);
         int removeIndex = imageInProblemDeleteRequest.getIndex();
         if(removeIndex < 0 || removeIndex >= jsonArray.size()) {
-            throw new BadParamException(ResultEnum.PARAM_WRONG);
+            throw new BadParamExceptionExam(ResultEnum.PARAM_WRONG);
         }
         String removedImage = (String) jsonArray.remove(removeIndex);
         problem.setImages(jsonArray.toJSONString());
@@ -225,23 +225,23 @@ public class PaperServiceImpl implements PaperService {
         Optional<Paper> paperOptional = paperRepository.findByIdForUpdate(problemDeleteRequest.getPaperId());
         if(paperOptional.isEmpty() ||
                 paperOptional.get().getState().equals(PaperStateEnum.SOFT_DELETE.getState())) {
-            throw new BadParamException(ResultEnum.PAPER_NOT_EXIST);
+            throw new BadParamExceptionExam(ResultEnum.PAPER_NOT_EXIST);
         }
         Paper paper = paperOptional.get();
         if(!paper.getCreator().getId().equals(userId)) {
-            throw new UnauthorizedOperationException(userId, ResultEnum.NOT_PAPER_CREATOR);
+            throw new UnauthorizedOperationExceptionExam(userId, ResultEnum.NOT_PAPER_CREATOR);
         }
         if(!paper.getState().equals(PaperStateEnum.CREATING.getState())) {
-            throw new NotAllowOperationException(ResultEnum.PAPER_STATE_IS_NOT_CREATING);
+            throw new NotAllowOperationExceptionExam(ResultEnum.PAPER_STATE_IS_NOT_CREATING);
         }
         Optional<Problem> problemOptional = problemRepository.findById(problemDeleteRequest.getProblemId());
         if(problemOptional.isEmpty()) {
-            throw new BadParamException(ResultEnum.PROBLEM_NOT_EXIST);
+            throw new BadParamExceptionExam(ResultEnum.PROBLEM_NOT_EXIST);
         }
         Problem problem = problemOptional.get();
         if(problem.getPaper() == null || !problem.getPaper().getId().equals(paper.getId())) {
             //问题和试卷不相等
-            throw new BadParamException(ResultEnum.PARAM_WRONG);
+            throw new BadParamExceptionExam(ResultEnum.PARAM_WRONG);
         }
         List<String> deleteImages = new ArrayList<>();
         Problem fatherProblem = problem.getFatherProblem();
@@ -294,16 +294,16 @@ public class PaperServiceImpl implements PaperService {
         Optional<Paper> paperOptional = paperRepository.findByIdForUpdate(paperId);
         if(paperOptional.isEmpty() ||
                 paperOptional.get().getState().equals(PaperStateEnum.SOFT_DELETE.getState())) {
-            throw new BadParamException(ResultEnum.PAPER_NOT_EXIST);
+            throw new BadParamExceptionExam(ResultEnum.PAPER_NOT_EXIST);
         }
         Paper paper = paperOptional.get();
         if(!paper.getCreator().getId().equals(userId)) {
-            throw new UnauthorizedOperationException(userId, ResultEnum.NOT_PAPER_CREATOR);
+            throw new UnauthorizedOperationExceptionExam(userId, ResultEnum.NOT_PAPER_CREATOR);
         }
         Integer state = paper.getState();
         if(!state.equals(PaperStateEnum.CREATING.getState()) &&
                 !state.equals(PaperStateEnum.END_ANSWER.getState())) {
-            throw new NotAllowOperationException(ResultEnum.PAPER_STATE_CAN_NOT_DELETE);
+            throw new NotAllowOperationExceptionExam(ResultEnum.PAPER_STATE_CAN_NOT_DELETE);
         }
         paper.setCode(null);
         paper.setState(PaperStateEnum.SOFT_DELETE.getState());
@@ -324,14 +324,14 @@ public class PaperServiceImpl implements PaperService {
         Optional<Paper> paperOptional = paperRepository.findByIdForUpdate(paperStateChangeRequest.getPaperId());
         if(paperOptional.isEmpty() ||
                 paperOptional.get().getState().equals(PaperStateEnum.SOFT_DELETE.getState())) {
-            throw new BadParamException(ResultEnum.PAPER_NOT_EXIST);
+            throw new BadParamExceptionExam(ResultEnum.PAPER_NOT_EXIST);
         }
         Paper paper = paperOptional.get();
         if(!paper.getCreator().getId().equals(userId)) {
-            throw new UnauthorizedOperationException(userId, ResultEnum.NOT_PAPER_CREATOR);
+            throw new UnauthorizedOperationExceptionExam(userId, ResultEnum.NOT_PAPER_CREATOR);
         }
         if(!stateChange.contains(paper.getState()+"-"+paperStateChangeRequest.getState())) {
-            throw new NotAllowOperationException(ResultEnum.PAPER_STATE_CHANGE_NOT_ALLOW);
+            throw new NotAllowOperationExceptionExam(ResultEnum.PAPER_STATE_CHANGE_NOT_ALLOW);
         }
         paper.setState(paperStateChangeRequest.getState());
         paper = paperRepository.save(paper);

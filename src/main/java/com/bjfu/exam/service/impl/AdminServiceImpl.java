@@ -5,7 +5,7 @@ import com.bjfu.exam.entity.user.User;
 import com.bjfu.exam.enums.ResultEnum;
 import com.bjfu.exam.enums.UserStateEnum;
 import com.bjfu.exam.enums.UserTypeEnum;
-import com.bjfu.exam.exception.BadParamException;
+import com.bjfu.exam.exception.BadParamExceptionExam;
 import com.bjfu.exam.repository.user.UserRepository;
 import com.bjfu.exam.request.admin.AdminCreateTeacherAccountRequest;
 import com.bjfu.exam.service.AdminService;
@@ -51,7 +51,7 @@ public class AdminServiceImpl implements AdminService {
     public void banTeacherAccount(Long teacherAccountId) {
         Optional<User> userOptional = userRepository.findByIdForUpdate(teacherAccountId);
         if(userOptional.isEmpty() || !userOptional.get().getType().equals(UserTypeEnum.TEACHER.getType())) {
-            throw new BadParamException(ResultEnum.TEACHER_NOT_EXIST);
+            throw new BadParamExceptionExam(ResultEnum.TEACHER_NOT_EXIST);
         }
         User teacher = userOptional.get();
         teacher.setState(UserStateEnum.BANNED.getType());
@@ -62,7 +62,7 @@ public class AdminServiceImpl implements AdminService {
     public void activeTeacherAccount(Long teacherAccountId) {
         Optional<User> userOptional = userRepository.findByIdForUpdate(teacherAccountId);
         if(userOptional.isEmpty() || !userOptional.get().getType().equals(UserTypeEnum.TEACHER.getType())) {
-            throw new BadParamException(ResultEnum.TEACHER_NOT_EXIST);
+            throw new BadParamExceptionExam(ResultEnum.TEACHER_NOT_EXIST);
         }
         User teacher = userOptional.get();
         teacher.setState(UserStateEnum.ACTIVE.getType());

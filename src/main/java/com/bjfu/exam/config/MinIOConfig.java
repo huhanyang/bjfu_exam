@@ -1,7 +1,7 @@
 package com.bjfu.exam.config;
 
 import com.bjfu.exam.enums.ResultEnum;
-import com.bjfu.exam.exception.OSSException;
+import com.bjfu.exam.exception.OSSExceptionExam;
 import io.minio.MinioClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,7 +34,7 @@ public class MinIOConfig {
             }
         } catch (Exception e) {
             log.error("oss client init failed!" + e.getMessage());
-            throw new OSSException(ResultEnum.OSS_CLIENT_INIT_FAILED);
+            throw new OSSExceptionExam(ResultEnum.OSS_CLIENT_INIT_FAILED);
         }
         return minioClient;
     }

@@ -4,11 +4,11 @@ import com.bjfu.exam.enums.ResultEnum;
 import lombok.Getter;
 
 @Getter
-public class UnauthorizedOperationException extends BaseException{
+public class UserNotExistExceptionExam extends ExamBaseException {
 
     private final Long userId;
 
-    public UnauthorizedOperationException(Long userId, ResultEnum resultEnum) {
+    public UserNotExistExceptionExam(Long userId, ResultEnum resultEnum) {
         super(resultEnum);
         this.userId = userId;
     }

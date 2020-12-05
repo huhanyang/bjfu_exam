@@ -10,9 +10,9 @@ import com.bjfu.exam.enums.PaperAnswerStateEnum;
 import com.bjfu.exam.enums.PaperStateEnum;
 import com.bjfu.exam.enums.ProblemTypeEnum;
 import com.bjfu.exam.enums.ResultEnum;
-import com.bjfu.exam.exception.BadParamException;
-import com.bjfu.exam.exception.NotAllowOperationException;
-import com.bjfu.exam.exception.UnauthorizedOperationException;
+import com.bjfu.exam.exception.BadParamExceptionExam;
+import com.bjfu.exam.exception.NotAllowOperationExceptionExam;
+import com.bjfu.exam.exception.UnauthorizedOperationExceptionExam;
 import com.bjfu.exam.repository.paper.PaperRepository;
 import com.bjfu.exam.service.ExportService;
 import com.bjfu.exam.util.DateUtil;
@@ -36,14 +36,14 @@ public class ExportServiceImpl implements ExportService {
     public void exportPaperAnswersToExcel(Long paperId, Long userId, OutputStream outputStream) {
         Optional<Paper> paperOptional = paperRepository.findById(paperId);
         if(paperOptional.isEmpty()) {
-            throw new BadParamException(ResultEnum.PAPER_NOT_EXIST);
+            throw new BadParamExceptionExam(ResultEnum.PAPER_NOT_EXIST);
         }
         Paper paper = paperOptional.get();
         if(!paper.getCreator().getId().equals(userId)) {
-            throw new UnauthorizedOperationException(userId, ResultEnum.NOT_CREATOR_EXPORT_PAPER);
+            throw new UnauthorizedOperationExceptionExam(userId, ResultEnum.NOT_CREATOR_EXPORT_PAPER);
         }
         if(!paper.getState().equals(PaperStateEnum.END_ANSWER.getState())) {
-            throw new NotAllowOperationException(ResultEnum.PAPER_STATE_IS_NOT_END_ANSWER);
+            throw new NotAllowOperationExceptionExam(ResultEnum.PAPER_STATE_IS_NOT_END_ANSWER);
         }
         // 1.创建表头
         List<List<String>> head = new LinkedList<>();

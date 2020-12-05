@@ -1,0 +1,6 @@
+2020-12-05 20:34:08.965 INFO  --- [           main] com.bjfu.exam.ExamApplication            : Starting ExamApplication on MateBook13 with PID 5044 (C:\Users\warthog\Desktop\bjfu_exam\target\classes started by warthog in C:\Users\warthog\Desktop\bjfu_exam)
+2020-12-05 20:34:08.967 INFO  --- [           main] com.bjfu.exam.ExamApplication            : No active profile set, falling back to default profiles: default
+2020-12-05 20:34:12.762 INFO  --- [           main] com.bjfu.exam.ExamApplication            : Started ExamApplication in 4.473 seconds (JVM running for 5.502)
+2020-12-05 20:36:18.468 INFO  --- [           main] com.bjfu.exam.ExamApplication            : Starting ExamApplication on MateBook13 with PID 25708 (C:\Users\warthog\Desktop\bjfu_exam\target\classes started by warthog in C:\Users\warthog\Desktop\bjfu_exam)
+2020-12-05 20:36:18.478 INFO  --- [           main] com.bjfu.exam.ExamApplication            : No active profile set, falling back to default profiles: default
+2020-12-05 20:36:22.526 INFO  --- [           main] com.bjfu.exam.ExamApplication            : Started ExamApplication in 4.612 seconds (JVM running for 5.795)

@@ -13,6 +13,7 @@ public enum ResultEnum {
     REQUIRE_TEACHER(105, "此请求只允许教师账号"),
     REQUIRE_ADMIN(106, "此请求只允许管理员账号"),
     ACCOUNT_IS_BANNED(107, "账号已被封禁"),
+    FREQUENT_VISITS(108, "访问过于频繁"),
 
     // 用户操作返回码
     LOGIN_FAILED(201, "登录失败，账号或密码错误"),
@@ -40,7 +41,8 @@ public enum ResultEnum {
     // 系统错误返回码
     USER_NOT_EXIST(401, "用户不存在"),
     OSS_CLIENT_INIT_FAILED(402, "oss客户端初始化失败"),
-    OSS_UPLOAD_FILE_FAILED(403, "上传文件出错");
+    OSS_UPLOAD_FILE_FAILED(403, "上传文件出错"),
+    UNKNOWN_EXCEPTION(404, "发生未知错误");
 
     private final int code;
     private final String msg;

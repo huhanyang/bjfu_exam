@@ -45,7 +45,7 @@ public class AnswerServiceImpl implements AnswerService {
     public List<PaperAnswerDTO> getPaperAnswers(Long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
         if(userOptional.isEmpty()) {
-            throw new UserNotExistException(userId, ResultEnum.USER_NOT_EXIST);
+            throw new UserNotExistExceptionExam(userId, ResultEnum.USER_NOT_EXIST);
         }
         User user = userOptional.get();
         List<PaperAnswer> paperAnswers = paperAnswerRepository.findAllByUser(user);
@@ -60,22 +60,22 @@ public class AnswerServiceImpl implements AnswerService {
         // 针对此用户加锁
         Optional<User> userOptional = userRepository.findByIdForUpdate(userId);
         if(userOptional.isEmpty()) {
-            throw new UserNotExistException(userId, ResultEnum.USER_NOT_EXIST);
+            throw new UserNotExistExceptionExam(userId, ResultEnum.USER_NOT_EXIST);
         }
         Optional<Paper> paperOptional = paperRepository.findById(paperAnswerCreateRequest.getPaperId());
         if(paperOptional.isEmpty()) {
-            throw new BadParamException(ResultEnum.PAPER_NOT_EXIST);
+            throw new BadParamExceptionExam(ResultEnum.PAPER_NOT_EXIST);
         }
         Paper paper = paperOptional.get();
         User user = userOptional.get();
         // 判断此试卷当前是否可以作答
         if(!paper.getState().equals(PaperStateEnum.ANSWERING.getState()) &&
                 !paper.getState().equals(PaperStateEnum.READY_TO_ANSWERING.getState())) {
-            throw new NotAllowOperationException(ResultEnum.PAPER_STATE_NOT_ANSWERING);
+            throw new NotAllowOperationExceptionExam(ResultEnum.PAPER_STATE_NOT_ANSWERING);
         }
         // 判断是否已经作答过此试卷
         if(paperAnswerRepository.findByUserAndPaper(user, paper).isPresent()) {
-            throw new NotAllowOperationException(ResultEnum.ANSWER_TWICE);
+            throw new NotAllowOperationExceptionExam(ResultEnum.ANSWER_TWICE);
         }
         // 更新试卷状态为作答中
         if(paper.getState().equals(PaperStateEnum.READY_TO_ANSWERING.getState())) {
@@ -104,17 +104,17 @@ public class AnswerServiceImpl implements AnswerService {
     public ProblemDTO getNextProblem(Long userId, Long paperAnswerId) {
         Optional<PaperAnswer> paperAnswerOptional = paperAnswerRepository.findById(paperAnswerId);
         if(paperAnswerOptional.isEmpty()) {
-            throw new BadParamException(ResultEnum.PAPER_ANSWER_NOT_EXIST);
+            throw new BadParamExceptionExam(ResultEnum.PAPER_ANSWER_NOT_EXIST);
         }
         PaperAnswer paperAnswer = paperAnswerOptional.get();
         Paper paper = paperAnswer.getPaper();
         if(!paper.getState().equals(PaperStateEnum.ANSWERING.getState()) &&
                 !paper.getState().equals(PaperStateEnum.READY_TO_ANSWERING.getState())) {
-            throw new NotAllowOperationException(ResultEnum.PAPER_STATE_NOT_ANSWERING);
+            throw new NotAllowOperationExceptionExam(ResultEnum.PAPER_STATE_NOT_ANSWERING);
         }
         // 判断是否为自己的答卷
         if(!paperAnswer.getUser().getId().equals(userId)) {
-            throw new UnauthorizedOperationException(userId, ResultEnum.ANSWER_OTHERS_PAPER);
+            throw new UnauthorizedOperationExceptionExam(userId, ResultEnum.ANSWER_OTHERS_PAPER);
         }
         return EntityConvertToDTOUtil.convertProblem(paperAnswer.getNextProblem());
     }
@@ -126,17 +126,17 @@ public class AnswerServiceImpl implements AnswerService {
         Optional<PaperAnswer> paperAnswerOptional =
                 paperAnswerRepository.findByIdForUpdate(problemAnswerSubmitRequest.getPaperAnswerId());
         if(paperAnswerOptional.isEmpty()) {
-            throw new BadParamException(ResultEnum.PAPER_ANSWER_NOT_EXIST);
+            throw new BadParamExceptionExam(ResultEnum.PAPER_ANSWER_NOT_EXIST);
         }
         PaperAnswer paperAnswer = paperAnswerOptional.get();
         // 判断是否为自己的答卷
         if(!paperAnswer.getUser().getId().equals(userId)) {
-            throw new UnauthorizedOperationException(userId, ResultEnum.ANSWER_OTHERS_PAPER);
+            throw new UnauthorizedOperationExceptionExam(userId, ResultEnum.ANSWER_OTHERS_PAPER);
         }
         // 判断此试卷当前是否可以作答
         if(!paperAnswer.getPaper().getState().equals(PaperStateEnum.ANSWERING.getState()) &&
                 !paperAnswer.getPaper().getState().equals(PaperStateEnum.READY_TO_ANSWERING.getState())) {
-            throw new NotAllowOperationException(ResultEnum.PAPER_STATE_NOT_ANSWERING);
+            throw new NotAllowOperationExceptionExam(ResultEnum.PAPER_STATE_NOT_ANSWERING);
         }
         // 保存作答题目
         ProblemAnswer problemAnswer = new ProblemAnswer();
