@@ -3,6 +3,7 @@ package com.bjfu.exam.config;
 import com.bjfu.exam.enums.ResultEnum;
 import com.bjfu.exam.exception.OSSExceptionExam;
 import io.minio.MinioClient;
+import io.minio.policy.PolicyType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +32,7 @@ public class MinIOConfig {
             boolean isExist = minioClient.bucketExists(imgBucket);
             if(!isExist) {
                 minioClient.makeBucket(imgBucket);
+                minioClient.setBucketPolicy(imgBucket, "*", PolicyType.READ_ONLY);
             }
         } catch (Exception e) {
             log.error("oss client init failed!" + e.getMessage());
