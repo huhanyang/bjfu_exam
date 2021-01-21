@@ -104,6 +104,32 @@ public class PaperServiceImpl implements PaperService {
     }
 
     @Override
+    public PaperDetailDTO editPaper(PaperEditRequest paperEditRequest, Long creatorId) {
+        //查找试卷是否存在
+        Optional<Paper> paperOptional = paperRepository.findByIdForUpdate(paperEditRequest.getPaperId());
+        if(paperOptional.isEmpty() ||
+                paperOptional.get().getState().equals(PaperStateEnum.SOFT_DELETE.getState())) {
+            throw new BadParamExceptionExam(ResultEnum.PAPER_NOT_EXIST);
+        }
+        //查找账号是否存在
+        Paper paper = paperOptional.get();
+        Optional<User> userOptional = userRepository.findById(creatorId);
+        if(userOptional.isEmpty()) {
+            throw new UserNotExistExceptionExam(creatorId, ResultEnum.USER_NOT_EXIST);
+        }
+        //判断是否为试卷创建者
+        User creator = userOptional.get();
+        if(!paper.getCreator().getId().equals(creator.getId())) {
+            throw new UnauthorizedOperationExceptionExam(creatorId, ResultEnum.NOT_PAPER_CREATOR);
+        }
+        //修改并保存
+        paper.setTitle(paperEditRequest.getTitle());
+        paper.setIntroduction(paperEditRequest.getIntroduction());
+        paper = paperRepository.save(paper);
+        return EntityConvertToDTOUtil.convertPaperToDetail(paper);
+    }
+
+    @Override
     @Transactional
     public ProblemDTO addProblem(Long userId, ProblemAddRequest problemAddRequest) {
         // 为此试卷加锁
@@ -155,6 +181,36 @@ public class PaperServiceImpl implements PaperService {
         BeanUtils.copyProperties(problemAddRequest, problem);
         problem = problemRepository.save(problem);
         return EntityConvertToDTOUtil.convertProblem(problem);
+    }
+
+    @Override
+    public PaperDetailDTO editProblem(ProblemEditRequest problemEditRequest, Long creatorId) {
+        //查找试题是否存在
+        Optional<Problem> problemOptional = problemRepository.findByIdForUpdate(problemEditRequest.getProblemId());
+        if(problemOptional.isEmpty() ||
+                problemOptional.get().getPaper().getState().equals(PaperStateEnum.SOFT_DELETE.getState())) {
+            throw new BadParamExceptionExam(ResultEnum.PROBLEM_NOT_EXIST);
+        }
+        //查找账号是否存在
+        Problem problem = problemOptional.get();
+        Paper paper = problem.getPaper();
+        Optional<User> userOptional = userRepository.findById(creatorId);
+        if(userOptional.isEmpty()) {
+            throw new UserNotExistExceptionExam(creatorId, ResultEnum.USER_NOT_EXIST);
+        }
+        //判断是否为试卷创建者
+        User creator = userOptional.get();
+        if(!paper.getCreator().getId().equals(creator.getId())) {
+            throw new UnauthorizedOperationExceptionExam(creatorId, ResultEnum.NOT_PAPER_CREATOR);
+        }
+        //修改并保存
+        problem.setTitle(problemEditRequest.getTitle());
+        problem.setMaterial(problemEditRequest.getMaterial());
+        if(problem.getType().equals(ProblemTypeEnum.CHOICE_PROBLEM.getType())) {
+            problem.setAnswer(problemEditRequest.getAnswer());
+        }
+        problemRepository.save(problem);
+        return EntityConvertToDTOUtil.convertPaperToDetail(paper);
     }
 
     @Override

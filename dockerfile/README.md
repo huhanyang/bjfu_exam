@@ -1,21 +1,45 @@
-# Docker部署与上传
+# Docker构建与部署
 
 [TOC]
 
-## Docker镜像上传
+## 镜像
 
-### 新镜像构建
+### bjfu_exam_develop
 
-#### 构建命令
+开发环境，占用80端口，将node前端3000端口转发到/，java后端8080端口转发到/exam/，minio服务器9000端口转发到/exam-img/
 
-docker build -t bjfu_exam:latest .
+### bjfu_exam_frontend
 
-### 新镜像上传
+线上环境前端服务器，占用80端口，负责前端静态资源，反向代理后端8080端口、minio服务器9000端口。
 
-docker tag 镜像名称 huhanyang.tencentcloudcr.com/project/bjfu_exam:[tag]
+### bjfu_exam_backend
 
-docker push huhanyang.tencentcloudcr.com/project/bjfu_exam:[tag]
+线上环境后端服务器，占用8080端口。
 
-## 使用Docker镜像部署
+## 新镜像构建
 
-docker run -itd --name bjfu_exam -p 80:80 bjfu_exam
+#### 开发环境
+
+docker build -t bjfu_exam_develop:latest .
+
+#### 线上环境-前端
+
+docker build -t bjfu_exam_frontend:latest .
+
+#### 线上环境-后端
+
+docker build -t bjfu_exam_backend:latest .
+
+## 镜像部署
+
+#### 开发环境
+
+docker run -itd --name bjfu_exam_develop -p 80:80 bjfu_exam_develop
+
+#### 线上环境-前端服务器
+
+docker run -p 80:80 -d --name bjfu_exam_frontend --network host bjfu_exam_frontend 
+
+#### 线上环境-后端服务器
+
+docker run -p 8080:8080 -d --name bjfu_exam_backend --network host bjfu_exam_backend 

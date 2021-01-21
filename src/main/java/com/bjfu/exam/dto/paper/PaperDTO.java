@@ -26,6 +26,10 @@ public class PaperDTO {
      */
     private String title;
     /**
+     * 试卷简介
+     */
+    private String introduction;
+    /**
      * 最长答题时间(分钟)
      */
     private Integer time;

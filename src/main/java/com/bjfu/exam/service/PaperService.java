@@ -30,9 +30,23 @@ public interface PaperService {
      */
     PaperDetailDTO createPaper(PaperCreateRequest paperCreateRequest, Long creatorId);
     /**
+     * 编辑试卷标题与介绍
+     * @param paperEditRequest 请求
+     * @param creatorId 创建者id
+     * @return 修改后的试卷
+     */
+    PaperDetailDTO editPaper(PaperEditRequest paperEditRequest, Long creatorId);
+    /**
      * 添加题目
      */
     ProblemDTO addProblem(Long userId, ProblemAddRequest problemAddRequest);
+    /**
+     * 编辑题目信息
+     * @param problemEditRequest 请求
+     * @param creatorId 创建者id
+     * @return 修改后的试卷
+     */
+    PaperDetailDTO editProblem(ProblemEditRequest problemEditRequest, Long creatorId);
     /**
      * 为题目添加图片
      */

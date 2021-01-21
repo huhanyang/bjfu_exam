@@ -90,13 +90,13 @@ docker run -d -p 5000:5000 --restart always --name registry registry:2
 启动前端服务器
 
 ```shell
-docker run -p 80:80 -d --name bjfu_exam_nginx --network host exam:nginx
+docker run -p 80:80 -d --name bjfu_exam_frontend --network host bjfu_exam_frontend:latest
 ```
 
 启动后端服务器
 
 ```shell
-docker run -p 8080:8080 -d --name bjfu_exam_java --network host exam:java
+docker run -p 8080:8080 -d --name bjfu_exam_backend --network host bjfu_exam_backend:latest
 ```
 
 启动数据库mysql服务器

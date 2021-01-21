@@ -84,6 +84,15 @@ public class PaperController {
         return new BaseResult<>(ResultEnum.SUCCESS, paperDetailVO);
     }
 
+    @PostMapping("/editPaper")
+    @RequireTeacher
+    public BaseResult<PaperDetailVO> editPaper(@Validated @RequestBody PaperEditRequest paperEditRequest,
+                                               HttpSession session) {
+        PaperDetailDTO paperDetailDTO = paperService.editPaper(paperEditRequest, getUserId(session));
+        PaperDetailVO paperDetailVO = DTOConvertToVOUtil.convertPaperDetailDTO(paperDetailDTO);
+        return new BaseResult<>(ResultEnum.SUCCESS, paperDetailVO);
+    }
+
     @PutMapping("/addProblem")
     @RequireTeacher
     public BaseResult<ProblemVO> addProblem(@Validated @RequestBody ProblemAddRequest problemAddRequest,
@@ -92,6 +101,15 @@ public class PaperController {
         ProblemDTO problemDTO = paperService.addProblem(userId, problemAddRequest);
         ProblemVO problemVO = DTOConvertToVOUtil.convertProblemDTO(problemDTO);
         return new BaseResult<>(ResultEnum.SUCCESS, problemVO);
+    }
+
+    @PostMapping("/editProblem")
+    @RequireTeacher
+    public BaseResult<PaperDetailVO> editProblem(@Validated @RequestBody ProblemEditRequest problemEditRequest,
+                                                 HttpSession session) {
+        PaperDetailDTO paperDetailDTO = paperService.editProblem(problemEditRequest, getUserId(session));
+        PaperDetailVO paperDetailVO = DTOConvertToVOUtil.convertPaperDetailDTO(paperDetailDTO);
+        return new BaseResult<>(ResultEnum.SUCCESS, paperDetailVO);
     }
 
     @PutMapping("/addImageInProblem")

@@ -48,7 +48,7 @@ public class Problem extends BaseEntity {
     /**
      * 选择题可选答案(JSON数组)
      */
-    @Column(length=256)
+    @Column(length=512)
     private String answer;
 
     /**
