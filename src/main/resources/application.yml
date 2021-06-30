@@ -14,10 +14,14 @@ spring:
     database-platform: mysql
     hibernate:
       ddl-auto: update
-    show-sql: true
+    #show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 minIO:
   #url: host.docker.internal
   url: localhost
