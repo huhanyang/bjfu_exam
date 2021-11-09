@@ -52,7 +52,7 @@ public class ExportServiceImpl implements ExportService {
         head.add(Collections.singletonList("答题人账号姓名"));
         head.add(Collections.singletonList("开始答题时间"));
         head.add(Collections.singletonList("结束答题时间"));
-        head.add(Collections.singletonList("是否答题超时"));
+        head.add(Collections.singletonList("答题状态"));
         // 1.2 表头的试卷收集项
         JSONArray collections =(JSONArray) JSONObject.parse(paper.getCollection());
         collections.forEach(collection -> head.add((Collections.singletonList((String) collection))));
@@ -66,12 +66,14 @@ public class ExportServiceImpl implements ExportService {
             // 2.1 答卷相关
             row.add(paperAnswer.getUser().getAccount());
             row.add(paperAnswer.getUser().getName());
-            row.add(paperAnswer.getCreatedTime().toString());
-            row.add(paperAnswer.getFinishTime().toString());
+            row.add(Optional.ofNullable(paperAnswer.getCreatedTime()).map(Object::toString).orElse(""));
+            row.add(Optional.ofNullable(paperAnswer.getFinishTime()).map(Object::toString).orElse(""));
             if(paperAnswer.getState().equals(PaperAnswerStateEnum.OVERTIME.getState())) {
-                row.add("已超时");
+                row.add("作答时间超时");
+            } else if(paperAnswer.getState().equals(PaperAnswerStateEnum.FINISH.getState())) {
+                row.add("作答完成");
             } else {
-                row.add("未超时");
+                row.add("作答中");
             }
             // 2.2 表头试卷收集项
             JSONObject collectionAnswers = (JSONObject) JSONObject.parse(paperAnswer.getCollectionAnswer());
