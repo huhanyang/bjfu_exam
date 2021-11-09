@@ -32,11 +32,8 @@ public class ExportController {
         try {
             response.setContentType("application/vnd.ms-excel");
             response.setCharacterEncoding("utf-8");
-            String fileName = URLEncoder.encode("测试", StandardCharsets.UTF_8)
-                    .replaceAll("\\+", "%20");
-            response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
             exportService.exportPaperAnswersToExcel(paperId, (Long) session.getAttribute("userId"),
-                    response.getOutputStream());
+                    response);
         } catch (Exception e) {
             log.error("export excel failed!", e);
             // 重置response

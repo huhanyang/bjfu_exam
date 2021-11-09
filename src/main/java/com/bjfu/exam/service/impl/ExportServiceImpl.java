@@ -20,8 +20,13 @@ import com.bjfu.exam.util.ExcelUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -33,7 +38,7 @@ public class ExportServiceImpl implements ExportService {
 
     @Override
     @Transactional
-    public void exportPaperAnswersToExcel(Long paperId, Long userId, OutputStream outputStream) {
+    public void exportPaperAnswersToExcel(Long paperId, Long userId, HttpServletResponse response) throws IOException {
         Optional<Paper> paperOptional = paperRepository.findById(paperId);
         if(paperOptional.isEmpty()) {
             throw new BadParamExceptionExam(ResultEnum.PAPER_NOT_EXIST);
@@ -45,6 +50,9 @@ public class ExportServiceImpl implements ExportService {
         if(!paper.getState().equals(PaperStateEnum.END_ANSWER.getState())) {
             throw new NotAllowOperationExceptionExam(ResultEnum.PAPER_STATE_IS_NOT_END_ANSWER);
         }
+        String fileName = URLEncoder.encode(paper.getTitle(), StandardCharsets.UTF_8)
+                .replaceAll("\\+", "%20");
+        response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
         // 1.创建表头
         List<List<String>> head = new LinkedList<>();
         // 1.1 表头答卷相关
@@ -93,7 +101,7 @@ public class ExportServiceImpl implements ExportService {
             });
             data.add(row);
         });
-        ExcelUtil.exportToExcel(outputStream, paper.getTitle(),head, data);
+        ExcelUtil.exportToExcel(response.getOutputStream(), paper.getTitle(), head, data);
     }
 
     /**

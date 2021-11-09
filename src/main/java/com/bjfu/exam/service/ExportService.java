@@ -1,5 +1,7 @@
 package com.bjfu.exam.service;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.io.OutputStream;
 
 /**
@@ -9,5 +11,5 @@ public interface ExportService {
     /**
      * 教师导出作答结束试卷的答题信息excel
      */
-    void exportPaperAnswersToExcel(Long paperId, Long userId, OutputStream outputStream);
+    void exportPaperAnswersToExcel(Long paperId, Long userId, HttpServletResponse response) throws IOException;
 }
