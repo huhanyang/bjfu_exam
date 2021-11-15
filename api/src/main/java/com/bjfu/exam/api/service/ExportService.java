@@ -1,4 +1,4 @@
-package com.bjfu.exam.service;
+package com.bjfu.exam.api.service;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;

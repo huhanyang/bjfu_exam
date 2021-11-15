@@ -1,4 +1,4 @@
-package exam.request.answer;
+package com.bjfu.exam.request.answer;
 
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;

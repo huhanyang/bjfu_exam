@@ -1,9 +1,11 @@
-package com.bjfu.exam.core.exception;
+package com.bjfu.exam.dao.exception;
 
 import com.bjfu.exam.api.enums.ResultEnum;
 
-public class OSSExceptionExam extends ExamBaseException {
+public class OSSExceptionExam extends RuntimeException {
+
+    private final ResultEnum resultEnum;
     public OSSExceptionExam(ResultEnum resultEnum) {
-        super(resultEnum);
+        this.resultEnum = resultEnum;
     }
 }

@@ -1,7 +1,7 @@
-package com.bjfu.exam.core.util;
+package com.bjfu.exam.utils;
 
 import com.bjfu.exam.api.enums.SessionKeyEnum;
-import com.bjfu.exam.dto.user.UserDTO;
+import com.bjfu.exam.core.dto.user.UserDTO;
 
 import javax.servlet.http.HttpSession;
 

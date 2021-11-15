@@ -1,2 +1,7 @@
-package com.bjfu.exam.core.params.answer;public class AnswerCreateProblemAnswerParams {
+package com.bjfu.exam.core.params.answer;
+
+import lombok.Data;
+
+@Data
+public class AnswerCreateProblemAnswerParams {
 }

@@ -1,4 +1,4 @@
-package com.bjfu.exam.core.util;
+package com.bjfu.exam.utils;
 
 import com.alibaba.fastjson.JSONObject;
 import com.bjfu.exam.api.enums.ResultEnum;

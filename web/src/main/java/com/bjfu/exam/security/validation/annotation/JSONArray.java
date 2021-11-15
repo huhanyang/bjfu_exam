@@ -1,6 +1,6 @@
-package exam.security.validation.annotation;
+package com.bjfu.exam.security.validation.annotation;
 
-import exam.security.validation.validator.JSONArrayValidator;
+import com.bjfu.exam.security.validation.validator.JSONArrayValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;

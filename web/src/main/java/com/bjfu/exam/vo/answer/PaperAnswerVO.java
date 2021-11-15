@@ -1,4 +1,4 @@
-package exam.vo.answer;
+package com.bjfu.exam.vo.answer;
 
 import lombok.Data;
 

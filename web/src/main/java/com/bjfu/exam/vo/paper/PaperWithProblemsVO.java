@@ -1,6 +1,6 @@
-package exam.vo.paper;
+package com.bjfu.exam.vo.paper;
 
-import exam.vo.user.UserVO;
+import com.bjfu.exam.vo.user.UserVO;
 import lombok.Data;
 
 import java.util.List;

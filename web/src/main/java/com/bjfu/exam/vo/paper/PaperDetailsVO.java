@@ -4,7 +4,7 @@ import com.bjfu.exam.vo.user.UserVO;
 import lombok.Data;
 
 @Data
-public class PaperDetailVO {
+public class PaperDetailsVO {
     /**
      * 试卷id
      */

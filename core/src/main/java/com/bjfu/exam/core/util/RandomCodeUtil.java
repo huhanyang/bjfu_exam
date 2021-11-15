@@ -1,4 +1,4 @@
-package com.bjfu.exam.util;
+package com.bjfu.exam.core.util;
 
 import java.util.Random;
 

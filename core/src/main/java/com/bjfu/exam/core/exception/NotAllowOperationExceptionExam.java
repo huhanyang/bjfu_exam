@@ -1,6 +1,6 @@
-package com.bjfu.exam.exception;
+package com.bjfu.exam.core.exception;
 
-import com.bjfu.exam.enums.ResultEnum;
+import com.bjfu.exam.api.enums.ResultEnum;
 
 public class NotAllowOperationExceptionExam extends ExamBaseException {
 

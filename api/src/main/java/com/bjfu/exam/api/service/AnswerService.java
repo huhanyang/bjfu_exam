@@ -1,7 +1,7 @@
-package com.bjfu.exam.service;
+package com.bjfu.exam.api.service;
 
-import com.bjfu.exam.dto.answer.PaperAnswerDTO;
-import com.bjfu.exam.dto.paper.ProblemDTO;
+import com.bjfu.exam.core.dto.answer.PaperAnswerDTO;
+import com.bjfu.exam.core.dto.paper.ProblemDTO;
 import com.bjfu.exam.request.answer.PaperAnswerCreateRequest;
 import com.bjfu.exam.request.answer.ProblemAnswerSubmitRequest;
 

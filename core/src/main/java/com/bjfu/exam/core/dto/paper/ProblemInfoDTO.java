@@ -1,4 +1,4 @@
-package com.bjfu.exam.api.dto.paper;
+package com.bjfu.exam.core.dto.paper;
 
 import lombok.Data;
 

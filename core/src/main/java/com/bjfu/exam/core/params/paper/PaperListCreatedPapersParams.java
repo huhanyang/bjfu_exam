@@ -7,6 +7,9 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class PaperListCreatedPaperParams extends PageRequest {
+public class PaperListCreatedPapersParams extends PageRequest {
+    /**
+     * 试卷状态
+     */
     private PaperStateEnum state;
 }

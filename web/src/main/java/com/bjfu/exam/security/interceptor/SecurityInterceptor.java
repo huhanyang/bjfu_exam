@@ -1,12 +1,12 @@
-package exam.security.interceptor;
+package com.bjfu.exam.security.interceptor;
 
-import exam.enums.ResultEnum;
-import exam.security.annotation.RequireAdmin;
-import exam.security.annotation.RequireLogin;
-import exam.security.annotation.RequireStudent;
-import exam.security.annotation.RequireTeacher;
-import exam.util.ResponseUtil;
-import exam.util.SessionUtil;
+import com.bjfu.exam.api.enums.ResultEnum;
+import com.bjfu.exam.security.annotation.RequireAdmin;
+import com.bjfu.exam.security.annotation.RequireLogin;
+import com.bjfu.exam.security.annotation.RequireStudent;
+import com.bjfu.exam.security.annotation.RequireTeacher;
+import com.bjfu.exam.utils.ResponseUtil;
+import com.bjfu.exam.utils.SessionUtil;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -18,6 +18,9 @@ import javax.servlet.http.HttpSession;
  * 权限控制拦截器
  */
 public class SecurityInterceptor extends HandlerInterceptorAdapter {
+
+    // todo isAdmin 要同时具备 isLogin的功能
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {

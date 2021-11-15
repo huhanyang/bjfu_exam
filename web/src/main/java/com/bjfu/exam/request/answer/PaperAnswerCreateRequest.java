@@ -1,6 +1,6 @@
-package exam.request.answer;
+package com.bjfu.exam.request.answer;
 
-import exam.security.validation.annotation.JSONObject;
+import com.bjfu.exam.security.validation.annotation.JSONObject;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 

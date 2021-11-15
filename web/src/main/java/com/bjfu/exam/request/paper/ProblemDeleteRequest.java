@@ -1,4 +1,4 @@
-package exam.request.paper;
+package com.bjfu.exam.request.paper;
 
 
 import lombok.Data;

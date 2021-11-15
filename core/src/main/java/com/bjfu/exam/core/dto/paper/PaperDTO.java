@@ -1,26 +1,23 @@
-package com.bjfu.exam.api.dto.paper;
+package com.bjfu.exam.core.dto.paper;
 
-import com.bjfu.exam.api.dto.user.UserDTO;
+import com.bjfu.exam.api.enums.PaperStateEnum;
+import com.bjfu.exam.core.dto.user.UserDTO;
 import lombok.Data;
 
 @Data
 public class PaperDTO {
     /**
-     * 试卷id
+     * 创建者
      */
-    private Long id;
+    private UserDTO creator;
     /**
      * 试卷代号
      */
     private String code;
     /**
-     * 创建者
-     */
-    private UserDTO creator;
-    /**
      * 试卷状态
      */
-    private Integer state;
+    private PaperStateEnum state;
     /**
      * 试卷标题
      */
@@ -34,11 +31,7 @@ public class PaperDTO {
      */
     private Integer time;
     /**
-     * 总答题人数
+     * 试卷收集项(JSON数组)
      */
-    private Integer paperAnswerCount;
-    /**
-     * 答题完成的人数
-     */
-    private Integer finishedPaperAnswerCount;
+    private String collection;
 }

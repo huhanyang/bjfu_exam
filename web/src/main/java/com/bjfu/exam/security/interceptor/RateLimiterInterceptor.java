@@ -1,7 +1,7 @@
-package exam.security.interceptor;
+package com.bjfu.exam.security.interceptor;
 
-import exam.enums.ResultEnum;
-import exam.util.ResponseUtil;
+import com.bjfu.exam.api.enums.ResultEnum;
+import com.bjfu.exam.utils.ResponseUtil;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
