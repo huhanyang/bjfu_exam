@@ -1,0 +1,32 @@
+
+server:
+  servlet:
+    context-path: /exam
+spring:
+  datasource:
+    username: root
+    password: my-secret-pw
+    #url: jdbc:mysql://host.docker.internal:3306/exam?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://localhost:3306/exam?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    #url: jdbc:mysql://www.huhanyang.cn:3306/exam?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database: mysql
+    database-platform: mysql
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+minIO:
+  #url: host.docker.internal
+  url: localhost
+  port: 9000
+  accessKey: minioadmin
+  secretKey: minioadmin
+  imgBucket: exam-img
