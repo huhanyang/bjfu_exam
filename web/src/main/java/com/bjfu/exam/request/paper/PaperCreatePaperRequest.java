@@ -1,6 +1,6 @@
 package com.bjfu.exam.request.paper;
 
-import com.bjfu.exam.security.validation.annotation.JSONArray;
+import com.bjfu.exam.interceptor.validation.annotation.JSONArray;
 import lombok.Data;
 import org.hibernate.validator.constraints.Length;
 

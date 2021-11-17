@@ -3,7 +3,6 @@ package com.bjfu.exam.controller;
 import com.alibaba.fastjson.JSONObject;
 import com.bjfu.exam.vo.BaseResult;
 import com.bjfu.exam.enums.ResultEnum;
-import com.bjfu.exam.security.annotation.RequireTeacher;
 import com.bjfu.exam.service.ExportService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,6 @@ public class ExportController {
     private ExportService exportService;
 
     @GetMapping("/exportPaper")
-    @RequireTeacher
     public void exportPaper(@NotNull(message = "试卷id不能为空!") Long paperId, HttpServletResponse response, HttpSession session) throws IOException {
         try {
             response.setContentType("application/vnd.ms-excel");

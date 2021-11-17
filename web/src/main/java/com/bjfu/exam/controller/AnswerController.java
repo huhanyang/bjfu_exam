@@ -6,7 +6,6 @@ import com.bjfu.exam.request.answer.PaperAnswerCreateRequest;
 import com.bjfu.exam.request.answer.ProblemAnswerSubmitRequest;
 import com.bjfu.exam.vo.BaseResult;
 import com.bjfu.exam.enums.ResultEnum;
-import com.bjfu.exam.security.annotation.RequireStudent;
 import com.bjfu.exam.service.AnswerService;
 import com.bjfu.exam.utils.DTOConvertToVOUtil;
 import com.bjfu.exam.vo.answer.PaperAnswerVO;
@@ -27,7 +26,6 @@ public class AnswerController {
     private AnswerService answerService;
 
     @GetMapping("/getPaperAnswers")
-    @RequireStudent
     public BaseResult<List<PaperAnswerVO>> getPaperAnswers(HttpSession session) {
         List<PaperAnswerDTO> paperAnswerDetailDTOS =
                 answerService.getPaperAnswers((Long) session.getAttribute("userId"));
@@ -38,7 +36,6 @@ public class AnswerController {
     }
 
     @PutMapping("/createPaperAnswer")
-    @RequireStudent
     public BaseResult<PaperAnswerVO> createPaperAnswer(@RequestBody PaperAnswerCreateRequest paperAnswerCreateRequest,
                                                        HttpSession session) {
         PaperAnswerDTO paperAnswerDTO =
@@ -48,7 +45,6 @@ public class AnswerController {
     }
 
     @GetMapping("/getNextProblem")
-    @RequireStudent
     public BaseResult<ProblemVO> getNextProblem(@NotNull(message = "答卷id不能为空!") Long paperAnswerId, HttpSession session) {
         ProblemDTO problemDTO =
                 answerService.getNextProblem((Long) session.getAttribute("userId"), paperAnswerId);
@@ -57,7 +53,6 @@ public class AnswerController {
     }
 
     @PutMapping("/submitAnswer")
-    @RequireStudent
     public BaseResult<Void> submitAnswer(@RequestBody ProblemAnswerSubmitRequest problemAnswerSubmitRequest,
                                                     HttpSession session) {
         answerService.submitAnswer((Long) session.getAttribute("userId"), problemAnswerSubmitRequest);

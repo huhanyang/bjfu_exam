@@ -14,7 +14,6 @@ import com.bjfu.exam.vo.BaseResult;
 import com.bjfu.exam.vo.user.UserDetailVO;
 import com.bjfu.exam.vo.user.UserVO;
 import com.bjfu.exam.request.user.UserRegisterRequest;
-import com.bjfu.exam.security.annotation.RequireAdmin;
 import com.bjfu.exam.utils.DTOConvertToVOUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,6 @@ public class AdminController {
     @Autowired
     private UserAO userAO;
 
-    @RequireAdmin
     @PutMapping("/createTeacher")
     public BaseResult<UserVO> createTeacher(@Validated @RequestBody UserRegisterRequest request) {
         UserRegisterParams userRegisterParams = new UserRegisterParams();
@@ -42,7 +40,6 @@ public class AdminController {
         return BaseResult.success(DTOConvertToVOUtil.convertUserDTO(teacherDTO));
     }
 
-    @RequireAdmin
     @GetMapping("/listUsers")
     public BaseResult<Page<UserDetailVO>> listUsers(@Validated AdminListUsersRequest request) {
         UserListUsersParams userListUsersParams = new UserListUsersParams();
@@ -52,7 +49,6 @@ public class AdminController {
         return BaseResult.success(userDTOPage.map(DTOConvertToVOUtil::convertToUserDetailVO));
     }
 
-    @RequireAdmin
     @PostMapping("/changeUserState")
     public BaseResult<UserVO> banTeacherAccount(@Validated @RequestBody AdminChangeUserStateRequest request) {
         UserChangeUserStateParams userChangeUserStateParams = new UserChangeUserStateParams();

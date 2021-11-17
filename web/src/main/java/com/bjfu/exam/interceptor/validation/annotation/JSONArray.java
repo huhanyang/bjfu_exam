@@ -1,6 +1,6 @@
-package com.bjfu.exam.security.validation.annotation;
+package com.bjfu.exam.interceptor.validation.annotation;
 
-import com.bjfu.exam.security.validation.validator.JSONObjectValidator;
+import com.bjfu.exam.interceptor.validation.validator.JSONArrayValidator;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
@@ -9,10 +9,10 @@ import java.lang.annotation.*;
 @Documented
 @Target({ElementType.PARAMETER, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = JSONObjectValidator.class)
-public @interface JSONObject {
+@Constraint(validatedBy = JSONArrayValidator.class)
+public @interface JSONArray {
 
-    String message() default "非json对象格式";
+    String message() default "非json数组格式";
 
     Class<?>[] groups() default {};
 

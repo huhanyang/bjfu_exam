@@ -19,6 +19,8 @@ public enum ResultEnum {
     ACCOUNT_NOT_EXIST_OR_PASSWORD_ERROR(201, "账号或密码错误"),
     ACCOUNT_EXIST(202, "账号重复"),
     ACCOUNT_NOT_EXIST(203, "账号不存在"),
+    TOKEN_ERROR(204, "token错误请重新登录"),
+    PERMISSION_DENIED(205, "无权限"),
 
     // 业务异常返回码
     NOT_TEACHER_CREATE_PAPER(301, "非教师用户创建试卷"),

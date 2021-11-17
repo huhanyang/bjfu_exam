@@ -11,8 +11,6 @@ import com.bjfu.exam.core.params.paper.PaperListCreatedPapersParams;
 import com.bjfu.exam.utils.SessionUtil;
 import com.bjfu.exam.vo.BaseResult;
 import com.bjfu.exam.request.paper.*;
-import com.bjfu.exam.security.annotation.RequireStudent;
-import com.bjfu.exam.security.annotation.RequireTeacher;
 import com.bjfu.exam.utils.DTOConvertToVOUtil;
 import com.bjfu.exam.vo.paper.PaperDetailsVO;
 import com.bjfu.exam.vo.paper.PaperVO;
@@ -39,7 +37,6 @@ public class PaperController {
      * @return 试卷信息
      * @throws BizException PAPER_NOT_EXIST
      */
-    @RequireStudent
     @GetMapping("/getByCode")
     public BaseResult<PaperVO> getPaper(@NotBlank(message = "试卷代码不能为空!") String code) {
         PaperDTO paperDTO = paperAO.getPaperByCode(code);
@@ -55,7 +52,6 @@ public class PaperController {
      * @throws BizException PAPER_NOT_EXIST
      * @throws BizException NOT_PAPER_CREATOR
      */
-    @RequireStudent
     @GetMapping("/getCreatedPaperDetails")
     public BaseResult<PaperDetailsVO> getCreatedPaperDetails(@NotNull(message = "试卷id不能为空!") Long paperId,
                                                              HttpSession session) {
@@ -70,7 +66,6 @@ public class PaperController {
      * @throws BizException PAPER_NOT_EXIST
      * @throws BizException NOT_PAPER_CREATOR
      */
-    @RequireStudent
     @GetMapping("/getCreatedPaper")
     public BaseResult<PaperVO> getCreatedPaper(@NotNull(message = "试卷id不能为空!") Long paperId,
                                                HttpSession session) {
@@ -78,7 +73,6 @@ public class PaperController {
         return BaseResult.success(DTOConvertToVOUtil.convertPaperDTO(paper));
     }
 
-    @RequireTeacher
     @PostMapping("/createPaper")
     public BaseResult<PaperVO> createPaper(@Validated @RequestBody PaperCreatePaperRequest request,
                                            HttpSession session) {
@@ -88,7 +82,6 @@ public class PaperController {
         return BaseResult.success(DTOConvertToVOUtil.convertPaperDTO(paper));
     }
 
-    @RequireTeacher
     @PostMapping("/editPaper")
     public BaseResult<PaperVO> editPaper(@Validated @RequestBody PaperEditPaperRequest request,
                                          HttpSession session) {
@@ -98,7 +91,6 @@ public class PaperController {
         return BaseResult.success(DTOConvertToVOUtil.convertPaperDTO(paper));
     }
 
-    @RequireTeacher
     @PostMapping("/changePaperState")
     public BaseResult<PaperVO> changePaperState(@Validated @RequestBody PaperChangePaperStateRequest request,
                                                 HttpSession session) {
@@ -106,7 +98,6 @@ public class PaperController {
         return BaseResult.success(DTOConvertToVOUtil.convertPaperDTO(paper));
     }
 
-    @RequireTeacher
     @GetMapping("/listCreatedPapers")
     public BaseResult<Page<PaperVO>> listCreatedPapers(@Validated PaperListCreatedPapersRequest request,
                                                        HttpSession session) {

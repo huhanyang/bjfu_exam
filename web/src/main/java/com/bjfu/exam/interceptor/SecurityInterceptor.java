@@ -1,10 +1,7 @@
-package com.bjfu.exam.security.interceptor;
+package com.bjfu.exam.interceptor;
 
 import com.bjfu.exam.api.enums.ResultEnum;
-import com.bjfu.exam.security.annotation.RequireAdmin;
-import com.bjfu.exam.security.annotation.RequireLogin;
-import com.bjfu.exam.security.annotation.RequireStudent;
-import com.bjfu.exam.security.annotation.RequireTeacher;
+import com.bjfu.exam.interceptor.annotation.HttpAuthCheck;
 import com.bjfu.exam.utils.ResponseUtil;
 import com.bjfu.exam.utils.SessionUtil;
 import org.springframework.web.method.HandlerMethod;
@@ -28,7 +25,7 @@ public class SecurityInterceptor extends HandlerInterceptorAdapter {
         boolean isHandlerMethod = handler.getClass().isAssignableFrom(HandlerMethod.class);
         if(isHandlerMethod) {
             HandlerMethod handlerMethod= ((HandlerMethod)handler);
-            boolean requireLogin = handlerMethod.getMethodAnnotation(RequireLogin.class) != null;
+            boolean requireLogin = handlerMethod.getMethodAnnotation(HttpAuthCheck.class) != null;
             boolean requireTeacher = handlerMethod.getMethodAnnotation(RequireTeacher.class) != null;
             boolean requireStudent = handlerMethod.getMethodAnnotation(RequireStudent.class) != null;
             boolean requireAdmin = handlerMethod.getMethodAnnotation(RequireAdmin.class) != null;

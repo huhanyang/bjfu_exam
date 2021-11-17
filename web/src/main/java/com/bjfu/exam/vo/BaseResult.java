@@ -1,7 +1,6 @@
 package com.bjfu.exam.vo;
 
 import com.bjfu.exam.api.enums.ResultEnum;
-import com.bjfu.exam.enums.ResultEnum;
 import lombok.Data;
 
 @Data

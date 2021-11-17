@@ -1,4 +1,4 @@
-package com.bjfu.exam.security.interceptor;
+package com.bjfu.exam.interceptor;
 
 import com.bjfu.exam.api.enums.ResultEnum;
 import com.bjfu.exam.utils.ResponseUtil;

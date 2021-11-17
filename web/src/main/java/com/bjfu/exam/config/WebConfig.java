@@ -1,8 +1,8 @@
 package com.bjfu.exam.config;
 
 
-import com.bjfu.exam.security.interceptor.RateLimiterInterceptor;
-import com.bjfu.exam.security.interceptor.SecurityInterceptor;
+import com.bjfu.exam.interceptor.RateLimiterInterceptor;
+import com.bjfu.exam.interceptor.SecurityInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
