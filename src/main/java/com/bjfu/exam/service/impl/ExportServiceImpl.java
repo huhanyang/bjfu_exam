@@ -6,6 +6,7 @@ import com.bjfu.exam.entity.answer.PaperAnswer;
 import com.bjfu.exam.entity.answer.ProblemAnswer;
 import com.bjfu.exam.entity.paper.Paper;
 import com.bjfu.exam.entity.paper.Problem;
+import com.bjfu.exam.entity.user.User;
 import com.bjfu.exam.enums.PaperAnswerStateEnum;
 import com.bjfu.exam.enums.PaperStateEnum;
 import com.bjfu.exam.enums.ProblemTypeEnum;
@@ -72,8 +73,8 @@ public class ExportServiceImpl implements ExportService {
         paperAnswers.forEach(paperAnswer -> {
             List<String> row = new LinkedList<>();
             // 2.1 答卷相关
-            row.add(paperAnswer.getUser().getAccount());
-            row.add(paperAnswer.getUser().getName());
+            row.add(Optional.ofNullable(paperAnswer.getUser()).map(User::getAccount).orElse(""));
+            row.add(Optional.ofNullable(paperAnswer.getUser()).map(User::getName).orElse(""));
             row.add(Optional.ofNullable(paperAnswer.getCreatedTime()).map(Object::toString).orElse(""));
             row.add(Optional.ofNullable(paperAnswer.getFinishTime()).map(Object::toString).orElse(""));
             if(paperAnswer.getState().equals(PaperAnswerStateEnum.OVERTIME.getState())) {
@@ -91,13 +92,25 @@ public class ExportServiceImpl implements ExportService {
             List<ProblemAnswer> problemAnswers = paperAnswer.getProblemAnswers();
             problemAnswers.forEach(problemAnswer -> {
                 row.add(problemAnswer.getAnswer());
-                if(problemAnswer.getProblem().getType().equals(ProblemTypeEnum.MATERIAL_PROBLEM.getType())) {
-                    row.add(DateUtil.calLastedTime(problemAnswer.getStartTime(), problemAnswer.getFirstEditTime()).toString());
-                    row.add(problemAnswer.getEditTime().toString());
+                if(Optional.ofNullable(problemAnswer.getProblem())
+                        .map(Problem::getType)
+                        .map(type -> type.equals(ProblemTypeEnum.MATERIAL_PROBLEM.getType()))
+                        .orElse(false)
+                ) {
+                    if (Objects.isNull(problemAnswer.getStartTime()) || Objects.isNull(problemAnswer.getFirstEditTime())) {
+                        row.add("");
+                    } else {
+                        row.add(DateUtil.calLastedTime(problemAnswer.getStartTime(), problemAnswer.getFirstEditTime()).toString());
+                    }
+                    row.add(Optional.ofNullable(problemAnswer.getEditTime()).map(String::valueOf).orElse(""));
                 }
-                row.add(DateUtil.calLastedTime(problemAnswer.getStartTime(), problemAnswer.getSubmitTime()).toString());
-                row.add(problemAnswer.getStartTime().toString());
-                row.add(problemAnswer.getSubmitTime().toString());
+                if (Objects.isNull(problemAnswer.getStartTime()) || Objects.isNull(problemAnswer.getSubmitTime())) {
+                    row.add("");
+                } else {
+                    row.add(DateUtil.calLastedTime(problemAnswer.getStartTime(), problemAnswer.getSubmitTime()).toString());
+                }
+                row.add(Optional.ofNullable(problemAnswer.getStartTime()).map(Date::toString).orElse(""));
+                row.add(Optional.ofNullable(problemAnswer.getSubmitTime()).map(Date::toString).orElse(""));
             });
             data.add(row);
         });

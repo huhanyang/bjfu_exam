@@ -8,7 +8,7 @@ spring:
     password: my-secret-pw
     #url: jdbc:mysql://host.docker.internal:3306/exam?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     url: jdbc:mysql://localhost:3306/exam?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
-    #url: jdbc:mysql://www.huhanyang.cn:3306/exam?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    #url: jdbc:mysql://49.232.112.133:3306/exam?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     database: mysql
